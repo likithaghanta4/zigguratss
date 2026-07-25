@@ -1,0 +1,294 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Mono:wght@400;700&display=swap');
+
+/* ══════════════════════════════════════════
+   WHEEL SCROLL CONTAINER
+   ══════════════════════════════════════════ */
+.wheel-scroll-container {
+  height: 200vh;
+  pointer-events: none;
+}
+
+/* ══════════════════════════════════════════
+   LEFT SIDE TEXT
+   ══════════════════════════════════════════ */
+.wheel-left-info {
+  position: absolute;
+  left: 120px;
+  top: 50%;
+  transform: translateY(-50%);
+  max-width: 280px;
+}
+
+/* "— Featured" eyebrow */
+.wl-eyebrow {
+  font-family: 'Space Mono', monospace;
+  font-size: 18px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: #888;
+  margin-bottom: 14px;
+  opacity: 1 !important;           /* override the general p opacity below */
+}
+
+/* Heading */
+.wheel-left-info h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 38px;
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -1px;
+  color: #111;
+  margin-bottom: 20px;
+}
+
+/* "Artists" italic accent */
+.wheel-left-info h2 em {
+  font-style: italic;
+  font-weight: 400;
+  color: #555;
+}
+
+/* Body copy */
+.wl-body {
+  font-family: 'Playfair Display', serif;
+  font-size: 15px;
+  font-style: italic;
+  line-height: 1.9;
+  color: #666;
+  opacity: 1 !important;
+}
+
+
+
+/* ══════════════════════════════════════════
+   FIXED WHEEL CONTAINER
+   ══════════════════════════════════════════ */
+.wheel-fixed {
+  position: absolute;   /* ✅ changed from fixed */
+  top: 50%;
+  transform: translateY(-50%);
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.wheel-section {
+  position: relative;   /* required for absolute child */
+  height: 100vh;        /* full screen section */
+  overflow: hidden;     /* prevents overflow */
+}
+
+/* ══════════════════════════════════════════
+   WHEEL ITEM (card)
+   ══════════════════════════════════════════ */
+.wheel-item {
+  border-radius: 20px;
+  overflow: visible;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  background: white;
+  will-change: transform, opacity;
+  pointer-events: auto;
+}
+
+.wheel-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 20px;    /* keep rounded corners on image too */
+}
+
+/* ══════════════════════════════════════════
+   TEXT SECTION  (right of card)
+   ══════════════════════════════════════════ */
+.wheel-item .text-section {
+  position: absolute;
+  left: 360px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 320px;
+}
+
+/* AR.05 large title */
+.wheel-fixed .wheel-item .text-section h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(68px, 8vw, 100px);
+  font-weight: 900;
+  line-height: 0.88;
+  letter-spacing: -3px;
+  color: #111;
+  margin-left: 45px !important;
+}
+
+/* The colored accent on the main title letters */
+.wt-title-main {
+  display: inline-block;
+  /* subtle gradient shimmer on the big title */
+  background: linear-gradient(135deg, #111 40%, #555 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* /10 — lighter weight, muted */
+.wheel-item .text-section h1 .slash {
+  font-size: 80px;
+  margin-left: 100px;
+  font-weight: 300;
+  font-style: italic;
+  letter-spacing: -1px;
+  color: #aaa;
+  -webkit-text-fill-color: #aaa;    /* override gradient on parent */
+}
+
+/* Thin divider line between title and name */
+.wt-divider {
+  width: 48px;
+  height: 2px;
+  background: #111;
+  margin: 14px 0 14px 120px;
+  transform-origin: left;
+}
+
+/* Artist name */
+.wheel-item .text-section p {
+  margin-right: 80px !important;
+  white-space: nowrap;
+}
+
+.wheel-item .author {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 700;
+  font-style: italic;
+  color: #111;
+  letter-spacing: 0.3px;
+  margin-left: 120px;
+}
+
+/* Designation */
+.designation {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #888;
+  margin-left: 122px;
+  margin-top: 8px;
+  font-weight: 400 !important;
+}
+
+/* Total artworks */
+.total-artwork {
+  font-family: 'Space Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #888;
+  margin-left: 122px;
+  margin-top: 4px;
+  font-weight: 400 !important;
+}
+
+/* ── small label below card (unused but kept) ── */
+.item-label {
+  text-align: center;
+  font-weight: 600;
+  margin-top: 12px;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+@media (max-width: 768px) {
+  .item-label { font-size: 1rem; margin-top: 8px; }
+}
+@media (max-width: 480px) {
+  .item-label { font-size: 0.8rem; margin-top: 4px; }
+}
+
+/* ══════════════════════════════════════════
+   MOBILE
+   ══════════════════════════════════════════ */
+@media (max-width: 768px) {
+
+   .featured-page-heading {
+    display: none;
+   }
+ 
+  .wheel-item { position: relative; }
+ 
+  .wheel-left-info { display: none; }
+ 
+  /* ── FIX: text-section sits to the RIGHT of the image ── */
+  .wheel-item .text-section {
+    position: absolute;
+    left: 61%;           /* right edge of the card */
+    top: 50%;
+    transform: translateY(-50%);
+    padding-left: 14px;
+    width: auto;
+    
+  }
+ 
+  /* ── FIX: AR.01/10 title — reset all desktop margin/size overrides ── */
+  .wheel-item .text-section h1,
+  .wheel-fixed .wheel-item .text-section h1 {
+   
+    line-height: 0.9 !important;
+    letter-spacing: -2px !important;
+    margin: 0 !important;
+    white-space: nowrap;
+  }
+ 
+  .wheel-item .text-section h1 .slash,
+  .wheel-item .text-section .slash {
+  
+    display: block;
+    margin: 5px 0 0 60px !important;
+  }
+ 
+  /* Divider hidden on mobile */
+  .wt-divider { display: none; }
+ 
+  /* ── Kept exactly from user's code ── */
+  .wheel-item .author {
+    position: absolute;
+    top: 100%;
+    left: -180%;
+    margin-top: 84px;
+    margin-right: 200px;
+    padding-right: 600px;
+    font-size: 20px;
+    text-align: left;
+  }
+ 
+  .wheel-item .designation {
+    position: absolute;
+    top: 100%;
+    left: -180%;
+    font-size: 15px;
+    margin-top: 110px;
+  }
+ 
+  .wheel-item .total-artwork {
+    position: absolute;
+    top: 100%;
+    left: -180%;
+    margin-top: 129px;
+    font-size: 14px;
+  }
+}
+ 
+/* ══════════════════════════════════════════
+   SMALL MOBILE  ≤ 480px
+   ══════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .wheel-item .text-section h1,
+  .wheel-fixed .wheel-item .text-section h1 {
+    font-size: 56px !important;
+  }
+  .wheel-item .text-section h1 .slash,
+  .wheel-item .text-section .slash {
+    font-size: 56px !important;
+  }
+}

@@ -1,0 +1,357 @@
+.post-row {
+    display: grid;
+    /* Balanced: 55% image and 45% content */
+    grid-template-columns: 55% 45%;
+    gap: 40px;
+    align-items: center;
+    padding: 18px 0;
+    border-bottom: 1px solid #eee;
+    box-sizing: border-box;
+    /* allow grid items to shrink on small viewports to avoid overflow */
+    min-width: 0;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.post-row { opacity: 0; transform: translateY(12px); animation: postFade 700ms ease forwards; }
+
+@keyframes postFade { to { opacity: 1; transform: translateY(0); } }
+
+.post-row.reverse {
+    direction: rtl;
+}
+
+.post-row.reverse .post-content { direction: ltr; }
+
+
+.post-image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    background: #fff;
+    border: 6px solid #c9a227;
+    transition: transform 0.45s ease, box-shadow 0.45s ease;
+    max-height: 500px;
+    box-sizing: border-box;
+}
+
+.post-image img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 450px;
+    object-fit: cover;
+}
+
+.post-image:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 40px 80px rgba(20,20,20,0.16);
+}
+
+.post-content {
+    padding: 8px 10px;
+    box-sizing: border-box;
+    /* allows the content column to shrink inside the grid without forcing overflow */
+    min-width: 0;
+    padding-left: 24px;
+    padding-right: 24px;
+}
+
+/* Featured post content: more compact padding */
+.post-row.featured .post-content {
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+/* ensure the image column visually reads as a golden section */
+.post-row .post-image {
+    box-shadow: none;
+}
+
+/* Featured post: golden panel on the image column only */
+.post-row.featured .post-image {
+    padding: 12px;
+    background: #fff3d6;
+    border: 8px solid #c9a227;
+    align-self: stretch;
+    min-height: auto;
+    box-shadow: 0 10px 30px rgba(201,146,39,0.06) inset;
+}
+
+.post-meta {
+    font-size: 12px;
+    color: #b88f3a;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    margin-bottom: 8px;
+}
+
+.post-title {
+    font-family: 'Playfair Display', serif;
+    /* responsive heading size: smaller on mobile, larger on desktop */
+    font-size: clamp(1.6rem, 4.5vw, 3rem);
+    line-height: 1.1;
+    margin-bottom: 10px;
+    letter-spacing: -0.15px;
+    /* safe wrapping rules to prevent overflow */
+    word-wrap: break-word;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    hyphens: auto;
+    /* ensure the title can shrink and wrap inside its container */
+    min-width: 0;
+}
+
+/* Featured post title: even smaller size */
+.post-row.featured .post-title {
+    font-size: clamp(1.5rem, 3.8vw, 2.6rem);
+    margin-bottom: 8px;
+}
+
+.post-title a { color: #111; }
+
+/* Word-by-word reveal for title */
+.post-title .word {
+    display: inline-block;
+    /* Make text visible by default for active articles */
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 350ms ease-out, transform 350ms ease-out;
+}
+
+/* ensure individual word spans can break if needed to avoid clipping */
+.post-title .word { white-space: normal; }
+
+.scroll-animate.visible .post-title .word {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.post-excerpt {
+    color: #666;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    font-size: 15px;
+}
+
+/* Featured post excerpt: even more compact */
+.post-row.featured .post-excerpt {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 16px;
+}
+
+
+.post-excerpt .word {
+    display: inline-block;
+    /* Make text visible by default for active articles */
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 320ms ease-out, transform 320ms ease-out;
+}
+
+.scroll-animate.visible .post-excerpt .word {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.post-readmore {
+    display: inline-block;
+    color: #111;
+    border-bottom: 2px solid #111;
+    padding-bottom: 3px;
+    font-weight: 600;
+}
+
+/* Reveal children in sequence when the parent wrapper (.scroll-animate) becomes visible */
+.scroll-animate .post-row {
+    opacity: 1; /* post-row itself is visible immediately when wrapper is visible */
+    animation: none; /* disable the earlier postFade so children control reveal */
+}
+
+/* Make all content visible by default for active articles */
+.post-row .post-meta,
+.post-row .post-title,
+.post-row .post-excerpt,
+.post-row .post-readmore,
+.post-row .post-image {
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 500ms ease-out, transform 500ms ease-out;
+}
+
+/* staggered reveal — each line appears after the previous */
+.scroll-animate.visible .post-row .post-image   { transition-delay: 0ms;   opacity: 1; transform: translateY(0); }
+.scroll-animate.visible .post-row .post-meta    { transition-delay: 120ms; opacity: 1; transform: translateY(0); }
+.scroll-animate.visible .post-row .post-title   { transition-delay: 260ms; opacity: 1; transform: translateY(0); }
+.scroll-animate.visible .post-row .post-excerpt { transition-delay: 420ms; opacity: 1; transform: translateY(0); }
+.scroll-animate.visible .post-row .post-readmore{ transition-delay: 580ms; opacity: 1; transform: translateY(0); }
+
+@media (max-width: 900px) {
+    .post-row { 
+        grid-template-columns: 1fr;
+        gap: 24px;
+        padding: 20px 16px;
+    }
+    
+    .post-row.reverse { 
+        direction: ltr; 
+    }
+    
+    /* On mobile make the golden border appear top and bottom instead of sides */
+    .post-image {
+        /* keep gold border on mobile as well (all sides) */
+        border: 6px solid #c9a227;
+        padding: 12px;
+        max-height: none;
+    }
+    
+    .post-image img { 
+        max-height: 380px; 
+        width: 100%; 
+        height: auto; 
+        object-fit: cover;
+    }
+    
+    .post-content { 
+        padding-left: 16px; 
+        padding-right: 16px; 
+    }
+    
+    .post-title {
+        font-size: clamp(1.6rem, 4.5vw, 2.8rem);
+        line-height: 1.15;
+    }
+
+    .post-excerpt {
+        font-size: 15px;
+        line-height: 1.7;
+    }
+}
+
+@media (max-width: 640px) {
+    .post-row {
+        padding: 16px 12px;
+        gap: 20px;
+    }
+
+    .post-image {
+        border: 5px solid #c9a227;
+        padding: 10px;
+    }
+
+    .post-image img {
+        max-height: 300px;
+    }
+
+    .post-content {
+        padding-left: 12px;
+        padding-right: 12px;
+    }
+
+    .post-meta {
+        font-size: 12px;
+        margin-bottom: 10px;
+    }
+
+    .post-title {
+        font-size: clamp(1.4rem, 5.5vw, 2.2rem);
+        margin-bottom: 10px;
+        line-height: 1.2;
+    }
+
+    .post-excerpt {
+        font-size: 14px;
+        line-height: 1.65;
+        margin-bottom: 16px;
+    }
+
+    .post-readmore {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .post-row {
+        padding: 14px 10px;
+        gap: 18px;
+    }
+
+    .post-image {
+        border: 4px solid #c9a227;
+        padding: 8px;
+    }
+
+    .post-image img {
+        max-height: 260px;
+    }
+
+    .post-content {
+        padding: 6px 10px;
+    }
+
+    .post-meta {
+        font-size: 11px;
+    }
+
+    .post-title {
+        font-size: clamp(1.3rem, 6.5vw, 2rem);
+    }
+
+    .post-excerpt {
+        font-size: 13px;
+        margin-bottom: 12px;
+        line-height: 1.6;
+    }
+
+    .post-readmore {
+        font-size: 12px;
+        padding-bottom: 2px;
+    }
+
+    .post-row.featured .post-image {
+        padding: 12px;
+        border: 6px solid #c9a227;
+        min-height: auto;
+    }
+}
+
+/* When inside a snap item, ensure content is vertically centered and doesn't overflow */
+.snap-item .post-row { 
+    padding: 16px 0; 
+}
+
+.snap-item .post-content { 
+    padding: 10px 16px; 
+}
+
+@media (max-width: 768px) {
+    .snap-item .post-row {
+        padding: 14px 0;
+    }
+    
+    .snap-item .post-content {
+        padding: 8px 12px;
+    }
+}
+
+@media (max-width: 640px) {
+    .snap-item .post-row {
+        padding: 12px 0;
+    }
+    
+    .snap-item .post-content {
+        padding: 6px 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .snap-item .post-row {
+        padding: 10px 0;
+    }
+    
+    .snap-item .post-content {
+        padding: 6px 8px;
+    }
+}

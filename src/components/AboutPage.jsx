@@ -1,0 +1,1222 @@
+import React, { useRef, useEffect, useState, useCallback } from 'react';
+// import Navbar from './NavBarr';
+import Navbar from './Navbar';
+import LuxuryHero from './LuxuryHero';
+import ImmersiveScroll from './ImmersiveScroll';
+import RevealOnScroll from './RevealOnScroll';
+
+import { motion, useScroll, useTransform, useSpring, useInView, useMotionValue } from 'framer-motion';
+
+// Easing constant used across components
+const EASE = [0.16, 1, 0.3, 1];
+
+
+/* ═══════════════════════════════════════════════════
+   2 · SCROLL PROGRESS TIMELINE
+   ═══════════════════════════════════════════════════ */
+const timelineData = [
+  {
+    year: 'The Genesis',
+    title: 'Our Story',
+    content:
+      'We started our journey with a thought of bringing worlds renowned and upcoming artists on one platform and connect them to the art collectors worldwide. Zigguratss is the beginning of a new era in the world of art business.',
+    image: 'https://images.unsplash.com/photo-1549880338-65ddcdfd017b?q=80&w=1200&auto=format',
+  },
+  {
+    year: 'Heritage',
+    title: 'A Brief History of Art',
+    content: `India, being the oldest and the first in the culture and also it's first in producing the different kind of artifacts or arts.
+Be it Vatsyayana who introduced art of love through Kamasutra or Raja Ravi Verma who portrayed the beauty of woman on canvas and brought it to life through his vision.
+There were times when artists used to engrave their craft on stones and walls, and later on it all converted into papers, canvas and painters like Rabindranath Tagore, Vincent Van Gogh, M.F. Hussain, Pablo Picasso, Amrita Sher Gill, Leonardo Da Vinci, Claude Monet and many more brought arts to life through their skills.`,
+    image: 'https://m.media-amazon.com/images/I/513rnVnTDeL._UF1000,1000_QL80_.jpg',
+  },
+  {
+    year: 'Legacy',
+    title: 'The Lineage of Masters',
+    content:
+      'There were times when artists used to engrave their craft on stones and walls, and later on it all converted into papers, canvas and painters like Rabindranath Tagore, Vincent Van Gogh, M.F. Hussain, Pablo Picasso, Amrita Sher Gill, Leonardo Da Vinci, Claude Monet and many more brought arts to life through their skills.',
+    image: 'https://www.theartstory.org/images20/works/old_masters_2.jpg',
+  },
+  {
+    year: 'Purpose',
+    title: 'Our Motive',
+    content: `OUR MOTIVE
+
+We believe that art is a medium of communication, innovation and above all, an inspiration. So, we at Zigguratss brings you the worlds spectacular all the original arts from the artists across the globe.
+
+We provide artists the space which enables them to sell their artwork globally and connect with their respective audience and admirers and also manage the sale of their artwork, because art is valuable & precious and the artist should get proper acknowledge for their work.`,
+    image: 'https://zigguratss.com/assets/images/motiveimage.jpg',
+  },
+  {
+    year: 'Mission',
+    title: 'Empowering Artists',
+    content:
+      'We provide artists the space which enables them to sell their artwork globally and connect with their respective audience and admirers and also manage the sale of their artwork, because art is valuable & precious and the artist should get proper acknowledge for their work.',
+    image: 'https://classbento.com.au/images/article/empowering-artists-to-earn-more-doing-what-they-love-800.jpg',
+  },
+];
+
+const TimelineSection = () => {
+  const containerRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start end', 'end start'],
+  });
+
+  const lineHeight = useTransform(scrollYProgress, [0.05, 0.95], ['0%', '100%']);
+  const smoothHeight = useSpring(lineHeight, { stiffness: 60, damping: 30 });
+
+  return (
+    <section id="story" ref={containerRef} className="relative w-full max-w-full py-8 sm:py-12 lg:py-16 overflow-x-hidden">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10 mb-6 sm:mb-8 text-center">
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{ duration: 1, ease: EASE }}
+          className="font-sans text-xs tracking-[0.3em] sm:tracking-[0.4em] uppercase text-gallery-accent mb-4"
+        >
+          Chronicle
+        </motion.p>
+
+        <motion.h2
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, amount: 0.5 }}
+          transition={{ duration: 1.2, ease: EASE, delay: 0.1 }}
+          className="font-serif text-3xl sm:text-4xl lg:text-5xl xl:text-6xl text-gallery-dark"
+        >
+          The Zigguratss <span className="italic text-gallery-accent">Chronicle</span>
+        </motion.h2>
+      </div>
+
+      <div className="relative w-full max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
+        <div className="absolute left-4 sm:left-6 lg:left-8 xl:left-10 top-0 bottom-0 w-px">
+          <div className="h-full w-full bg-gallery-subtle" />
+          <motion.div style={{ height: smoothHeight }} className="absolute top-0 left-0 w-full bg-gallery-accent origin-top" />
+        </div>
+
+        <div className="space-y-6 sm:space-y-8 lg:space-y-12">
+          {timelineData.map((item, i) => (
+            <TimelineMilestone key={i} item={item} index={i} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const TimelineMilestone = ({ item, index }) => {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, amount: 0.3 });
+
+  const rowReverse = index % 2 === 1 ? 'lg:flex-row-reverse' : '';
+
+  return (
+    <div ref={ref} className={`relative pl-8 sm:pl-12 lg:pl-16 w-full max-w-full`}>
+      {/* Dot on timeline */}
+      <motion.div
+        initial={{ scale: 0 }}
+        animate={inView ? { scale: 1 } : {}}
+        transition={{ duration: 0.6, ease: EASE, delay: 0.2 }}
+        className="absolute left-0 top-2 w-3 h-3 -translate-x-[5px]"
+      >
+        <div className="w-full h-full rounded-full bg-gallery-accent" />
+        <div className="absolute inset-0 rounded-full bg-gallery-accent/30 animate-ping" />
+      </motion.div>
+
+      <div className={`relative z-0 flex flex-col lg:flex-row items-start gap-4 sm:gap-6 ${rowReverse} w-full max-w-full`}>
+        {/* Side image */}
+        {item.image && (
+          <figure className="w-full lg:w-1/3 rounded-lg overflow-hidden">
+            <img
+              src={item.image}
+              alt={item.title}
+              loading="lazy"
+              className="w-full h-40 sm:h-48 md:h-56 lg:h-56 object-cover rounded-md shadow-sm"
+              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            />
+          </figure>
+        )}
+
+        {/* Text content */}
+        <div className="w-full lg:w-2/3 max-w-full">
+          <motion.div
+            initial={{ opacity: 0, x: -30 }}
+            animate={inView ? { opacity: 1, x: 0 } : {}}
+            transition={{ duration: 0.8, ease: EASE, delay: 0.1 }}
+            className="font-sans text-[10px] tracking-[0.3em] sm:tracking-[0.4em] uppercase text-gallery-accent mb-3"
+          >
+            {item.year}
+          </motion.div>
+
+          <motion.h3
+            initial={{ opacity: 0, y: 30 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 1, ease: EASE, delay: 0.2 }}
+            className="font-serif text-xl sm:text-2xl lg:text-3xl xl:text-4xl text-gallery-dark mb-4"
+          >
+            {item.title}
+          </motion.h3>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, ease: EASE, delay: 0.4 }}
+            className="font-sans text-sm sm:text-base text-gallery-muted leading-[1.6] break-words"
+          >
+            {item.content}
+          </motion.p>
+
+          <motion.div
+            initial={{ scaleX: 0 }}
+            animate={inView ? { scaleX: 1 } : {}}
+            transition={{ duration: 1, ease: EASE, delay: 0.6 }}
+            className="mt-6 sm:mt-8 h-px w-16 sm:w-24 bg-gallery-subtle origin-left"
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+/* ═══════════════════════════════════════════════════
+   3 · ARTWORK GALLERY — CURATED COLLECTION
+   ═══════════════════════════════════════════════════ */
+const artworks = [
+  {
+    id: 1,
+    title: 'Tune Of Bengal — 4',
+    artist: 'Sekhar Roy',
+    medium: 'Acrylic on Canvas',
+    price: '₹ 4,16,000',
+    dimensions: '121.92 × 91.44 cm',
+    image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=1200&auto=format',
+  },
+  {
+    id: 2,
+    title: 'Tune Of Bengal — 3',
+    artist: 'Sekhar Roy',
+    medium: 'Acrylic on Canvas',
+    price: '₹ 8,32,000',
+    dimensions: '152.40 × 121.92 cm',
+    image: 'https://images.unsplash.com/photo-1549490349-8643362247b5?q=80&w=1200&auto=format',
+  },
+  {
+    id: 3,
+    title: 'The Juggler Within',
+    artist: 'Pramod Neelakandan',
+    medium: 'Mixed Media',
+    price: '₹ 45,500',
+    dimensions: '60.96 × 45.72 cm',
+    image: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?q=80&w=1200&auto=format',
+  },
+  {
+    id: 4,
+    title: 'Ocean Of Dreams',
+    artist: 'Uttam Bhattacharya',
+    medium: 'Oil on Canvas',
+    price: '₹ 52,000',
+    dimensions: '76.20 × 101.60 cm',
+    image: 'https://images.unsplash.com/photo-1551913902-c92207136625?q=80&w=1200&auto=format',
+  },
+  {
+    id: 5,
+    title: 'Eternal Grace',
+    artist: 'Priyanka Bardhan',
+    medium: 'Watercolor',
+    price: '₹ 68,750',
+    dimensions: '76.20 × 76.20 cm',
+    image: 'https://images.unsplash.com/photo-1578301978162-7aae4d755744?q=80&w=1200&auto=format',
+  },
+  {
+    id: 6,
+    title: 'Melody of Feathers',
+    artist: 'Priyanka Bardhan',
+    medium: 'Watercolor on Paper',
+    price: '₹ 68,750',
+    dimensions: '76.20 × 91.44 cm',
+    image: 'https://images.unsplash.com/photo-1577083552431-6e5fd01988ec?q=80&w=1200&auto=format',
+  },
+  {
+    id: 7,
+    title: 'Inner Peace 6',
+    artist: 'Monalisa Sarkar Mitra',
+    medium: 'Acrylic on Canvas',
+    price: '₹ 1,17,000',
+    dimensions: '91.44 × 91.44 cm',
+    image: 'https://images.unsplash.com/photo-1561214115-f2f134cc4912?q=80&w=1200&auto=format',
+  },
+  {
+    id: 8,
+    title: 'Serene Horizons',
+    artist: 'Ananya Gupta',
+    medium: 'Oil on Linen',
+    price: '₹ 95,000',
+    dimensions: '91.44 × 121.92 cm',
+    image: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=1200&auto=format',
+  },
+  {
+    id: 9,
+    title: 'Fragments of Time',
+    artist: 'Rajeev Kapoor',
+    medium: 'Mixed Media on Board',
+    price: '₹ 1,25,000',
+    dimensions: '101.60 × 76.20 cm',
+    image: 'https://images.unsplash.com/photo-1547891654-e66ed7ebb968?q=80&w=1200&auto=format',
+  },
+  {
+    id: 10,
+    title: 'Golden Whisper',
+    artist: 'Sunita Devi',
+    medium: 'Acrylic & Gold Leaf',
+    price: '₹ 2,10,000',
+    dimensions: '121.92 × 121.92 cm',
+    image: 'https://images.unsplash.com/photo-1518998053901-5348d3961a04?q=80&w=1200&auto=format',
+  },
+  {
+    id: 11,
+    title: 'Urban Pulse',
+    artist: 'Karthik Menon',
+    medium: 'Digital Print on Canvas',
+    price: '₹ 38,000',
+    dimensions: '60.96 × 91.44 cm',
+    image: 'https://images.unsplash.com/photo-1459908676235-d5f02a50184b?q=80&w=1200&auto=format',
+  },
+  {
+    id: 12,
+    title: 'Whispers of the Ganges',
+    artist: 'Deepa Sharma',
+    medium: 'Watercolor on Handmade Paper',
+    price: '₹ 72,000',
+    dimensions: '76.20 × 55.88 cm',
+    image: 'https://images.unsplash.com/photo-1544967082-d9d25d867d66?q=80&w=1200&auto=format',
+  },
+];
+
+/* ═══════════════════════════════════════════════════
+   ARTWORK GALLERY SECTION WITH RESPONSIVE GRID
+   ═══════════════════════════════════════════════════ */
+const ArtworkGallerySection = () => {
+  return (
+    <section className="relative w-full max-w-full py-16 sm:py-20 lg:py-24 bg-white">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Section Header */}
+        <div className="mb-12 text-center">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, ease: EASE }}
+            className="font-sans text-xs tracking-[0.4em] uppercase text-gallery-accent mb-4"
+          >
+            Curated Collection
+          </motion.p>
+          <motion.h2
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.2, ease: EASE, delay: 0.1 }}
+            className="font-serif text-3xl sm:text-4xl lg:text-5xl xl:text-6xl text-gallery-dark"
+          >
+            Featured <span className="italic text-gallery-accent">Artworks</span>
+          </motion.h2>
+        </div>
+
+        {/* Responsive Grid Layout */}
+        <div className="w-full max-w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          {artworks.map((artwork, index) => (
+            <ArtworkCard key={artwork.id} artwork={artwork} index={index} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const ArtworkCard = ({ artwork, index }) => {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, amount: 0.2 });
+
+  return (
+    <motion.article
+      ref={ref}
+      initial={{ opacity: 0, y: 60 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.8, ease: EASE, delay: index * 0.1 }}
+      className="group relative w-full max-w-full flex flex-col bg-white rounded-lg shadow-sm hover:shadow-2xl transition-shadow duration-500"
+    >
+      {/* Image Container */}
+      <div className="relative w-full aspect-[4/5] overflow-hidden rounded-t-lg">
+        <img
+          src={artwork.image}
+          alt={artwork.title}
+          loading="lazy"
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          onError={(e) => { 
+            e.currentTarget.src = 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=600&auto=format';
+          }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      </div>
+
+      {/* Content */}
+      <div className="flex-1 p-5 sm:p-6 flex flex-col">
+        <h3 className="font-serif text-2xl sm:text-3xl font-bold text-gallery-dark mb-2 group-hover:text-gallery-accent transition-colors duration-300">
+          {artwork.title}
+        </h3>
+        
+        <p className="font-sans text-sm text-gallery-muted mb-3">
+          by {artwork.artist}
+        </p>
+        
+        <div className="mt-auto space-y-2">
+          <div className="flex items-center justify-between text-sm">
+            <span className="font-sans text-gallery-muted">{artwork.medium}</span>
+          </div>
+          
+          <div className="flex items-center justify-between text-sm">
+            <span className="font-sans text-gallery-muted">{artwork.dimensions}</span>
+          </div>
+          
+          <div className="pt-3 border-t border-gallery-subtle">
+            <p className="font-serif text-2xl text-gallery-dark font-semibold">
+              {artwork.price}
+            </p>
+          </div>
+        </div>
+      </div>
+    </motion.article>
+  );
+};
+
+
+// ═══════════════════════════════════════════════════
+// 3 · ABOUT PAGE FULL CONTENT SECTION (100% WIDTH)
+// ═══════════════════════════════════════════════════
+const AboutContentSection = () => {
+  const imgRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: imgRef,
+    offset: ['start end', 'end start'],
+  });
+  const y = useTransform(scrollYProgress, [0, 1], [0, -40]);
+  const smoothY = useSpring(y, { stiffness: 80, damping: 35 });
+
+  return (
+    <section className="w-full max-w-full pt-2 pb-6 sm:pb-10 bg-white overflow-x-hidden">
+      <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 xl:px-10">
+        <div className="grid grid-cols-1 lg:grid-cols-[40%_60%] gap-6 lg:gap-8 items-center">
+        {/* Text column */}
+        <div className="w-full max-w-full">
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: EASE }}
+            className="font-sans text-xs tracking-[0.3em] sm:tracking-[0.4em] uppercase text-gallery-accent mb-4"
+          >
+            Welcome to Zigguratss
+          </motion.p>
+
+          <LuxuryHero />
+
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, ease: EASE, delay: 0.1 }}
+            className="font-sans text-base sm:text-lg text-gallery-muted w-full max-w-2xl mb-4"
+          >
+            We welcome Artists around the world to showcase their work here. Our aim and mission is to bring both the Artist's and Art lovers at one stage.
+          </motion.p>
+
+          {/* Stats */}
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.15 }}
+            className="flex flex-wrap gap-3 sm:gap-4 items-center mb-4 w-full"
+          >
+            {[
+              { label: '500+', sub: 'Original Works' },
+              { label: '120+', sub: 'Global Artists' },
+              { label: '30+', sub: 'Countries Served' },
+            ].map((s) => (
+              <div key={s.label} className="flex-shrink-0 bg-gallery-accent/10 rounded-md px-3 sm:px-4 py-2 sm:py-3">
+                <div className="font-serif text-xl sm:text-2xl text-gallery-dark font-semibold">{s.label}</div>
+                <div className="text-xs text-gallery-muted">{s.sub}</div>
+              </div>
+            ))}
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.25 }}
+            className="flex flex-wrap gap-3 sm:gap-4 w-full"
+          >
+            <a href="/artworks" className="px-4 sm:px-6 py-2 sm:py-3 bg-black text-white font-sans text-xs sm:text-sm font-semibold rounded-none hover:scale-[1.01] transition-transform">Explore Collection</a>
+            <a href="#story" className="px-4 sm:px-6 py-2 sm:py-3 text-black underline font-sans text-xs sm:text-sm font-semibold rounded-md hover:bg-gallery-accent/5 transition-colors">Our Story</a>
+          </motion.div>
+        </div>
+
+        {/* Image column with subtle parallax */}
+        <motion.div
+          ref={imgRef}
+          initial={{ opacity: 0, x: 30 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true, amount: 0.2 }}
+          transition={{ duration: 1, ease: EASE, delay: 0.1 }}
+          className="w-full max-w-full rounded-lg overflow-hidden shadow-lg"
+        >
+          <motion.img
+            src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/26/Abraham_Mignon_-_Flowers_in_a_metal_vase.jpg/500px-Abraham_Mignon_-_Flowers_in_a_metal_vase.jpg?20190327095151"
+            alt="Flowers in a metal vase by Abraham Mignon"
+            loading="lazy"
+            onError={(e) => { e.currentTarget.style.display = 'none'; }}
+            style={{ y: smoothY }}
+            className="w-full h-[300px] sm:h-[400px] md:h-[500px] lg:h-[600px] xl:h-[700px] object-cover"
+          />
+        </motion.div>
+      </div>
+    </div>
+  </section>
+  );
+};
+
+/* ═══════════════════════════════════════════════════
+   4 · EDITORIAL QUOTE BREAK
+   ═══════════════════════════════════════════════════ */
+const QuoteBreak = () => {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start end', 'end start'],
+  });
+  const y = useTransform(scrollYProgress, [0, 1], [60, -60]);
+
+  return (
+    <section
+      ref={ref}
+      className="relative w-full max-w-full py-12 sm:py-16 bg-gallery-dark"
+    >
+      <div className="absolute inset-0 bg-grain opacity-40" />
+
+      <motion.div
+        style={{ y }}
+        className="relative z-10 max-w-4xl mx-auto px-6 sm:px-10 lg:px-16 text-center"
+      >
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1.5 }}
+          className="font-serif text-6xl sm:text-8xl text-gallery-accent/20 mb-4 leading-none select-none"
+        >
+          "
+        </motion.div>
+        <motion.blockquote
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1.2, ease: EASE }}
+          className="font-serif text-2xl sm:text-3xl lg:text-4xl text-white/90 leading-[1.4] italic"
+        >
+          All Artworks have the power to captivate and inspire. Whether it's
+          through the lens of a camera or the brush strokes of a painter, each
+          of these art forms has the ability to evoke emotions, tell a story,
+          and bring{' '}
+          <span className="text-gallery-accent not-italic">joy to those who experience them</span>.
+        </motion.blockquote>
+
+        <motion.div
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1, ease: EASE, delay: 0.3 }}
+          className="mx-auto mt-6 h-px w-16 bg-gallery-accent/40 origin-center"
+        />
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+          className="mt-6 font-sans text-xs tracking-[0.3em] uppercase text-white/40"
+        >
+          — Zigguratss Manifesto
+        </motion.p>
+      </motion.div>
+    </section>
+  );
+};
+
+/* ═══════════════════════════════════════════════════
+   4 · TEAM — GLASSMORPHISM CARDS
+   ═══════════════════════════════════════════════════ */
+const teamMembers = [
+  {
+    name: 'AKANSHA N BHATT',
+    role: 'AVP - Client Relations',
+    bio: `She is pursuing her career in Public Relations but gained experience in marketing at American Express. It was her passion for art that led her to join ZIGGURATSS, from the very beginning. She is the global head of client relations at ZIGGURATSS, and has been with the company since its inception in 2021. During her tenure, she has undertaken several roles, from business development and marketing to event management and operations. She now focusses on ZIGGURATSS domestic and international expansion, strategy, as well as building up the team. She is fond of cinema and travelling and when she's in private she enjoys live music!`,
+    image: 'https://zigguratss.com/assets/images/akansha.jpg',
+    accent: 'from-rose-300/20 to-transparent',
+  },
+  {
+    name: 'VIJAY BHATT',
+    role: 'Founder & CEO',
+    bio: `He is an emerging entrepreneur with vast knowledge in the field of ARTS. He is an ardent fan of original Artwork, and loves to bring forward the spectacular works of famous artists from across the globe to one point i.e. THE ZIGGURATSS, where the whole world and its amazing Artwork comes alive from them to You. Vijay is bent upon promoting the bestest of ART and giving a platform for new-comers and established artists too with a zeal to represent their talent on ZIGGURATSS.`,
+    image: 'https://zigguratss.com/assets/images/vijaypiclatest.jpg',
+    accent: 'from-gallery-accent/20 to-transparent',
+  },
+  {
+    name: 'MUKESH DABRAL',
+    role: 'Co-Founder & CFO',
+    bio: `He is a MBA (Finance) professional and he has worked with professionally managed corporates in the capacity of Senior Finance and Accounts Manager. He has experience of handling corporate affairs in different areas for more than 7 Years. He has helped organisations to grow business in India and operating it smoothly. Mukesh has vast knowledge and a thorough understanding of Accounting Rules and Regulations, as well as the complex corporate taxation system.`,
+    image: 'https://zigguratss.com/assets/images/mukesh.jpg',
+    accent: 'from-blue-300/20 to-transparent',
+  },
+  {
+    name: 'AJAY SINGH',
+    role: 'Co-Founder & AVP-S & M',
+    bio: `Ajay is the Co-Founder & AVP- Sales & Marketing and also looks after the technology part of ZIGGURATSS. He is responsible for all aspects of growing and marketing ZIGGURATSS to establish its presence and dominance in the online artwork market. He designed and developed not only the ZIGGURATSS online store, but also the resource planning, customer relationship and supply chain management systems that ZIGGURATSS do every day.`,
+    image: 'https://zigguratss.com/assets/images/ajay.jpeg',
+    accent: 'from-emerald-300/20 to-transparent',
+  },
+];
+
+const TeamSection = () => (
+  <section className="relative w-full max-w-full py-12 sm:py-16">
+    {/* Section header */}
+    <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16 mb-6">
+      <motion.p
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 1, ease: EASE }}
+        className="font-sans text-xs tracking-[0.4em] uppercase text-gallery-accent mb-3"
+      >
+        The Collective
+      </motion.p>
+      <motion.h2
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 1.2, ease: EASE, delay: 0.1 }}
+        className="font-serif text-4xl sm:text-5xl lg:text-6xl text-gallery-dark"
+      >
+        Meet Our <span className="italic text-gallery-accent">Team</span>
+      </motion.h2>
+      <motion.p
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        viewport={{ once: true }}
+        transition={{ duration: 1, delay: 0.3 }}
+        className="mt-6 font-sans text-base text-gallery-muted max-w-lg leading-relaxed"
+      >
+        Four distinct perspectives united by a singular conviction — that art
+        transcends commerce when handled with reverence.
+      </motion.p>
+    </div>
+
+    {/* Cards grid */}
+    <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+        {teamMembers.map((member, i) => (
+          <TeamCard key={member.name} member={member} index={i} />
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+const TeamCard = ({ member, index }) => {
+  const ref = useRef(null);
+  const [expanded, setExpanded] = useState(false);
+
+  const shortBio = member.bio.length > 180 ? member.bio.slice(0, 180) + '…' : member.bio;
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 60 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.2 }}
+      transition={{ duration: 0.8, ease: EASE, delay: index * 0.2 }}
+      whileHover={{ scale: 1.05, boxShadow: '0 20px 40px rgba(0,0,0,0.12)' }}
+      className="group relative w-full max-w-full"
+      data-magnetic
+    >
+      <div className="relative transition-all duration-700">
+        <div
+          className="relative overflow-hidden rounded-2xl p-6 sm:p-8"
+          style={{
+            background: 'rgba(255, 255, 255, 0.55)',
+            backdropFilter: 'blur(14px)',
+            WebkitBackdropFilter: 'blur(14px)',
+            border: '0.5px solid rgba(201, 169, 110, 0.12)',
+            boxShadow: '0 10px 36px rgba(0, 0, 0, 0.06)',
+          }}
+          onClick={() => setExpanded((s) => !s)}
+        >
+          <div
+            className={`absolute -top-20 -right-20 w-40 h-40 rounded-full bg-gradient-to-br ${member.accent} blur-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-700`}
+          />
+
+          {/* Portrait (click to view larger) */}
+          <div className="relative w-40 h-40 mx-auto mb-6 overflow-hidden rounded-full">
+            <img
+              src={member.image}
+              alt={member.name}
+              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 rounded-full border border-gallery-accent/20" />
+          </div>
+
+          <div className="text-center relative z-10">
+            <h3 className="font-serif text-xl sm:text-2xl font-bold text-gallery-dark mb-1 group-hover:text-gallery-accent transition-colors duration-300">
+              {member.name}
+            </h3>
+            <p className="font-sans text-[10px] tracking-[0.25em] uppercase text-gallery-accent mb-4">
+              {member.role}
+            </p>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              className="font-sans text-sm text-gallery-muted leading-relaxed"
+            >
+              {expanded ? (
+                <motion.p initial={{ height: 0 }} animate={{ height: 'auto' }} transition={{ duration: 0.4 }}>
+                  {member.bio}
+                </motion.p>
+              ) : (
+                <p>{shortBio}</p>
+              )}
+            </motion.div>
+
+            <button
+              aria-expanded={expanded}
+              className="mt-3 text-xs font-medium text-gallery-accent hover:underline"
+              onClick={(e) => {
+                e.stopPropagation();
+                setExpanded((s) => !s);
+              }}
+            >
+              {expanded ? 'Show less' : 'Read more'}
+            </button>
+          </div>
+
+          <motion.div
+            initial={{ scaleX: 0 }}
+            whileInView={{ scaleX: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: 0.4 + index * 0.05 }}
+            className="mt-6 h-px w-full bg-gradient-to-r from-transparent via-gallery-accent/30 to-transparent origin-center"
+          />
+        </div>
+      </div>
+
+      {/* overlay preview removed per UX request */}
+    </motion.div>
+  );
+};
+
+/* ═══════════════════════════════════════════════════
+   5 · VALUES / PROMISES
+   ═══════════════════════════════════════════════════ */
+const values = [
+  {
+    icon: (
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-1.657 0-3 1.567-3 3.5S10.343 15 12 15s3-1.567 3-3.5S13.657 8 12 8z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2m0 14v2M4.2 6.2l1.4 1.4M18.4 18.4l1.4 1.4M3 12h2m14 0h2M4.2 17.8l1.4-1.4M18.4 5.6l1.4-1.4" />
+      </svg>
+    ),
+    title: 'Curated Selection',
+    description: 'Hand-picked works by our curatorial team.',
+  },
+  {
+    icon: (
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 11c1.657 0 3-1.567 3-3.5S13.657 4 12 4s-3 1.567-3 3.5S10.343 11 12 11z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M4 13c2 4 6 7 8 7s6-3 8-7" />
+      </svg>
+    ),
+    title: 'Authenticity Guarantee',
+    description: 'All works are verified by experts.',
+  },
+  {
+    icon: (
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 7h18M7 7v10a4 4 0 004 4h2a4 4 0 004-4V7" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V5a4 4 0 014-4h0a4 4 0 014 4v2" />
+      </svg>
+    ),
+    title: 'Bespoke Consultation',
+    description: 'Guidance to place art in your space.',
+  },
+  {
+    icon: (
+      <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 11V7m0 8v-2" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M5 12h14" />
+      </svg>
+    ),
+    title: 'Dedicated Support',
+    description: 'Assistance at every step of your purchase.',
+  },
+];
+
+const ValuesSection = () => (
+  <section className="relative py-8 bg-gallery-warm">
+    <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {values.map((val, i) => (
+          <motion.div
+            key={val.title}
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, ease: EASE, delay: i * 0.1 }}
+            className="text-center group"
+            data-magnetic
+          >
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full border border-gallery-accent/20 text-gallery-accent mb-5 group-hover:bg-gallery-accent group-hover:text-gallery-dark transition-all duration-500">
+              {val.icon}
+            </div>
+            <h4 className="font-serif text-xl font-bold text-gallery-dark mb-2">
+              {val.title}
+            </h4>
+            <p className="font-sans text-sm text-gallery-muted leading-relaxed">
+              {val.description}
+            </p>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  </section>
+);
+
+/* ═══════════════════════════════════════════════════
+   6 · CLOSING CTA — LIVE WITH ART
+   ═══════════════════════════════════════════════════ */
+const ClosingCTA = () => {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ['start end', 'end start'],
+  });
+  const bgY = useTransform(scrollYProgress, [0, 1], ['-10%', '10%']);
+
+  return (
+    <section ref={ref} className="relative w-full max-w-full py-12 sm:py-16 bg-gallery-dark">
+      {/* Parallax background image */}
+      <motion.div
+        style={{ y: bgY }}
+        className="absolute inset-0"
+      >
+        <img
+          src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=2000&auto=format"
+          alt=""
+          className="w-full h-[120%] object-cover opacity-20"
+        />
+      </motion.div>
+
+      <div className="absolute inset-0 bg-gradient-to-t from-gallery-dark via-gallery-dark/80 to-gallery-dark/60" />
+      <div className="absolute inset-0 bg-grain opacity-30" />
+
+      <div className="relative z-10 max-w-3xl mx-auto px-6 sm:px-10 lg:px-16 text-center">
+        <motion.div
+          initial={{ scaleX: 0 }}
+          whileInView={{ scaleX: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1.2, ease: EASE }}
+          className="mx-auto w-16 h-px bg-gallery-accent/50 mb-6 origin-center"
+        />
+
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1, ease: EASE }}
+          className="font-sans text-xs tracking-[0.4em] uppercase text-gallery-accent mb-6"
+        >
+          Live With Art
+        </motion.p>
+
+        <motion.h2
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1.2, ease: EASE, delay: 0.1 }}
+          className="font-serif text-3xl sm:text-4xl lg:text-5xl xl:text-6xl text-white leading-[1.1] mb-4"
+        >
+          Those who have fallen in love with works of our{' '}
+          <span className="italic text-gallery-accent">Artist's</span> can call
+          and visit us
+        </motion.h2>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1, delay: 0.3 }}
+          className="font-sans text-base text-white/50 max-w-md mx-auto mb-6 leading-relaxed"
+        >
+          For suggestions to buy art for their home and office. Live with Art —
+          Live with Zigguratss.
+        </motion.p>
+
+        {/* Features grid requested: Free Shipping, Money Back, Selected Artist, Secure Payments */}
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.35 }}
+          className="max-w-3xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8"
+        >
+          <div className="flex items-start gap-4 bg-white/3 p-4 rounded-md">
+            <div className="flex-shrink-0 w-10 h-10 rounded-md bg-gallery-accent/10 flex items-center justify-center text-gallery-accent">
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M3 7h18" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M3 12h18" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <div>
+              <div className="font-serif text-lg text-white">Free Shipping World Wide</div>
+              <div className="text-sm text-white/60">By Professionals.</div>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-4 bg-white/3 p-4 rounded-md">
+            <div className="flex-shrink-0 w-10 h-10 rounded-md bg-gallery-accent/10 flex items-center justify-center text-gallery-accent">
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <path d="M12 8v8" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M8 12h8" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <div>
+              <div className="font-serif text-lg text-white">Money Back Guarantee</div>
+              <div className="text-sm text-white/60">Within 14 days after delivery.</div>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-4 bg-white/3 p-4 rounded-md">
+            <div className="flex-shrink-0 w-10 h-10 rounded-md bg-gallery-accent/10 flex items-center justify-center text-gallery-accent">
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <circle cx="12" cy="8" r="2" />
+                <path d="M4 20c1.5-4 6-6 8-6s6.5 2 8 6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <div>
+              <div className="font-serif text-lg text-white">Selected Artist</div>
+              <div className="text-sm text-white/60">Artists around the world.</div>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-4 bg-white/3 p-4 rounded-md">
+            <div className="flex-shrink-0 w-10 h-10 rounded-md bg-gallery-accent/10 flex items-center justify-center text-gallery-accent">
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+                <rect x="3" y="7" width="18" height="10" rx="2" />
+                <path d="M7 11h10" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <div>
+              <div className="font-serif text-lg text-white">Secure Payments</div>
+              <div className="text-sm text-white/60">By credit card or online.</div>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="flex flex-wrap justify-center gap-5"
+        >
+          <a
+            href="https://zigguratss.com/signup"
+            data-magnetic
+            className="px-10 py-4 bg-gallery-accent text-gallery-dark font-sans text-xs font-semibold tracking-[0.25em] uppercase transition-all duration-500 hover:bg-white hover:text-gallery-dark"
+          >
+            Join Us
+          </a>
+          <a
+            href="https://zigguratss.com/product"
+            data-magnetic
+            className="px-10 py-4 border border-white/20 text-white/70 font-sans text-xs tracking-[0.25em] uppercase transition-all duration-500 hover:border-gallery-accent hover:text-gallery-accent"
+          >
+            Product Page
+          </a>
+        </motion.div>
+      </div>
+    </section>
+  );
+};
+
+/* ═══════════════════════════════════════════════════
+   7 · FOOTER
+   ═══════════════════════════════════════════════════ */
+const Footer = () => (
+  <footer className="bg-gallery-dark border-t border-white/5 py-8">
+    <div className="max-w-7xl mx-auto px-6 sm:px-10 lg:px-16">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-6 mb-8">
+        {/* Brand */}
+        <div>
+          <h3 className="font-serif text-xl text-white tracking-[0.1em] uppercase mb-4">
+            Zigguratss
+          </h3>
+          <p className="font-sans text-sm text-white/40 leading-relaxed max-w-xs">
+            Bridging art and soul since 2023. Curating global talent for
+            discerning collectors worldwide.
+          </p>
+        </div>
+
+        {/* Links */}
+        <div className="grid grid-cols-2 gap-8">
+          <div>
+            <p className="font-sans text-[10px] tracking-[0.3em] uppercase text-gallery-accent mb-4">
+              For Buyers
+            </p>
+            <ul className="space-y-2 font-sans text-sm text-white/40">
+              <li><a href="https://zigguratss.com/cms/customer-guide" className="hover:text-white transition-colors duration-300">Customer Guide</a></li>
+              <li><a href="https://zigguratss.com/artworks" className="hover:text-white transition-colors duration-300">Browse Artworks</a></li>
+              <li><a href="https://zigguratss.com/faq" className="hover:text-white transition-colors duration-300">FAQs</a></li>
+            </ul>
+          </div>
+          <div>
+            <p className="font-sans text-[10px] tracking-[0.3em] uppercase text-gallery-accent mb-4">
+              For Artists
+            </p>
+            <ul className="space-y-2 font-sans text-sm text-white/40">
+              <li><a href="https://zigguratss.com/cms/artist-guide" className="hover:text-white transition-colors duration-300">Artist Guide</a></li>
+              <li><a href="https://zigguratss.com/signup" className="hover:text-white transition-colors duration-300">Join As Artist</a></li>
+              <li><a href="https://zigguratss.com/contest/artwork/week" className="hover:text-white transition-colors duration-300">Weekly Contest</a></li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Social */}
+        <div>
+          <p className="font-sans text-[10px] tracking-[0.3em] uppercase text-gallery-accent mb-4">
+            Follow Us
+          </p>
+          <div className="flex gap-4">
+            {[
+              { name: 'Instagram', url: 'https://www.instagram.com/zigguratss/' },
+              { name: 'LinkedIn', url: 'https://www.linkedin.com/company/zigguratssartwork/about/' },
+              { name: 'Facebook', url: 'https://www.facebook.com/people/Zigguratss-Artwork-LLP/100090657829166/' },
+              { name: 'Pinterest', url: 'https://in.pinterest.com/zigguratss/' },
+            ].map((social) => (
+              <a
+                key={social.name}
+                href={social.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                data-magnetic
+                className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:border-gallery-accent hover:text-gallery-accent transition-all duration-300 font-sans text-[10px] font-medium"
+              >
+                {social.name[0]}
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Bottom bar */}
+      <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <p className="font-sans text-xs text-white/30">
+          © 2026 Zigguratss Artwork LLP. All Rights Reserved.
+        </p>
+        <div className="flex gap-6 font-sans text-xs text-white/30">
+          <a href="https://zigguratss.com/cms/terms-and-conditions" className="hover:text-white/60 transition-colors duration-300">
+            Terms & Conditions
+          </a>
+          <a href="https://zigguratss.com/cms/contest-rules" className="hover:text-white/60 transition-colors duration-300">
+            Privacy Policy
+          </a>
+        </div>
+      </div>
+    </div>
+  </footer>
+);
+
+/* ═══════════════════════════════════════════════════
+   MAIN EXPORT — ABOUT PAGE
+   ═══════════════════════════════════════════════════ */
+
+const PaintingIcon = () => (
+  <svg className="w-8 h-8 text-gallery-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+    <rect x="4" y="4" width="16" height="16" rx="2" stroke="currentColor" strokeWidth="1.5" fill="none" />
+    <circle cx="8" cy="8" r="1.5" fill="currentColor" />
+  </svg>
+);
+const SculptureIcon = () => (
+  <svg className="w-8 h-8 text-gallery-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+    <ellipse cx="12" cy="8" rx="6" ry="4" stroke="currentColor" strokeWidth="1.5" fill="none" />
+    <rect x="8" y="12" width="8" height="6" rx="2" stroke="currentColor" strokeWidth="1.5" fill="none" />
+  </svg>
+);
+const SerigraphIcon = () => (
+  <svg className="w-8 h-8 text-gallery-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+    <rect x="4" y="7" width="16" height="10" rx="2" stroke="currentColor" strokeWidth="1.5" fill="none" />
+    <path d="M4 12h16" stroke="currentColor" strokeWidth="1.5" />
+  </svg>
+);
+const PhotographyIcon = () => (
+  <svg className="w-8 h-8 text-gallery-accent" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+    <rect x="3" y="7" width="18" height="12" rx="3" stroke="currentColor" strokeWidth="1.5" fill="none" />
+    <circle cx="12" cy="13" r="3" stroke="currentColor" strokeWidth="1.5" fill="none" />
+  </svg>
+);
+
+const artForms = [
+  {
+    name: 'Painting',
+    icon: <PaintingIcon />,
+    desc: 'Works of art created using pigments applied to a flat surface.'
+  },
+  {
+    name: 'Sculpture',
+    icon: <SculptureIcon />,
+    desc: 'Three-dimensional works of art made from stone, wood, or metal.'
+  },
+  {
+    name: 'Digital Artwork',
+    icon: <SerigraphIcon />,
+    desc: 'Art created using digital tools such as graphic tablets, design software, and computers.'
+  },
+  {
+    name: 'Drawing',
+    icon: <PhotographyIcon />,
+    desc: 'The art of creating images using lines, shapes, and shading with tools like pencils, pens, or charcoal.'
+  },
+];
+
+const ArtworksBriefSection = () => (
+  <RevealOnScroll as="section" className="relative w-full max-w-full py-32 sm:py-40 bg-gallery-warm">
+    <div className="absolute inset-0 bg-grain opacity-20 pointer-events-none" />
+    <div className="relative z-10 max-w-6xl mx-auto px-6 sm:px-10 lg:px-16">
+      <RevealOnScroll>
+        <motion.h2
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1.2, ease: EASE }}
+          className="font-serif text-4xl sm:text-5xl lg:text-6xl text-gallery-dark mb-8 text-center"
+        >
+          A Brief about <span className="italic text-gallery-accent">Artworks</span>
+        </motion.h2>
+      </RevealOnScroll>
+      <div className="absolute inset-0 pointer-events-none">
+        <img
+          src="https://images.unsplash.com/photo-1504198453319-5ce911bafcde?q=80&w=2000&auto=format&fit=crop"
+          alt="decorative background"
+          className="w-full h-[130%] object-cover opacity-10 scale-105"
+        />
+      </div>
+
+      <RevealOnScroll>
+        <div className="max-w-4xl mx-auto mb-12 px-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, ease: EASE, delay: 0.1 }}
+            className="bg-white/5 backdrop-blur-sm rounded-2xl p-8 md:p-12 shadow-xl"
+          >
+            <p className="font-serif text-xl md:text-2xl text-gallery-dark leading-relaxed text-center">
+              All Artworks have the power to captivate and inspire. Whether it's
+              through the lens of a camera or the brush strokes of a painter,
+              each of these art forms has the ability to evoke emotions, tell
+              a story, and bring joy to those who experience them.
+            </p>
+
+            <span className="block mt-4 text-sm text-gallery-accent text-center">— Zigguratss Manifesto</span>
+          </motion.div>
+        </div>
+      </RevealOnScroll>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-12">
+        {artForms.map((form, i) => (
+          <RevealOnScroll key={form.name}>
+            <div className="flex flex-col items-center bg-white/70 rounded-xl p-6 shadow-lg hover:shadow-2xl transition-shadow duration-300 group cursor-pointer" data-magnetic>
+              <div className="mb-4">{form.icon}</div>
+              <h4 className="font-serif text-2xl font-bold text-gallery-dark mb-2 group-hover:text-gallery-accent transition-colors duration-300">{form.name}</h4>
+              <p className="font-sans text-sm text-gallery-muted text-center">{form.desc}</p>
+            </div>
+          </RevealOnScroll>
+        ))}
+      </div>
+      <RevealOnScroll>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          className="text-center"
+        >
+          <span className="inline-block px-8 py-4 bg-gallery-accent text-gallery-dark font-sans text-base font-semibold rounded-full shadow-lg tracking-wide animate-pulse cursor-pointer select-none">
+            Discover More Art Forms
+          </span>
+        </motion.div>
+      </RevealOnScroll>
+    </div>
+  </RevealOnScroll>
+);
+
+const AboutPage = () => {
+  const containerRef = useRef(null);
+
+  return (
+    <main ref={containerRef} className="relative w-full max-w-full min-h-screen overflow-x-hidden overflow-y-auto" style={{ touchAction: 'pan-y' }}>
+      {/* Persistent fixed background layer */}
+      <div className="fixed inset-0 -z-10 bg-gallery-bg max-w-full">
+        <div className="absolute inset-0 bg-gradient-to-b from-white/5 via-transparent to-white/5" />
+      </div>
+
+      <div className="fixed top-0 sm:top-6 left-0 right-0 z-40 w-full max-w-full pointer-events-none">
+        <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 pointer-events-auto">
+          <Navbar />
+        </div>
+      </div>
+
+      <div className="relative w-full max-w-full pt-16 sm:pt-20">
+        <div className="w-full max-w-full">
+          <AboutContentSection />
+        </div>
+
+        <div className="w-full max-w-full">
+          <TimelineSection />
+        </div>
+
+        <div className="w-full max-w-full">
+          <ArtworksBriefSection />
+        </div>
+
+        <div className="w-full max-w-full">
+          <QuoteBreak />
+        </div>
+
+        <div className="w-full max-w-full">
+          <TeamSection />
+        </div>
+
+        <div className="w-full max-w-full">
+          <ClosingCTA />
+        </div>
+
+        <footer className="w-full max-w-full">
+          <Footer />
+        </footer>
+      </div>
+    </main>
+  );
+};
+
+export default AboutPage;

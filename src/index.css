@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+/* Single import for Playfair is enough */
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Lato:wght@300;400;700&display=swap');
+
+@theme {
+  --font-playfair: "Playfair Display", serif;
+  --font-lato: "Lato", sans-serif;
+}
+
+:root {
+  font-family: var(--font-lato);
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+/* Prevent horizontal overflow globally */
+body {
+  @apply overflow-x-hidden w-full antialiased;
+}
+
+body, a, button {
+  cursor: none !important;
+}

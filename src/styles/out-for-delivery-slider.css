@@ -1,0 +1,491 @@
+.out-delivery-section {
+  min-height: 100vh;
+  width: 100%;
+  padding: 60px 40px;
+  background: linear-gradient(135deg, #f5f5f5 0%, #ffffff 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  overflow: hidden;
+}
+
+.delivery-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.delivery-title {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin-bottom: 10px;
+}
+
+.delivery-subtitle {
+  font-size: 1.3rem;
+  color: #8b7355;
+  font-weight: 500;
+}
+
+/* Animated Map */
+.delivery-map-container {
+  width: 100%;
+  max-width: 800px;
+  height: 120px;
+  background: linear-gradient(135deg, #f0f0f0 0%, #e8e8e8 100%);
+  border-radius: 12px;
+  margin-bottom: 50px;
+  overflow: hidden;
+  border: 2px solid #ddd;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.delivery-map {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0 40px;
+}
+
+.map-route {
+  flex: 1;
+  height: 3px;
+  background: linear-gradient(90deg, #8b7355 0%, #a68870 100%);
+  position: relative;
+  margin: 0 20px;
+}
+
+.map-route::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #8b7355 0%, transparent 100%);
+  animation: expandLine 2s ease-in-out infinite;
+}
+
+.map-vehicle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  animation: slideVehicle 4s ease-in-out infinite;
+}
+
+.vehicle-icon {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+}
+
+.map-destination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes slideVehicle {
+  0%, 100% {
+    transform: translateX(-20px);
+  }
+  50% {
+    transform: translateX(20px);
+  }
+}
+
+@keyframes expandLine {
+  0%, 100% {
+    width: 0;
+  }
+  50% {
+    width: 100%;
+  }
+}
+
+/* Container */
+.delivery-container {
+  width: 100%;
+  max-width: 1200px;
+}
+
+/* Phase Track */
+.delivery-phase-track {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 50px;
+  padding: 0 20px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.phase-marker {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  background: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #999;
+}
+
+.phase-marker:hover {
+  border-color: #8b7355;
+  transform: scale(1.1);
+}
+
+.phase-marker.completed {
+  background: #8b7355;
+  border-color: #8b7355;
+  color: white;
+}
+
+.phase-marker.active {
+  border-color: #8b7355;
+  box-shadow: 0 0 0 3px rgba(139, 115, 85, 0.2);
+}
+
+.marker-number {
+  font-size: 1.2rem;
+}
+
+/* Content */
+.delivery-content-wrapper {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+  margin-bottom: 60px;
+  animation: slideInFromBottom 0.8s ease-out;
+}
+
+/* Image */
+.delivery-image-section {
+  animation: slideLeft 0.8s ease-out;
+}
+
+.delivery-image-box {
+  position: relative;
+  width: 100%;
+  max-width: 550px;
+  aspect-ratio: 4 / 3;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  transition: all 0.4s ease;
+  border: 8px solid #f5f5f5;
+}
+
+.delivery-image-box::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px solid rgba(139, 115, 85, 0.3);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+.delivery-image-section:hover .delivery-image-box {
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.3);
+  transform: translateY(-10px);
+}
+
+.delivery-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease, filter 0.6s ease;
+}
+
+.delivery-image-section:hover .delivery-image {
+  transform: scale(1.08);
+  filter: brightness(1.05);
+}
+
+/* Info */
+.delivery-info-section {
+  animation: slideRight 0.8s ease-out;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.phase-label {
+  display: inline-block;
+  width: fit-content;
+  background: linear-gradient(135deg, #8b7355 0%, #a68870 100%);
+  color: white;
+  padding: 8px 18px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.delivery-step-title {
+  font-size: 2.3rem;
+  font-weight: 700;
+  color: #1a1a1a;
+  line-height: 1.2;
+}
+
+.delivery-step-description {
+  font-size: 1.05rem;
+  color: #666;
+  line-height: 1.8;
+  text-align: justify;
+}
+
+.eta-box {
+  background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+  padding: 15px 20px;
+  border-radius: 8px;
+  border-left: 4px solid #8b7355;
+  display: flex;
+  gap: 15px;
+}
+
+.eta-label {
+  font-size: 0.9rem;
+  color: #8b7355;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.eta-value {
+  font-size: 0.95rem;
+  color: #333;
+  font-weight: 500;
+}
+
+/* Progress Bar */
+.delivery-progress-bar {
+  width: 100%;
+  height: 6px;
+  background: #e0e0e0;
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 15px 0;
+}
+
+.progress-indicator {
+  height: 100%;
+  background: linear-gradient(90deg, #8b7355, #a68870);
+  transition: width 0.6s ease;
+}
+
+/* Checklist */
+.delivery-checklist {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  border: 2px solid #f0f0f0;
+}
+
+.checklist-title {
+  font-size: 0.9rem;
+  color: #8b7355;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 15px;
+  display: block;
+}
+
+.checklist-items {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.checklist-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  color: #999;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.checklist-item.completed {
+  color: #4CAF50;
+}
+
+.checklist-item.active {
+  color: #8b7355;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+.check-icon {
+  font-weight: 700;
+  font-size: 1.1rem;
+  min-width: 20px;
+}
+
+/* Navigation */
+.delivery-navigation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+}
+
+.delivery-nav-btn {
+  width: 50px;
+  height: 50px;
+  border: 2px solid #8b7355;
+  background: white;
+  color: #8b7355;
+  font-size: 1.4rem;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.delivery-nav-btn:hover {
+  background: #8b7355;
+  color: white;
+  transform: scale(1.1);
+}
+
+.delivery-nav-btn:active {
+  transform: scale(0.95);
+}
+
+.phase-counter {
+  font-size: 1.1rem;
+  color: #8b7355;
+  font-weight: 700;
+  min-width: 130px;
+  text-align: center;
+  letter-spacing: 0.5px;
+}
+
+@media (max-width: 1024px) {
+  .delivery-content-wrapper {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .delivery-title {
+    font-size: 2.3rem;
+  }
+
+  .delivery-step-title {
+    font-size: 1.8rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .out-delivery-section {
+    padding: 40px 20px;
+  }
+
+  .delivery-map-container {
+    height: 100px;
+    margin-bottom: 30px;
+  }
+
+  .delivery-title {
+    font-size: 1.8rem;
+  }
+
+  .delivery-step-title {
+    font-size: 1.4rem;
+  }
+
+  .delivery-phase-track {
+    margin-bottom: 30px;
+  }
+
+  .phase-marker {
+    width: 40px;
+    height: 40px;
+    font-size: 0.9rem;
+  }
+
+  .delivery-nav-btn {
+    width: 42px;
+    height: 42px;
+    font-size: 1.2rem;
+  }
+
+  .phase-counter {
+    font-size: 0.9rem;
+  }
+}
+
+/* Small phones (480px and below) */
+@media (max-width: 480px) {
+  .out-delivery-section {
+    padding: 30px 15px;
+  }
+
+  .delivery-title {
+    font-size: 1.6rem;
+  }
+
+  .delivery-subtitle {
+    font-size: 0.95rem;
+  }
+
+  .delivery-map-container {
+    height: 80px;
+    margin-bottom: 30px;
+  }
+
+  .delivery-phase-track {
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 0 10px;
+  }
+
+  .phase-marker {
+    width: 40px;
+    height: 40px;
+    font-size: 0.85rem;
+  }
+
+  .delivery-content {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .delivery-image-box {
+    max-width: 100%;
+  }
+
+  .delivery-step-title {
+    font-size: 1.4rem;
+  }
+
+  .delivery-step-description {
+    font-size: 0.95rem;
+  }
+
+  .phase-label {
+    padding: 6px 12px;
+    font-size: 0.75rem;
+  }
+}

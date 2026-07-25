@@ -1,0 +1,341 @@
+@reference "tailwindcss";
+
+.my-class {
+  @apply gap-2;
+}
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+} */
+
+/* body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background-color: #ffffff;
+  color: #1a1a1a;
+  line-height: 1.6;
+} */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+}
+
+/* Custom Components */
+.luxury-button {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #000000;
+  border-radius: 9999px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-size: 0.875rem;
+  background-color: transparent;
+  color: #000000;
+  display: inline-block;
+}
+
+.luxury-button:hover {
+  background-color: #000000;
+  color: #ffffff;
+  transform: translateY(-2px);
+}
+
+.luxury-button-dark {
+  padding: 0.75rem 1.5rem;
+  background-color: #000000;
+  color: #ffffff;
+  border: 2px solid #000000;
+  border-radius: 9999px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-size: 0.875rem;
+  display: inline-block;
+}
+
+.luxury-button-dark:hover {
+  background-color: #1a1a1a;
+  border-color: #1a1a1a;
+  transform: translateY(-2px);
+}
+
+.section-title {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #000000;
+  margin-bottom: 1rem;
+  font-family: 'Playfair Display', serif;
+}
+
+.section-subtitle {
+  color: #666666;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  margin-bottom: 2rem;
+  font-weight: 500;
+}
+
+.luxury-container {
+  max-width: 100%;
+  margin: 0 auto;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+
+@media (max-width: 768px) {
+  .luxury-container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --text: #9ca3af;
+    --text-h: #f3f4f6;
+    --bg: #16171d;
+    --border: #2e303a;
+    --code-bg: #1f2028;
+    --accent: #c084fc;
+    --accent-bg: rgba(192, 132, 252, 0.15);
+    --accent-border: rgba(192, 132, 252, 0.5);
+    --social-bg: rgba(47, 48, 58, 0.5);
+    --shadow:
+      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
+  }
+
+  #social .button-icon {
+    filter: invert(1) brightness(2);
+  }
+}
+
+body {
+  margin: 0;
+}
+
+#root {
+  width: 100%;
+  max-width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+}
+
+h1,
+h2 {
+  font-family: var(--heading);
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+h1 {
+  font-size: 56px;
+  letter-spacing: -1.68px;
+  margin: 32px 0;
+  @media (max-width: 1024px) {
+    font-size: 36px;
+    margin: 20px 0;
+  }
+}
+h2 {
+  font-size: 24px;
+  line-height: 118%;
+  letter-spacing: -0.24px;
+  margin: 0 0 8px;
+  @media (max-width: 1024px) {
+    font-size: 20px;
+  }
+}
+p {
+  margin: 0;
+}
+
+code,
+.counter {
+  font-family: var(--mono);
+  display: inline-flex;
+  border-radius: 4px;
+  color: var(--text-h);
+}
+
+code {
+  font-size: 15px;
+  line-height: 135%;
+  padding: 4px 8px;
+  background: var(--code-bg);
+}
+
+/* ===== RESPONSIVE UTILITIES ===== */
+
+/* Mobile First - Base Styles */
+@media (max-width: 640px) {
+  .luxury-container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  
+  h1 {
+    font-size: 1.875rem; /* 30px */
+    line-height: 1.2;
+  }
+  
+  h2 {
+    font-size: 1.5rem; /* 24px */
+  }
+  
+  h3 {
+    font-size: 1.25rem; /* 20px */
+  }
+  
+  p {
+    font-size: 0.875rem; /* 14px */
+  }
+  
+  .section-title {
+    font-size: 1.875rem;
+  }
+  
+  .section-subtitle {
+    font-size: 0.75rem;
+  }
+}
+
+/* Tablet Styles (640px - 1024px) */
+@media (min-width: 640px) and (max-width: 1024px) {
+  .luxury-container {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+  
+  h1 {
+    font-size: 2.5rem; /* 40px */
+  }
+  
+  h2 {
+    font-size: 1.875rem; /* 30px */
+  }
+  
+  .section-title {
+    font-size: 2.5rem;
+  }
+}
+
+/* Desktop Styles (1024px+) */
+@media (min-width: 1024px) {
+  .luxury-container {
+    padding-left: 2rem;
+    padding-right: 2rem;
+  }
+  
+  h1 {
+    font-size: 3rem; /* 48px */
+  }
+  
+  h2 {
+    font-size: 2rem; /* 32px */
+  }
+  
+  .section-title {
+    font-size: 3rem;
+  }
+}
+
+/* Form Elements Responsive */
+input,
+select,
+textarea {
+  font-size: 16px; /* Prevents zoom on iOS */
+}
+
+/* Button Responsive */
+button {
+  min-height: 44px; /* Touch target minimum */
+}
+
+@media (max-width: 640px) {
+  button {
+    min-width: 44px;
+  }
+}
+
+/* Grid Responsive Defaults */
+.some-class {
+  @apply flex gap-2;
+}
+
+@media (min-width: 768px) {
+  .some-class {
+    gap: 1rem;
+  }
+}
+
+/* Padding Utilities Responsive */
+.responsive-px {
+  @apply px-4 md:px-6 lg:px-8;
+}
+
+.responsive-py {
+  @apply py-4 md:py-6 lg:py-8;
+}
+
+/* Margin Utilities Responsive */
+.responsive-mb {
+  @apply mb-4 md:mb-6 lg:mb-8;
+}
+
+.responsive-mt {
+  @apply mt-4 md:mt-6 lg:mt-8;
+}
+
+/* Text Responsive */
+.text-responsive-sm {
+  @apply text-xs md:text-sm lg:text-base;
+}
+
+.text-responsive-base {
+  @apply text-sm md:text-base lg:text-lg;
+}
+
+.text-responsive-lg {
+  @apply text-base md:text-lg lg:text-xl;
+}
+
+.text-responsive-xl {
+  @apply text-lg md:text-xl lg:text-2xl;
+}
+
+.text-responsive-2xl {
+  @apply text-xl md:text-2xl lg:text-3xl;
+}
+
+/* Continuous Scroll Animation */
+@keyframes scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll {
+  animation: scroll 20s linear infinite;
+}
+
+/* Mobile Container */
+@media (max-width: 640px) {
+  .luxury-container {
+    max-width: 100%;
+  }
+}

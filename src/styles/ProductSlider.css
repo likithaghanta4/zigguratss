@@ -1,0 +1,1558 @@
+:root {
+    --transition-duration: 1.5s;
+    --transition-timing: ease;
+    --base-scale: 0.5;
+    --active-scale: 2;
+    --next-scale: 1.4;
+    --next-plus-scale: 0.9;
+    --base-blur: 20px;
+    --next-blur: 0px;
+    --next-plus-blur: 10px;
+    --blur-effect: 50px;
+    --text-color: #ad8107
+}
+
+.product-slider * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'lato', sans-serif;
+    font-weight: 400;
+
+}
+
+.product-slider .mySwiper {
+    height: 100vh;
+    width: 100vw;
+
+
+}
+
+.product-slider .mySwiper {
+    overflow: hidden;
+}
+
+.product-slider .logo h1 {
+    width: 7vh;
+    position: absolute;
+    left: 75px;
+    top: 50px;
+}
+
+
+
+/* Slide Base */
+.swiper-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Image */
+.swiper-slide .slide-img {
+    width: 320px;
+    /* aspect-ratio: 1; */
+    height: auto;
+    filter: blur(var(--base-blur));
+    transition: all var(--transition-duration) var(--transition-timing);
+    scale: var(--base-scale);
+    opacity: 1;
+    transform: translate(50%);
+
+}
+
+.slide-content .category {
+    font-weight: 400;
+    font-size: medium;
+}
+
+
+
+.slide-content .cart-explore-btn {
+    display: flex;
+    gap: 30px;
+}
+
+.slide-content .explore-btn {
+    border: solid var(--text-color) 1px;
+    padding: 10px 15px;
+    border-radius: 50px;
+    color: var(--text-color);
+    background-color: transparent;
+}
+
+.slide-content .buy-now {
+    color: var(--text-color);
+    border: solid var(--text-color) 1px;
+    padding: 10px 15px;
+    border-radius: 50px;
+    background-color: transparent;
+}
+
+.slide-content .by-cat-div {
+    margin-bottom: 10px;
+}
+
+
+.swiper-slide .slide-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+
+/* ----------------frame add--------  */
+.swiper-slide .slide-img img {
+    width: 100%;
+    max-height: 420px;
+    display: block;
+    object-fit: contain;
+
+    /* mat board (off-white background behind the painting) */
+    padding: 0px;
+    background: rgb(255, 249, 224);
+
+    /* gold mat edge (inside the wooden frame) */
+    border: 4px solid;
+    border-color: rgb(207, 166, 0) rgb(207, 166, 0) rgb(145, 110, 0) rgb(145, 110, 0);
+
+    /* wooden frame */
+    outline: 14px solid rgb(65, 40, 16);
+    border-radius: px;
+
+    /* 3D bevel and shadow effect */
+    box-shadow:
+        inset 0 0 0 3px rgba(255, 255, 255, 0.3),
+        /* inner bevel highlight */
+        0 4px 10px rgba(0, 0, 0, 0.5),
+        /* main shadow for depth */
+        0 10px 20px rgba(0, 0, 0, 0.6);
+
+    /* optional slight rotation for a realistic hanging effect */
+    transform: perspective(800px) rotateX(1deg) rotateY(-1deg);
+    transition: transform 0.3s ease;
+}
+
+/* --------------above frame code---------  */
+
+/* hover effect for slight depth interaction */
+.swiper-slide .slide-img img:hover {
+    transform: perspective(800px) rotateX(0deg) rotateY(0deg) scale(1.02);
+}
+
+.slide-img {
+    position: relative;
+}
+
+.slide-img::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background: linear-gradient(120deg,
+            rgba(255, 255, 255, 0.35) 0%,
+            rgba(255, 255, 255, 0.15) 25%,
+            rgba(255, 255, 255, 0) 60%);
+
+    pointer-events: none;
+}
+
+/* Max height limit for portrait image */
+.swiper-slide .slide-img img {
+    max-height: 45vh;
+    /* iske aage portrait image nahi badegi */
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.swiper-slide .slide-img-blur {
+    opacity: 0;
+    position: absolute;
+
+}
+
+/* Active */
+.swiper-slide.swiper-slide-active .slide-img {
+    scale: var(--active-scale);
+    transform: translateX(-60%);
+    opacity: 0;
+
+}
+
+/* Next */
+.swiper-slide.swiper-slide-next .slide-img {
+    filter: blur(var(--next-blur));
+    scale: var(--next-scale);
+    transform: translateX(20%);
+    opacity: 1;
+}
+
+.swiper-slide.swiper-slide-next .slide-img-blur {
+    opacity: 0.5;
+    filter: blur(var(--blur-effect));
+    z-index: -1;
+    transform: translateX(100%);
+
+}
+
+.swiper-slide.swiper-slide-next .slide-img-blur img {
+    scale: var(--active-scale);
+}
+
+/* Next + 1 */
+.swiper-slide.swiper-slide-next+.swiper-slide .slide-img {
+    filter: blur(var(--next-plus-blur));
+    scale: var(--next-plus-scale);
+    opacity: 1;
+
+}
+
+.swiper-slide.swiper-slide-next {
+    transform: translateX(50%);
+    z-index: 10;
+
+}
+
+.swiper-slide.swiper-slide-next+.swiper-slide {
+    transform: translateX(23%);
+    z-index: -2;
+
+}
+
+/* Content */
+.swiper-slide .slide-content {
+    position: absolute;
+    opacity: 0;
+    filter: blur(20px);
+    transition: opacity var(--transition-duration) ease-in-out,
+        filter var(--transition-duration) ease;
+    width: 35vw;
+
+}
+
+.swiper-slide.swiper-slide-next .slide-content {
+    transform: translateX(-80%);
+    opacity: 1;
+    filter: blur(0);
+
+}
+
+/* title */
+.slide-content .art-title {
+    width: 80%;
+    font-size: 36px;
+    margin-bottom: 12px;
+    color: var(--text-color);
+}
+
+/* Heading */
+/* full screen layout */
+.product-slider .main-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 5% heading */
+.slider-heading {
+    height: 5%;
+    margin-top: 70px;
+    min-height: 60px;
+    /* responsive safety */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+    /* top: 10px;
+    right: 40%;
+    position: absolute; */
+}
+
+.slider-heading h1 {
+    font-size: clamp(1.5rem, 2vw, 2.5rem);
+}
+
+/* 95% slider */
+.slider-wrapper {
+    height: 95%;
+}
+
+/* IMPORTANT: swiper full height */
+.mySwiper {
+    height: 100%;
+}
+
+/* -----------------heading code above */
+
+
+.slide-content p {
+    width: 90%;
+    /* font-family: "Poppins", sans-serif; */
+    font-size: 15px;
+    color: var(--text-color);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    /* sirf 3 line dikhegi */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+
+}
+
+/* Art-meta(art,category,size) */
+.slide-content .info .art-meta {
+    margin-bottom: 10px;
+
+}
+
+/* jab expand hoga */
+.slide-content p.expanded {
+    -webkit-line-clamp: unset;
+}
+
+.art-title {
+    line-height: 1;
+}
+
+@media (max-width: 767px) {
+    .slide-content p {
+        -webkit-line-clamp: 1;
+        /* 1 line */
+    }
+}
+
+/* price */
+.slide-content .price {
+    font-size: 30px;
+    margin-block: 20px;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.slide-content button {
+    background: transparent;
+    border: none;
+    font-weight: 600;
+    display: flex;
+    font-size: 18px;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.slide-content button svg {
+    width: 20px;
+    height: 20px;
+    margin-left: 10px;
+}
+
+/* button animation  */
+.explore-btn,
+.buy-now {
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.explore-btn::before,
+.buy-now::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: black;
+    z-index: -1;
+    transition: none;
+}
+
+/* button animation end  */
+
+
+/* Tablet Responsive */
+@media (max-width: 1024px) and (min-width: 768px) {
+
+    .logo img,
+    .logo h1 {
+        left: 40px;
+        top: 30px;
+    }
+
+    /* image size reduce */
+    .swiper-slide .slide-img {
+        width: 220px;
+    }
+
+    .swiper-slide.swiper-slide-next .slide-img {
+        filter: blur(var(--next-blur));
+        scale: var(--next-scale);
+        transform: translateX(40%);
+        opacity: 1;
+
+    }
+
+    /* content position */
+    .swiper-slide.swiper-slide-next .slide-content {
+        transform: translateX(-75%);
+
+    }
+
+
+    .swiper-slide .slide-img {
+        width: 320px;
+        /* aspect-ratio: 1; */
+        height: auto;
+        filter: blur(var(--base-blur));
+        transition: all var(--transition-duration) var(--transition-timing);
+        scale: var(--base-scale);
+        opacity: 1;
+        transform: translate(60%);
+        z-index: 100;
+
+    }
+
+    .swiper-slide.swiper-slide-next+.swiper-slide {
+        transform: translateX(15%);
+        z-index: 1;
+
+    }
+
+    /* text size */
+    .slide-content h2 {
+        font-size: 28px;
+    }
+
+    .slide-content p {
+        width: 100%;
+        font-size: 13px;
+    }
+
+    .slide-content .price {
+        font-size: 24px;
+    }
+
+    /* button size */
+    .slide-content button {
+        font-size: 16px;
+    }
+
+}
+
+
+
+/*-------------- mobile screen responsive---------------------*/
+
+
+@media (max-width: 767px) {
+
+    .swiper-slide .slide-img {
+        width: 80%;
+        scale: 1;
+        transform: none;
+        filter: none;
+    }
+
+    .swiper-slide.swiper-slide-active .slide-img {
+        scale: 1;
+        transform: none;
+        opacity: 1;
+    }
+
+    .swiper-slide.swiper-slide-next .slide-img {
+        scale: 1;
+        transform: none;
+        filter: none;
+    }
+}
+
+
+@media (max-width: 767px) {
+
+    .swiper-slide .slide-content {
+        position: static;
+        opacity: 1;
+        filter: none;
+        transform: none;
+        width: 90%;
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .swiper-slide.swiper-slide-next .slide-content {
+        transform: none;
+        opacity: 1;
+    }
+
+    .swiper-slide {
+
+        height: 100%;
+        flex-direction: column-reverse;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 10px;
+    }
+}
+
+@media (max-width: 767px) {
+
+    .slide-img {
+        order: 1;
+        width: 75%;
+        margin-top: 10px;
+    }
+
+
+    .slide-img-blur {
+        display: none;
+    }
+
+    .slide-content {
+        height: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        line-height: 25px;
+        padding: px;
+
+    }
+
+    .slide-content p {
+        width: 90%;
+        font-size: 14px;
+        margin-left: 16px;
+        text-align: center;
+        /* text-align:justify; */
+        line-height: 18px;
+
+    }
+
+    .slide-content button {
+        justify-content: center;
+    }
+}
+
+/* background */
+.product-slider {
+    position: relative;
+    min-height: 100vh;
+    overflow: hidden;
+}
+
+.product-slider::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+}
+
+.main-container {
+    position: relative;
+    z-index: 1;
+}
+
+
+
+/* content see more btn handle kiya */
+@media (max-width: 767px) {
+
+    .slide-content p.expanded {
+        -webkit-line-clamp: unset;
+        max-height: 100px;
+        overflow-y: auto;
+        padding-right: 5px;
+    }
+
+    .slide-content p {
+        touch-action: pan-y;
+    }
+
+    .slide-content .art-title {
+        width: 100%;
+        font-size: 25px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        font-weight: normal;
+    }
+
+
+    .slide-content .desc {
+        font-weight: 600;
+    }
+
+    .slide-content .price {
+        color: var(--text-color);
+        font-size: 23px;
+        font-weight: normal;
+    }
+
+    .slide-content .cart-explore-btn {
+        display: flex;
+        align-items: center;
+        gap: 40px;
+    }
+
+    .slide-content .explore-btn {
+        border: solid var(--text-color) 1px;
+        padding: 5px 10px;
+        border-radius: 50px;
+        margin-bottom: 10px;
+        color: var(--text-color);
+        background-color: transparent;
+    }
+
+    .slide-content .buy-now {
+        border: solid var(--text-color) 1px;
+        padding: 5px 10px;
+        border-radius: 50px;
+        margin-bottom: 10px;
+        background-color: transparent;
+    }
+
+    .slide-content .category {
+        font-weight: 300;
+        font-size: medium;
+    }
+
+
+    .slide-content h2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        font-size: 22px;
+        font-weight: 600;
+    }
+
+    .see-more-btn {
+        display: block;
+        margin: 3px auto;
+        text-align: center;
+        color: var(--text-color);
+    }
+
+    @media (max-width: 767px) {
+
+        .swiper-slide .slide-img {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Max height limit for portrait image */
+        .swiper-slide .slide-img img {
+            max-height: 40vh;
+            /* iske aage portrait image nahi badegi */
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
+        }
+    }
+
+}
+
+@media (max-width: 767px) {
+
+    .swiper-slide .slide-img {
+        width: 85%;
+        transform: none;
+        scale: 0.7;
+        filter: blur(20px);
+        opacity: 0.6;
+        transition: all 1s ease;
+    }
+
+    /* active slide */
+    .swiper-slide.swiper-slide-active .slide-img {
+        scale: 1;
+        filter: blur(0px);
+        opacity: 1;
+    }
+
+    /* next slide */
+    .swiper-slide.swiper-slide-next .slide-img {
+        scale: 0.85;
+        filter: blur(8px);
+        opacity: 0.8;
+    }
+
+    /* blur background effect */
+    .swiper-slide.swiper-slide-active .slide-img-blur {
+        opacity: 0.4;
+        filter: blur(50px);
+        position: absolute;
+        z-index: -1;
+    }
+
+}
+
+@media (max-width: 767px) {
+
+    /* base content state */
+    .swiper-slide .slide-content {
+        position: static;
+        opacity: 0.4;
+        filter: blur(10px);
+        transform: scale(0.9);
+        transition: all 0.8s ease;
+        width: 90%;
+        text-align: center;
+        margin-top: 20px;
+
+    }
+
+    /* active slide content */
+    .swiper-slide.swiper-slide-active .slide-content {
+        opacity: 1;
+        filter: blur(0);
+        transform: scale(1);
+    }
+
+    /* next slide content */
+    .swiper-slide.swiper-slide-next .slide-content {
+        opacity: 0.7;
+        filter: blur(4px);
+        transform: scale(0.95);
+    }
+
+}
+
+/* extra smooth effect */
+@media (max-width: 767px) {
+
+    /* base state */
+    .swiper-slide .slide-content {
+        position: static;
+        width: 95%;
+        text-align: center;
+        margin-top: 20px;
+        opacity: 0;
+        filter: blur(15px);
+        transform: translateY(60px);
+        transition: all 0.8s ease;
+
+    }
+
+    /* active slide content */
+    .swiper-slide.swiper-slide-active .slide-content {
+        opacity: 1;
+        filter: blur(0);
+        transform: translateY(0);
+    }
+
+    /* next slide content */
+    .swiper-slide.swiper-slide-next .slide-content {
+        opacity: 0.6;
+        filter: blur(6px);
+        transform: translateY(20px);
+    }
+
+}
+
+/* heading */
+@media (max-width: 767px) {
+    .product-slider .main-container {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* 5% heading */
+    .slider-heading {
+        height: 5%;
+        min-height: 30px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-color);
+
+    }
+
+    .slider-heading h1 {
+        font-size: clamp(1.5rem, 2vw, 2.5rem);
+    }
+
+    /* 95% slider */
+    .slider-wrapper {
+        height: 95%;
+    }
+
+    /* IMPORTANT: swiper full height */
+    .mySwiper {
+        height: 100%;
+    }
+}
+
+:root {
+    --transition-duration: 1.5s;
+    --transition-timing: ease;
+    --base-scale: 0.5;
+    --active-scale: 2;
+    --next-scale: 1.4;
+    --next-plus-scale: 0.9;
+    --base-blur: 20px;
+    --next-blur: 0px;
+    --next-plus-blur: 10px;
+    --blur-effect: 50px;
+    --text-color: #ad8107
+}
+
+.product-slider * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'lato', sans-serif;
+    font-weight: 400;
+
+}
+
+.product-slider .mySwiper {
+    height: 100vh;
+    width: 100vw;
+
+
+}
+
+.product-slider .mySwiper {
+    overflow: hidden;
+}
+
+.product-slider .logo h1 {
+    width: 7vh;
+    position: absolute;
+    left: 75px;
+    top: 50px;
+}
+
+
+
+/* Slide Base */
+.swiper-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Image */
+.swiper-slide .slide-img {
+    width: 320px;
+    /* aspect-ratio: 1; */
+    height: auto;
+    filter: blur(var(--base-blur));
+    transition: all var(--transition-duration) var(--transition-timing);
+    scale: var(--base-scale);
+    opacity: 1;
+    transform: translate(50%);
+
+}
+
+.slide-content .category {
+    font-weight: 400;
+    font-size: medium;
+}
+
+
+
+.slide-content .cart-explore-btn {
+    display: flex;
+    gap: 30px;
+}
+
+.slide-content .explore-btn {
+    border: solid var(--text-color) 1px;
+    padding: 10px 15px;
+    border-radius: 50px;
+    color: var(--text-color);
+    background-color: transparent;
+}
+
+.slide-content .buy-now {
+    color: var(--text-color);
+    border: solid var(--text-color) 1px;
+    padding: 10px 15px;
+    border-radius: 50px;
+    background-color: transparent;
+}
+
+.slide-content .by-cat-div {
+    margin-bottom: 10px;
+}
+
+
+.swiper-slide .slide-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+
+/* ----------------frame add--------  */
+.swiper-slide .slide-img img {
+    width: 100%;
+    max-height: 420px;
+    display: block;
+    object-fit: contain;
+
+    /* mat board (off-white background behind the painting) */
+    padding: 0px;
+    background: rgb(255, 249, 224);
+
+    /* gold mat edge (inside the wooden frame) */
+    border: 4px solid;
+    border-color: rgb(207, 166, 0) rgb(207, 166, 0) rgb(145, 110, 0) rgb(145, 110, 0);
+
+    /* wooden frame */
+    outline: 14px solid rgb(65, 40, 16);
+    border-radius: px;
+
+    /* 3D bevel and shadow effect */
+    box-shadow:
+        inset 0 0 0 3px rgba(255, 255, 255, 0.3),
+        /* inner bevel highlight */
+        0 4px 10px rgba(0, 0, 0, 0.5),
+        /* main shadow for depth */
+        0 10px 20px rgba(0, 0, 0, 0.6);
+
+    /* optional slight rotation for a realistic hanging effect */
+    transform: perspective(800px) rotateX(1deg) rotateY(-1deg);
+    transition: transform 0.3s ease;
+}
+
+/* --------------above frame code---------  */
+
+/* hover effect for slight depth interaction */
+.swiper-slide .slide-img img:hover {
+    transform: perspective(800px) rotateX(0deg) rotateY(0deg) scale(1.02);
+}
+
+.slide-img {
+    position: relative;
+}
+
+.slide-img::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    background: linear-gradient(120deg,
+            rgba(255, 255, 255, 0.35) 0%,
+            rgba(255, 255, 255, 0.15) 25%,
+            rgba(255, 255, 255, 0) 60%);
+
+    pointer-events: none;
+}
+
+/* Max height limit for portrait image */
+.swiper-slide .slide-img img {
+    max-height: 45vh;
+    /* iske aage portrait image nahi badegi */
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+}
+
+.swiper-slide .slide-img-blur {
+    opacity: 0;
+    position: absolute;
+
+}
+
+/* Active */
+.swiper-slide.swiper-slide-active .slide-img {
+    scale: var(--active-scale);
+    transform: translateX(-60%);
+    opacity: 0;
+
+}
+
+/* Next */
+.swiper-slide.swiper-slide-next .slide-img {
+    filter: blur(var(--next-blur));
+    scale: var(--next-scale);
+    transform: translateX(20%);
+    opacity: 1;
+}
+
+.swiper-slide.swiper-slide-next .slide-img-blur {
+    opacity: 0.5;
+    filter: blur(var(--blur-effect));
+    z-index: -1;
+    transform: translateX(100%);
+
+}
+
+.swiper-slide.swiper-slide-next .slide-img-blur img {
+    scale: var(--active-scale);
+}
+
+/* Next + 1 */
+.swiper-slide.swiper-slide-next+.swiper-slide .slide-img {
+    filter: blur(var(--next-plus-blur));
+    scale: var(--next-plus-scale);
+    opacity: 1;
+
+}
+
+.swiper-slide.swiper-slide-next {
+    transform: translateX(50%);
+    z-index: 10;
+
+}
+
+.swiper-slide.swiper-slide-next+.swiper-slide {
+    transform: translateX(23%);
+    z-index: -2;
+
+}
+
+/* Content */
+.swiper-slide .slide-content {
+    position: absolute;
+    opacity: 0;
+    filter: blur(20px);
+    transition: opacity var(--transition-duration) ease-in-out,
+        filter var(--transition-duration) ease;
+    width: 35vw;
+
+}
+
+.swiper-slide.swiper-slide-next .slide-content {
+    transform: translateX(-80%);
+    opacity: 1;
+    filter: blur(0);
+
+}
+
+/* title */
+.slide-content .art-title {
+    width: 80%;
+    font-size: 36px;
+    margin-bottom: 12px;
+    color: var(--text-color);
+}
+
+/* Heading */
+/* full screen layout */
+.product-slider .main-container {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* 5% heading */
+.slider-heading {
+    height: 5%;
+    margin-top: 70px;
+    min-height: 60px;
+    /* responsive safety */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-color);
+    /* top: 10px;
+    right: 40%;
+    position: absolute; */
+}
+
+.slider-heading h1 {
+    font-size: clamp(1.5rem, 2vw, 2.5rem);
+}
+
+/* 95% slider */
+.slider-wrapper {
+    height: 95%;
+}
+
+/* IMPORTANT: swiper full height */
+.mySwiper {
+    height: 100%;
+}
+
+/* -----------------heading code above */
+
+
+.slide-content p {
+    width: 90%;
+    /* font-family: "Poppins", sans-serif; */
+    font-size: 15px;
+    color: var(--text-color);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    /* sirf 3 line dikhegi */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+
+}
+
+/* Art-meta(art,category,size) */
+.slide-content .info .art-meta {
+    margin-bottom: 10px;
+
+}
+
+/* jab expand hoga */
+.slide-content p.expanded {
+    -webkit-line-clamp: unset;
+}
+
+.art-title {
+    line-height: 1;
+}
+
+@media (max-width: 767px) {
+    .slide-content p {
+        -webkit-line-clamp: 1;
+        /* 1 line */
+    }
+}
+
+/* price */
+.slide-content .price {
+    font-size: 30px;
+    margin-block: 20px;
+    font-weight: 600;
+    color: var(--text-color);
+}
+
+.slide-content button {
+    background: transparent;
+    border: none;
+    font-weight: 600;
+    display: flex;
+    font-size: 18px;
+    text-transform: uppercase;
+    cursor: pointer;
+}
+
+.slide-content button svg {
+    width: 20px;
+    height: 20px;
+    margin-left: 10px;
+}
+
+/* button animation  */
+.explore-btn,
+.buy-now {
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.explore-btn::before,
+.buy-now::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: black;
+    z-index: -1;
+    transition: none;
+}
+
+/* button animation end  */
+
+
+/* Tablet Responsive */
+@media (max-width: 1024px) and (min-width: 768px) {
+
+    .logo img,
+    .logo h1 {
+        left: 40px;
+        top: 30px;
+    }
+
+    /* image size reduce */
+    .swiper-slide .slide-img {
+        width: 220px;
+    }
+
+    .swiper-slide.swiper-slide-next .slide-img {
+        filter: blur(var(--next-blur));
+        scale: var(--next-scale);
+        transform: translateX(40%);
+        opacity: 1;
+
+    }
+
+    /* content position */
+    .swiper-slide.swiper-slide-next .slide-content {
+        transform: translateX(-75%);
+
+    }
+
+
+    .swiper-slide .slide-img {
+        width: 320px;
+        /* aspect-ratio: 1; */
+        height: auto;
+        filter: blur(var(--base-blur));
+        transition: all var(--transition-duration) var(--transition-timing);
+        scale: var(--base-scale);
+        opacity: 1;
+        transform: translate(60%);
+        z-index: 100;
+
+    }
+
+    .swiper-slide.swiper-slide-next+.swiper-slide {
+        transform: translateX(15%);
+        z-index: 1;
+
+    }
+
+    /* text size */
+    .slide-content h2 {
+        font-size: 28px;
+    }
+
+    .slide-content p {
+        width: 100%;
+        font-size: 13px;
+    }
+
+    .slide-content .price {
+        font-size: 24px;
+    }
+
+    /* button size */
+    .slide-content button {
+        font-size: 16px;
+    }
+
+}
+
+
+
+/*-------------- mobile screen responsive---------------------*/
+
+
+@media (max-width: 767px) {
+
+    .swiper-slide .slide-img {
+        width: 80%;
+        scale: 1;
+        transform: none;
+        filter: none;
+    }
+
+    .swiper-slide.swiper-slide-active .slide-img {
+        scale: 1;
+        transform: none;
+        opacity: 1;
+    }
+
+    .swiper-slide.swiper-slide-next .slide-img {
+        scale: 1;
+        transform: none;
+        filter: none;
+    }
+}
+
+
+@media (max-width: 767px) {
+
+    .swiper-slide .slide-content {
+        position: static;
+        opacity: 1;
+        filter: none;
+        transform: none;
+        width: 90%;
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .swiper-slide.swiper-slide-next .slide-content {
+        transform: none;
+        opacity: 1;
+    }
+
+    .swiper-slide {
+
+        height: 100%;
+        flex-direction: column-reverse;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 10px;
+    }
+}
+
+@media (max-width: 767px) {
+
+    .slide-img {
+        order: 1;
+        width: 75%;
+        margin-top: 10px;
+    }
+
+
+    .slide-img-blur {
+        display: none;
+    }
+
+    .slide-content {
+        height: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        line-height: 25px;
+        padding: px;
+
+    }
+
+    .slide-content p {
+        width: 90%;
+        font-size: 14px;
+        margin-left: 16px;
+        text-align: center;
+        /* text-align:justify; */
+        line-height: 18px;
+
+    }
+
+    .slide-content button {
+        justify-content: center;
+    }
+}
+
+/* content see more btn handle kiya */
+@media (max-width: 767px) {
+
+    .slide-content p.expanded {
+        -webkit-line-clamp: unset;
+        max-height: 100px;
+        overflow-y: auto;
+        padding-right: 5px;
+    }
+
+    .slide-content p {
+        touch-action: pan-y;
+    }
+
+    .slide-content .art-title {
+        width: 100%;
+        font-size: 25px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        font-weight: normal;
+    }
+
+
+    .slide-content .desc {
+        font-weight: 600;
+    }
+
+    .slide-content .price {
+        color: var(--text-color);
+        font-size: 23px;
+        font-weight: normal;
+    }
+
+    .slide-content .cart-explore-btn {
+        display: flex;
+        align-items: center;
+        gap: 40px;
+    }
+
+    .slide-content .explore-btn {
+        border: solid var(--text-color) 1px;
+        padding: 5px 10px;
+        border-radius: 50px;
+        margin-bottom: 10px;
+        color: var(--text-color);
+        background-color: transparent;
+    }
+
+    .slide-content .buy-now {
+        border: solid var(--text-color) 1px;
+        padding: 5px 10px;
+        border-radius: 50px;
+        margin-bottom: 10px;
+        background-color: transparent;
+    }
+
+    .slide-content .category {
+        font-weight: 300;
+        font-size: medium;
+    }
+
+
+    .slide-content h2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        font-size: 22px;
+        font-weight: 600;
+    }
+
+    .see-more-btn {
+        display: block;
+        margin: 3px auto;
+        text-align: center;
+        color: var(--text-color);
+    }
+
+    @media (max-width: 767px) {
+
+        .swiper-slide .slide-img {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Max height limit for portrait image */
+        .swiper-slide .slide-img img {
+            max-height: 40vh;
+            /* iske aage portrait image nahi badegi */
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
+        }
+    }
+
+}
+
+@media (max-width: 767px) {
+
+    .swiper-slide .slide-img {
+        width: 85%;
+        transform: none;
+        scale: 0.7;
+        filter: blur(20px);
+        opacity: 0.6;
+        transition: all 1s ease;
+    }
+
+    /* active slide */
+    .swiper-slide.swiper-slide-active .slide-img {
+        scale: 1;
+        filter: blur(0px);
+        opacity: 1;
+    }
+
+    /* next slide */
+    .swiper-slide.swiper-slide-next .slide-img {
+        scale: 0.85;
+        filter: blur(8px);
+        opacity: 0.8;
+    }
+
+    /* blur background effect */
+    .swiper-slide.swiper-slide-active .slide-img-blur {
+        opacity: 0.4;
+        filter: blur(50px);
+        position: absolute;
+        z-index: -1;
+    }
+
+}
+
+@media (max-width: 767px) {
+
+    /* base content state */
+    .swiper-slide .slide-content {
+        position: static;
+        opacity: 0.4;
+        filter: blur(10px);
+        transform: scale(0.9);
+        transition: all 0.8s ease;
+        width: 90%;
+        text-align: center;
+        margin-top: 20px;
+
+    }
+
+    /* active slide content */
+    .swiper-slide.swiper-slide-active .slide-content {
+        opacity: 1;
+        filter: blur(0);
+        transform: scale(1);
+    }
+
+    /* next slide content */
+    .swiper-slide.swiper-slide-next .slide-content {
+        opacity: 0.7;
+        filter: blur(4px);
+        transform: scale(0.95);
+    }
+
+}
+
+/* extra smooth effect */
+@media (max-width: 767px) {
+
+    /* base state */
+    .swiper-slide .slide-content {
+        position: static;
+        width: 95%;
+        text-align: center;
+        margin-top: 20px;
+        opacity: 0;
+        filter: blur(15px);
+        transform: translateY(60px);
+        transition: all 0.8s ease;
+
+    }
+
+    /* active slide content */
+    .swiper-slide.swiper-slide-active .slide-content {
+        opacity: 1;
+        filter: blur(0);
+        transform: translateY(0);
+    }
+
+    /* next slide content */
+    .swiper-slide.swiper-slide-next .slide-content {
+        opacity: 0.6;
+        filter: blur(6px);
+        transform: translateY(20px);
+    }
+
+}
+
+/* heading */
+@media (max-width: 767px) {
+    .product-slider .main-container {
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* 5% heading */
+    .slider-heading {
+        height: 5%;
+        min-height: 30px;
+        /* responsive safety */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-color);
+
+    }
+
+    .slider-heading h1 {
+        font-size: clamp(1.5rem, 2vw, 2.5rem);
+    }
+
+    /* 95% slider */
+    .slider-wrapper {
+        height: 95%;
+    }
+
+    /* IMPORTANT: swiper full height */
+    .mySwiper {
+        height: 100%;
+    }
+}
