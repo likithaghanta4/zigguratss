@@ -1,8 +1,8 @@
 import React from 'react';
-import image9 from '../image9.jpg';
-import image7 from '../image7.jpg';
-import image6 from '../image6.jpg';
-import image5 from '../image5.jpg';
+import image9 from '../assets/User-images/image9.jpg';
+import image7 from '../assets/User-images/image7.jpg';
+import image6 from '../assets/User-images/image6.jpg';
+import image5 from '../assets/User-images/image5.jpg';
 
 export function FeaturedCollections() {
   const collections = [

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { ChevronRight, Home } from 'lucide-react';
-import back2 from '../back2.jpg';
-import birds from '../birds.jpg';
-import bird1 from '../bird1.jpg';
+import back2 from '../assets/User-images/back2.jpg';
+import birds from '../assets/User-images/birds.jpg';
+import bird1 from '../assets/User-images/bird1.jpg';
 
 export function MyInformation() {
   const [formData, setFormData] = useState({

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import About from "./AboutPage";
 import { Link } from 'react-router-dom';
-import logo from "../assets/logo.png";
+import logo from "../assets/Logo.png";
 
 /* ─────────────────────────────────────
     DATA OBJECT (Unchanged)
@@ -305,7 +305,7 @@ const Navbar = () => {
       
       <aside className={`lg:hidden fixed top-0 left-0 w-[85%] max-w-[400px] bottom-0 z-[70] bg-[#0a0a0a] border-r border-white/10 flex flex-col transition-transform duration-500 ease-out ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-6 border-b border-white/5 flex items-center justify-between">
-            <img src="/logo.png" alt="Logo" className="h-8 w-auto" />
+            <img src={logo} alt="Logo" className="h-8 w-auto" />
             <button onClick={() => setMobileOpen(false)} className="text-[#C5A059]">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
             </button>

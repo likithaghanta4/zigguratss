@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { gsap } from 'gsap';
 import ContactForm from '../components/ContactForm';
-import Navbar from '../components/NavBar';
+import Navbar from '../components/Navbar';
 import '../styles/contact-scroll.css';
 
 const isMobileDevice = () => window.innerWidth <= 768;
