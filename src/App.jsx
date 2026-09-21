@@ -10,7 +10,7 @@ import PageTransition from './components/PageTransition'
 import { Sliders } from 'lucide-react'
 import ProductSlider from './components/ProductSlider'
 import Navbar from './components/Navbar'
-import GridSection from './components/grid'
+import GridSection from './components/Grid'
 import { CustomCursor } from './components/CustomCursor'
 import { SmoothScroll } from './components/SmoothScroll'
 import Mostviewart from './components/Mostviewart'
@@ -52,13 +52,13 @@ const App = () => {
     <SmoothScroll>
       <div className="relative min-h-screen w-full flex flex-col">
         <CustomCursor />
-        <Navbar /> 
+        <Navbar />
         <main className="flex-grow">
           <PageTransition>
-        <Routes>
-          <Route path='/' element={<Home />} ></Route>
-          <Route path="/about" element={<AboutPage />} />
-          {/* <Route
+            <Routes>
+              <Route path='/' element={<Home />} ></Route>
+              <Route path="/about" element={<AboutPage />} />
+              {/* <Route
             path="/blog"
             element={
               <BlogSection
@@ -69,27 +69,27 @@ const App = () => {
               />
             }
           /> */}
-          <Route path="/contact" element={<Contact />} />
-          <Route path='/slider' element={<ProductSlider/>} ></Route>
-          <Route path='grid' element={<GridSection/>} ></Route>
-          <Route path='most' element={<Mostviewart/>} ></Route>
-          <Route path="/artist" element={<Canvas/>} ></Route>
-          <Route path="/artwork" element={<ArtworkProductsPage/>} ></Route>
-          <Route path='carousel' element={<DesignCarousel/>} ></Route>
-          <Route path="/artistartworks" element={<ArtistArtworks/>} ></Route>
-          <Route path="/login" element={<LoginPage/>} ></Route>
-          <Route path="/Product" element={<ProductPage />} />
-          <Route path="/Delivery" element={<DeliverToOrder />} />
-          <Route path="/blog" element={<FinalBlog />} />
-          <Route path="/article/:id" element={<ArticlePage />} />
-          <Route path="/User" element={<UserPanel />} />
-          <Route path="/privacy" element={<PrivacyPolicy />} />
-          <Route path="/terms" element={<TermsAndConditions />} />
-          <Route path="/admin" element={<AdminPanel />} />
-        </Routes>
-      </PageTransition>
-    </main>
-      {/* Footer would go here */}
+              <Route path="/contact" element={<Contact />} />
+              <Route path='/slider' element={<ProductSlider />} ></Route>
+              <Route path='grid' element={<GridSection />} ></Route>
+              <Route path='most' element={<Mostviewart />} ></Route>
+              <Route path="/artist" element={<Canvas />} ></Route>
+              <Route path="/artwork" element={<ArtworkProductsPage />} ></Route>
+              <Route path='carousel' element={<DesignCarousel />} ></Route>
+              <Route path="/artistartworks" element={<ArtistArtworks />} ></Route>
+              <Route path="/login" element={<LoginPage />} ></Route>
+              <Route path="/Product" element={<ProductPage />} />
+              <Route path="/Delivery" element={<DeliverToOrder />} />
+              <Route path="/blog" element={<FinalBlog />} />
+              <Route path="/article/:id" element={<ArticlePage />} />
+              <Route path="/User" element={<UserPanel />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/terms" element={<TermsAndConditions />} />
+              <Route path="/admin" element={<AdminPanel />} />
+            </Routes>
+          </PageTransition>
+        </main>
+        {/* Footer would go here */}
       </div>
     </SmoothScroll>
   )
