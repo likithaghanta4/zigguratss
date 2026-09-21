@@ -22,6 +22,131 @@ import hansImage from '../assets/ProductPage-images/hans.jpg'
 
 const ART_SRC = 'https://zigguratss.com/assets/upload/art-1155.jpg'
 
+// Luxury Art-Gallery Subtle Staggered Entrance Variants
+const panelContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.05
+    }
+  }
+}
+
+const subtleFadeUp = {
+  hidden: { opacity: 0, y: 7 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.45,
+      ease: [0.22, 1, 0.36, 1]
+    }
+  }
+}
+
+const subItemStaggerContainer = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.04,
+      delayChildren: 0.02
+    }
+  }
+}
+
+const subItemFade = {
+  hidden: { opacity: 0, y: 4 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.35,
+      ease: [0.22, 1, 0.36, 1]
+    }
+  }
+}
+
+// About the Artwork editorial section animation variants
+const aboutSectionVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.05
+    }
+  }
+}
+
+const aboutItemFadeUp = {
+  hidden: { opacity: 0, y: 14 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.55,
+      ease: [0.16, 1, 0.3, 1]
+    }
+  }
+}
+
+// Shipping & Returns editorial section animation variants
+const shippingSectionVariants = {
+  hidden: { opacity: 0, y: 20, scale: 0.985 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: {
+      duration: 0.6,
+      ease: [0.16, 1, 0.3, 1],
+      staggerChildren: 0.08,
+      delayChildren: 0.05
+    }
+  }
+}
+
+const shippingItemFadeUp = {
+  hidden: { opacity: 0, y: 15 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.55,
+      ease: [0.16, 1, 0.3, 1]
+    }
+  }
+}
+
+const shippingCardHeaderFade = {
+  hidden: { opacity: 0, y: 6 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.4,
+      delay: 0.05,
+      ease: [0.16, 1, 0.3, 1]
+    }
+  }
+}
+
+const shippingCardBodyFade = {
+  hidden: { opacity: 0, y: 6 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.45,
+      delay: 0.12,
+      ease: [0.16, 1, 0.3, 1]
+    }
+  }
+}
+
 const THUMBS = [
   { src: screenshotImage, alt: 'Divine Tunes-11 - main' },
   { src: screenshotImage, alt: 'Divine Tunes-11 - alternate' },
@@ -243,62 +368,97 @@ export default function ProductDetail() {
       {/* Left - Artwork - Takes 70% on desktop */}
       <div className="md:col-span-8 md:pr-4 md:pl-4">
         {/* Image Gallery Section */}
-        <div className="space-y-6">
-        <div 
-          className="relative rounded-lg overflow-visible"
-          style={{
-            background: 'white',
-            border: '1px solid #e2e8f0'
-          }}
-        >
-          <motion.div
-            key={active}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.45 }}
-            className="w-full h-[420px] sm:h-[520px] md:h-[640px] bg-white cursor-zoom-in rounded-lg flex items-center justify-center"
-            onClick={() => setOpen(true)}
+        <div className="space-y-5">
+          {/* Main Artwork Frame */}
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.96, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+            className="relative rounded-2xl overflow-hidden bg-gradient-to-b from-slate-50/60 to-white border border-slate-200/80 shadow-[0_4px_25px_rgba(0,0,0,0.04)]"
           >
-            {galleryThumbs[active]?.isWallHung ? (
-              <WallHangedImageGenerator 
-                src={galleryThumbs[active].src}
-                alt={galleryThumbs[active].alt}
-                width={800}
-                height={480}
-              />
-            ) : (
-              <img
-                src={galleryThumbs[active].src}
-                alt={galleryThumbs[active].alt}
-                className="w-full h-full object-contain"
-                style={{ imageRendering: "auto" }}
-              />
-            )}
+            <div
+              className="w-full h-[420px] sm:h-[520px] md:h-[640px] cursor-zoom-in flex items-center justify-center relative overflow-hidden p-3 sm:p-6"
+              onClick={() => setOpen(true)}
+            >
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={active}
+                  initial={{ opacity: 0, scale: 0.98 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 1.015 }}
+                  transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                  whileHover={{ scale: 1.035, transition: { duration: 0.35, ease: "easeOut" } }}
+                  className="w-full h-full flex items-center justify-center"
+                >
+                  {galleryThumbs[active]?.isWallHung ? (
+                    <WallHangedImageGenerator 
+                      src={galleryThumbs[active].src}
+                      alt={galleryThumbs[active].alt}
+                      width={800}
+                      height={480}
+                    />
+                  ) : (
+                    <img
+                      src={galleryThumbs[active].src}
+                      alt={galleryThumbs[active].alt}
+                      className="w-full h-full object-contain select-none filter drop-shadow-sm"
+                      style={{ imageRendering: "auto" }}
+                    />
+                  )}
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* Gallery Control Buttons (Zoom & Fullscreen) */}
+            <div className="absolute top-3 right-3 sm:top-4 sm:right-4 flex items-center space-x-2 z-10">
+              <motion.button 
+                whileHover={{ scale: 1.08, y: -1.5 }}
+                whileTap={{ scale: 0.94 }}
+                aria-label="Zoom" 
+                onClick={() => setOpen(true)} 
+                className="p-2 sm:p-2.5 bg-white/95 backdrop-blur-md rounded-lg shadow-sm border border-slate-200 hover:border-[#c9a96e] hover:bg-[#c9a96e] text-slate-700 hover:text-white transition-colors duration-200 cursor-pointer"
+              >
+                <ZoomIn size={16} className="sm:w-[17px] sm:h-[17px]" />
+              </motion.button>
+              <motion.button 
+                whileHover={{ scale: 1.08, y: -1.5 }}
+                whileTap={{ scale: 0.94 }}
+                aria-label="Fullscreen" 
+                onClick={() => setOpen(true)} 
+                className="p-2 sm:p-2.5 bg-white/95 backdrop-blur-md rounded-lg shadow-sm border border-slate-200 hover:border-[#c9a96e] hover:bg-[#c9a96e] text-slate-700 hover:text-white transition-colors duration-200 cursor-pointer"
+              >
+                <Maximize2 size={16} className="sm:w-[17px] sm:h-[17px]" />
+              </motion.button>
+            </div>
           </motion.div>
 
-          <div className="absolute top-2 right-2 sm:top-4 sm:right-4 flex items-center space-x-2 sm:space-x-3" style={active >= 3 ? { top: '32px', right: '32px' } : {}}>
-            <button aria-label="Zoom" onClick={() => setOpen(true)} className="p-1.5 sm:p-2 bg-white rounded-md shadow-sm border-2 border-[#c9a96e] hover:bg-[#c9a96e] hover:border-[#a87d4d] transition-all">
-              <ZoomIn size={16} className="sm:w-[18px] sm:h-[18px] text-black" />
-            </button>
-            <button aria-label="Fullscreen" onClick={() => setOpen(true)} className="p-1.5 sm:p-2 bg-white rounded-md shadow-sm border-2 border-[#c9a96e] hover:bg-[#c9a96e] hover:border-[#a87d4d] transition-all">
-              <Maximize2 size={16} className="sm:w-[18px] sm:h-[18px] text-black" />
-            </button>
-          </div>
-        </div>
-
-        <div ref={thumbnailContainerRef} className="flex md:justify-center items-center space-x-2 sm:space-x-3 md:space-x-4 overflow-x-auto pb-4 snap-x snap-mandatory px-0" style={{ scrollbarWidth: 'none', scrollbarColor: '#c9a96e #f1f5f9' }}>
-          {galleryThumbs.map((t, i) => {
-            return (
-              <button
+          {/* Thumbnail Gallery */}
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.12, ease: [0.16, 1, 0.3, 1] }}
+            ref={thumbnailContainerRef} 
+            className="flex md:justify-center items-center space-x-2.5 sm:space-x-3 md:space-x-3.5 overflow-x-auto py-2 snap-x snap-mandatory px-1" 
+            style={{ scrollbarWidth: 'none' }}
+          >
+            {galleryThumbs.map((t, i) => (
+              <motion.button
                 key={`${t.src}-${i}`}
                 onClick={() => setActive(i)}
-                className={`flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-md transition-all cursor-pointer overflow-hidden border-2 snap-center ${i === active ? 'border-[#c9a96e]' : 'border-slate-200'} bg-white hover:border-[#c9a96e]`}
+                whileHover={{ y: -4, scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                className={`flex-shrink-0 w-20 h-20 sm:w-24 sm:h-24 md:w-26 md:h-26 rounded-xl cursor-pointer overflow-hidden snap-center bg-white transition-colors duration-200 ${
+                  i === active 
+                    ? 'border-2 border-[#c9a96e] shadow-[0_4px_14px_rgba(201,169,110,0.25)] ring-2 ring-[#c9a96e]/20 opacity-100' 
+                    : 'border border-slate-200/90 hover:border-[#c9a96e]/70 hover:shadow-md opacity-75 hover:opacity-100'
+                }`}
                 aria-label={`Thumbnail ${i + 1}`}
               >
                 {t.isWallHung ? (
                   <WallHangedImageGenerator 
                     src={t.src} 
-                    alt={t.alt}
+                    alt={t.alt} 
                     width={320}
                     height={192}
                   />
@@ -306,94 +466,130 @@ export default function ProductDetail() {
                   <img 
                     src={t.src} 
                     alt={t.alt} 
-                    className="w-full h-full object-contain pointer-events-none bg-white"
+                    className="w-full h-full object-contain pointer-events-none bg-white p-1"
                   />
                 )}
-              </button>
-            );
-          })}
-        </div>
+              </motion.button>
+            ))}
+          </motion.div>
         </div>
 
         {/* Divine Tunes Box - Mobile Only */}
         <motion.div
-          className="md:hidden -mx-4 sm:-mx-0 mt-0 px-4 sm:px-0 py-0"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          className="md:hidden -mx-4 sm:-mx-0 mt-6 px-4 sm:px-0 py-0"
+          variants={panelContainerVariants}
+          initial="hidden"
+          animate="visible"
         >
-          <div className="w-full bg-white rounded-lg border-2 border-slate-300 text-slate-900 shadow-lg overflow-hidden">
-            {/* Content */}
-            <div className="p-4">
-              <h1 className="font-serif text-2xl font-bold leading-tight mb-0.5">Divine Tunes-11</h1>
-              <p className="text-xs text-slate-600 mb-2">Pradip Sarkar</p>
-
-              {/* Price Section */}
-              <div className="mb-2.5 pb-2.5 border-b border-slate-200">
-                <p className="text-xs text-slate-500 font-medium">Price</p>
-                <p className="text-lg font-bold text-slate-900">₹1,18,300 <span className="text-xs text-slate-500 font-normal">($1,577.33)</span></p>
-                <p className="text-xs text-slate-500">Tax included</p>
-              </div>
-
-              {/* Artwork Details Grid - Expanded */}
-              <div className="mb-2.5 pb-2.5 border-b border-slate-200">
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div>
-                    <p className="text-slate-500 font-medium">Size (inch)</p>
-                    <p className="font-bold text-slate-900">32.00 x 30.00</p>
-                  </div>
-                  <div>
-                    <p className="text-slate-500 font-medium">Size (cm)</p>
-                    <p className="font-bold text-slate-900">81.28 x 76.20</p>
-                  </div>
-                  <div>
-                    <p className="text-slate-500 font-medium">Type</p>
-                    <p className="font-bold text-slate-900">Painting</p>
-                  </div>
-                  <div>
-                    <p className="text-slate-500 font-medium">Year</p>
-                    <p className="font-bold text-slate-900">2023</p>
-                  </div>
-                  <div>
-                    <p className="text-slate-500 font-medium">Medium</p>
-                    <p className="font-bold text-slate-900">Acrylic Canvas</p>
-                  </div>
-                  <div>
-                    <p className="text-slate-500 font-medium">Style</p>
-                    <p className="font-bold text-slate-900">Geometric</p>
-                  </div>
-                  <div>
-                    <p className="text-slate-500 font-medium">Technique</p>
-                    <p className="font-bold text-slate-900">Layered</p>
-                  </div>
-                  <div>
-                    <p className="text-slate-500 font-medium">Category</p>
-                    <p className="font-bold text-slate-900">Abstract</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Features */}
-              <div className="mb-2.5 space-y-1 text-xs">
-                <div className="flex items-center gap-2"><CheckCircle size={12} className="text-green-600 flex-shrink-0" /> <span className="text-slate-700">14-Days Money Back Guarantee</span></div>
-                <div className="flex items-center gap-2"><Shield size={12} className="text-blue-600 flex-shrink-0" /> <span className="text-slate-700">100% Secured Payment</span></div>
-                <div className="flex items-center gap-2"><CheckCircle size={12} className="text-green-600 flex-shrink-0" /> <span className="text-slate-700">Certificate of Authenticity</span></div>
-                <div className="flex items-center gap-2"><Truck size={12} className="text-amber-600 flex-shrink-0" /> <span className="text-slate-700">Free shipping world wide</span></div>
-              </div>
-
-              {/* Buttons */}
-              <div className="flex gap-1.5">
-                <button className="flex-1 py-2.5 px-2 bg-[#c9a96e] hover:bg-[#a87d4d] text-white rounded text-xs font-semibold transition-all flex items-center justify-center gap-1">
-                  <ShoppingCart size={13} /> Add
-                </button>
-                <button onClick={() => setShowOfferModal(true)} className="flex-1 py-2.5 px-2 border-2 border-[#c9a96e] text-[#c9a96e] hover:bg-[#c9a96e] hover:text-white rounded text-xs font-semibold transition-all">
-                  Offer
-                </button>
-                <button className="flex-1 py-2.5 px-2 bg-[#c9a96e] hover:bg-[#a87d4d] text-white rounded text-xs font-semibold transition-all">
-                  Buy
-                </button>
-              </div>
+          <div className="w-full bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
+            {/* Title & Artist */}
+            <div className="space-y-1">
+              <motion.h1 variants={subtleFadeUp} className="font-serif text-2xl sm:text-3xl font-normal text-slate-900 leading-tight">
+                Divine Tunes-11
+              </motion.h1>
+              <motion.a variants={subtleFadeUp} href="#" className="text-xs uppercase tracking-[0.12em] text-slate-500 font-medium hover:text-[#c9a96e] transition-colors inline-block mb-2.5">
+                Pradip Sarkar
+              </motion.a>
             </div>
+
+            {/* Price Section */}
+            <motion.div variants={subtleFadeUp} className="py-3 border-y border-slate-100 mb-3.5">
+              <p className="text-[10px] uppercase tracking-[0.16em] text-slate-400 font-semibold">Price</p>
+              <div className="flex items-baseline gap-2 mt-0.5">
+                <span className="text-xl font-serif font-medium text-slate-900">₹1,18,300</span>
+                <span className="text-xs text-slate-400 font-normal">($1,577.33)</span>
+              </div>
+              <p className="text-[10px] text-slate-400 mt-0.5 font-light">Tax included</p>
+            </motion.div>
+
+            {/* Artwork Details Grid */}
+            <motion.div variants={subtleFadeUp} className="pb-3.5 border-b border-slate-100 mb-3.5">
+              <div className="text-[10px] uppercase tracking-[0.16em] text-slate-400 font-semibold mb-2">Specifications</div>
+              <motion.div variants={subItemStaggerContainer} className="grid grid-cols-2 gap-2 text-xs">
+                <motion.div variants={subItemFade}>
+                  <p className="text-slate-400 text-[10px] uppercase tracking-wider font-medium">Size (inch)</p>
+                  <p className="font-medium text-slate-800">32.00 x 30.00</p>
+                </motion.div>
+                <motion.div variants={subItemFade}>
+                  <p className="text-slate-400 text-[10px] uppercase tracking-wider font-medium">Size (cm)</p>
+                  <p className="font-medium text-slate-800">81.28 x 76.20</p>
+                </motion.div>
+                <motion.div variants={subItemFade}>
+                  <p className="text-slate-400 text-[10px] uppercase tracking-wider font-medium">Type</p>
+                  <p className="font-medium text-slate-800">Painting</p>
+                </motion.div>
+                <motion.div variants={subItemFade}>
+                  <p className="text-slate-400 text-[10px] uppercase tracking-wider font-medium">Year</p>
+                  <p className="font-medium text-slate-800">2023</p>
+                </motion.div>
+                <motion.div variants={subItemFade}>
+                  <p className="text-slate-400 text-[10px] uppercase tracking-wider font-medium">Medium</p>
+                  <p className="font-medium text-slate-800">Acrylic Canvas</p>
+                </motion.div>
+                <motion.div variants={subItemFade}>
+                  <p className="text-slate-400 text-[10px] uppercase tracking-wider font-medium">Style</p>
+                  <p className="font-medium text-slate-800">Geometric</p>
+                </motion.div>
+                <motion.div variants={subItemFade}>
+                  <p className="text-slate-400 text-[10px] uppercase tracking-wider font-medium">Technique</p>
+                  <p className="font-medium text-slate-800">Layered</p>
+                </motion.div>
+                <motion.div variants={subItemFade}>
+                  <p className="text-slate-400 text-[10px] uppercase tracking-wider font-medium">Category</p>
+                  <p className="font-medium text-slate-800">Abstract</p>
+                </motion.div>
+              </motion.div>
+            </motion.div>
+
+            {/* Features */}
+            <motion.div variants={subtleFadeUp} className="mb-4">
+              <motion.div variants={subItemStaggerContainer} className="space-y-2 text-xs">
+                <motion.div variants={subItemFade} className="flex items-center gap-2.5 text-slate-600">
+                  <CheckCircle size={13} className="text-[#c9a96e] flex-shrink-0" />
+                  <span>14-Days Money Back Guarantee</span>
+                </motion.div>
+                <motion.div variants={subItemFade} className="flex items-center gap-2.5 text-slate-600">
+                  <Shield size={13} className="text-[#c9a96e] flex-shrink-0" />
+                  <span>100% Secured Payment</span>
+                </motion.div>
+                <motion.div variants={subItemFade} className="flex items-center gap-2.5 text-slate-600">
+                  <CheckCircle size={13} className="text-[#c9a96e] flex-shrink-0" />
+                  <span>Certificate of Authenticity</span>
+                </motion.div>
+                <motion.div variants={subItemFade} className="flex items-center gap-2.5 text-slate-600">
+                  <Truck size={13} className="text-[#c9a96e] flex-shrink-0" />
+                  <span>Free shipping world wide</span>
+                </motion.div>
+              </motion.div>
+            </motion.div>
+
+            {/* Buttons */}
+            <motion.div variants={subtleFadeUp} className="flex flex-col gap-2">
+              <div className="flex gap-2">
+                <motion.button 
+                  whileHover={{ y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                  className="flex-1 py-3 px-3 bg-slate-900 hover:bg-black text-white rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1.5 shadow-sm active:scale-[0.98]"
+                >
+                  <ShoppingCart size={13.5} /> Add to Cart
+                </motion.button>
+                <motion.button 
+                  whileHover={{ y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setShowOfferModal(true)} 
+                  className="flex-1 py-3 px-3 border border-[#c9a96e] text-[#a88242] hover:bg-[#c9a96e]/10 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1.5 active:scale-[0.98]"
+                >
+                  <MessageCircle size={13.5} /> Make an Offer
+                </motion.button>
+              </div>
+              <motion.button 
+                whileHover={{ y: -1 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full py-3 px-3 bg-[#c9a96e] hover:bg-[#b8935f] text-white rounded-lg text-xs font-medium transition-all shadow-sm flex items-center justify-center gap-1.5 active:scale-[0.98]"
+              >
+                <CreditCard size={13.5} /> Buy Now
+              </motion.button>
+            </motion.div>
           </div>
         </motion.div>
 
@@ -457,62 +653,53 @@ export default function ProductDetail() {
         {/* About the Artwork Section with Tabs */}
         <motion.div 
           className="mt-8"
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
           {/* Tabs Navigation */}
-          <div className="flex items-center gap-2 sm:gap-3 bg-slate-50/50 p-1.5 rounded-xl border border-slate-200 overflow-x-auto mb-6">
+          <div className="flex items-center gap-2 sm:gap-3 bg-slate-50/70 p-1.5 rounded-xl border border-slate-200/80 overflow-x-auto mb-6">
             <button 
               onClick={() => setTab('artwork')} 
               className={`
                 relative px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-medium whitespace-nowrap rounded-lg
-                transition-all duration-300 ease-in-out
+                transition-colors duration-200 cursor-pointer
                 ${tab === 'artwork' 
-                  ? 'bg-white text-[#c9a96e] shadow-md shadow-[#c9a96e]/10 border border-[#c9a96e]/20' 
-                  : 'text-slate-600 hover:text-[#c9a96e] hover:bg-white/50'
+                  ? 'bg-white text-[#c9a96e] shadow-sm border border-[#c9a96e]/30 font-semibold' 
+                  : 'text-slate-600 hover:text-[#c9a96e] hover:bg-white/60'
                 }
               `}
             >
               <span className="relative z-10">About the Artwork</span>
-              {tab === 'artwork' && (
-                <span className="absolute inset-0 bg-gradient-to-r from-[#c9a96e]/5 via-[#d4af7a]/5 to-[#c9a96e]/5 rounded-lg animate-pulse"></span>
-              )}
             </button>
             
             <button 
               onClick={() => setTab('artist')} 
               className={`
                 relative px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-medium whitespace-nowrap rounded-lg
-                transition-all duration-300 ease-in-out
+                transition-colors duration-200 cursor-pointer
                 ${tab === 'artist' 
-                  ? 'bg-white text-[#c9a96e] shadow-md shadow-[#c9a96e]/10 border border-[#c9a96e]/20' 
-                  : 'text-slate-600 hover:text-[#c9a96e] hover:bg-white/50'
+                  ? 'bg-white text-[#c9a96e] shadow-sm border border-[#c9a96e]/30 font-semibold' 
+                  : 'text-slate-600 hover:text-[#c9a96e] hover:bg-white/60'
                 }
               `}
             >
               <span className="relative z-10">Artist Bio</span>
-              {tab === 'artist' && (
-                <span className="absolute inset-0 bg-gradient-to-r from-[#c9a96e]/5 via-[#d4af7a]/5 to-[#c9a96e]/5 rounded-lg animate-pulse"></span>
-              )}
             </button>
             
             <button 
               onClick={() => setTab('shipping')} 
               className={`
                 relative px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-medium whitespace-nowrap rounded-lg
-                transition-all duration-300 ease-in-out
+                transition-colors duration-200 cursor-pointer
                 ${tab === 'shipping' 
-                  ? 'bg-white text-[#c9a96e] shadow-md shadow-[#c9a96e]/10 border border-[#c9a96e]/20' 
-                  : 'text-slate-600 hover:text-[#c9a96e] hover:bg-white/50'
+                  ? 'bg-white text-[#c9a96e] shadow-sm border border-[#c9a96e]/30 font-semibold' 
+                  : 'text-slate-600 hover:text-[#c9a96e] hover:bg-white/60'
                 }
               `}
             >
               <span className="relative z-10">Shipping & Returns</span>
-              {tab === 'shipping' && (
-                <span className="absolute inset-0 bg-gradient-to-r from-[#c9a96e]/5 via-[#d4af7a]/5 to-[#c9a96e]/5 rounded-lg animate-pulse"></span>
-              )}
             </button>
           </div>
 
@@ -521,61 +708,97 @@ export default function ProductDetail() {
             {/* About the Artwork Tab */}
             {tab === 'artwork' && (
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
+                variants={aboutSectionVariants}
+                initial="hidden"
+                animate="visible"
+                className="space-y-6"
               >
-                <motion.h3 
-                  className="text-3xl md:text-4xl font-serif font-extrabold text-slate-900 mb-6 flex items-center gap-4"
-                  initial={{ opacity: 0, x: -50 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.6, delay: 0.2 }}
-                >
+                {/* Heading & Accent Divider */}
+                <motion.div variants={aboutItemFadeUp} className="flex items-center gap-3.5 mb-5">
                   <motion.span 
-                    className="h-1 bg-gradient-to-r from-[#c9a96e] via-[#b8935f] to-[#c9a96e] transition-all duration-500 rounded-full shadow-lg"
-                    initial={{ width: 0 }}
-                    animate={{ width: 60 }}
-                    transition={{ duration: 1, delay: 0.4 }}
-                  ></motion.span>
-                  <span>About the Artwork</span>
-                </motion.h3>
+                    className="h-[2px] bg-gradient-to-r from-[#c9a96e] to-[#d4af7a] rounded-full inline-block"
+                    initial={{ width: 0, opacity: 0 }}
+                    animate={{ width: 40, opacity: 1 }}
+                    transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                  />
+                  <h3 className="text-2xl sm:text-3xl font-serif font-normal text-slate-900 tracking-tight">
+                    About the Artwork
+                  </h3>
+                </motion.div>
                 
-                <div className="space-y-4">
-                  <div className="font-semibold text-base">Divine Tunes-11 Painting series</div>
-                  <div>WxH: 32.00 x 30.00 inch (81.28 x 76.20 cm)</div>
-                  <div>Type of Artwork: Painting</div>
-                  <div>Shipped as: Rolled</div>
-
-                  <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                    <div><span className="font-semibold">Category:</span> Portrait</div>
-                    <div><span className="font-semibold">Style:</span> Geometric</div>
-                    <div><span className="font-semibold">Techniques:</span> Acrylic</div>
-                    <div><span className="font-semibold">Material used:</span> Canvas</div>
-                    <div><span className="font-semibold">Size (WxH):</span> 45.72 x 50.80 cm</div>
-                    <div><span className="font-semibold">Medium:</span> Acrylic</div>
-                    <div><span className="font-semibold">Selling Options:</span> Original</div>
-                    <div><span className="font-semibold">Year:</span> 2018</div>
-                    <div className="col-span-full"><span className="font-semibold">Delivery:</span> Stretched</div>
+                {/* Artwork Title & Overview */}
+                <motion.div variants={aboutItemFadeUp} className="space-y-1.5 pb-4 border-b border-slate-100">
+                  <div className="font-serif text-lg sm:text-xl font-medium text-slate-900">Divine Tunes-11 Painting series</div>
+                  <div className="text-xs sm:text-sm text-slate-600 font-light flex flex-wrap items-center gap-x-3 gap-y-1">
+                    <span><span className="font-medium text-slate-700">WxH:</span> 32.00 x 30.00 inch (81.28 x 76.20 cm)</span>
+                    <span className="text-slate-300">•</span>
+                    <span><span className="font-medium text-slate-700">Type of Artwork:</span> Painting</span>
+                    <span className="text-slate-300">•</span>
+                    <span><span className="font-medium text-slate-700">Shipped as:</span> Rolled</span>
                   </div>
+                </motion.div>
 
-                  <div className="mt-4">This piece is part of the 'DIVINE TUNES' series — a saga of urge whereby depicted deeds inspire others. Love, affection, innocence, bonding and festivity are the root of the sonata that created this ambiance of expression and effect. Art in itself is the final message.</div>
+                {/* Specifications Grid */}
+                <motion.div variants={aboutItemFadeUp} className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3.5 py-4 px-4 sm:px-5 bg-slate-50/70 rounded-xl border border-slate-100 text-xs">
+                  <div>
+                    <span className="text-[10px] uppercase tracking-[0.14em] text-slate-400 font-semibold block mb-0.5">Category</span>
+                    <span className="font-normal text-slate-800">Portrait</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase tracking-[0.14em] text-slate-400 font-semibold block mb-0.5">Style</span>
+                    <span className="font-normal text-slate-800">Geometric</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase tracking-[0.14em] text-slate-400 font-semibold block mb-0.5">Techniques</span>
+                    <span className="font-normal text-slate-800">Acrylic</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase tracking-[0.14em] text-slate-400 font-semibold block mb-0.5">Material used</span>
+                    <span className="font-normal text-slate-800">Canvas</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase tracking-[0.14em] text-slate-400 font-semibold block mb-0.5">Size (WxH)</span>
+                    <span className="font-normal text-slate-800">45.72 x 50.80 cm</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase tracking-[0.14em] text-slate-400 font-semibold block mb-0.5">Medium</span>
+                    <span className="font-normal text-slate-800">Acrylic</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase tracking-[0.14em] text-slate-400 font-semibold block mb-0.5">Selling Options</span>
+                    <span className="font-normal text-slate-800">Original</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase tracking-[0.14em] text-slate-400 font-semibold block mb-0.5">Year</span>
+                    <span className="font-normal text-slate-800">2018</span>
+                  </div>
+                  <div className="col-span-2 sm:col-span-3 md:col-span-4 pt-1.5 border-t border-slate-200/60 flex items-center gap-2">
+                    <span className="text-[10px] uppercase tracking-[0.14em] text-slate-400 font-semibold">Delivery:</span>
+                    <span className="font-medium text-slate-800">Stretched</span>
+                  </div>
+                </motion.div>
 
+                {/* Series Description */}
+                <motion.p variants={aboutItemFadeUp} className="text-slate-600 leading-relaxed font-light text-[15px]">
+                  This piece is part of the 'DIVINE TUNES' series — a saga of urge whereby depicted deeds inspire others. Love, affection, innocence, bonding and festivity are the root of the sonata that created this ambiance of expression and effect. Art in itself is the final message.
+                </motion.p>
+
+                {/* Curatorial Artwork Statement */}
+                <motion.div variants={aboutItemFadeUp}>
                   <ArtworkStatement title="Lady and Butterflies" defaultOpen={true}>
-                    <div className="space-y-3">
-                      <p>To further enhance the connection with nature, I have included three butterflies in the painting. Resplendent in darker shades of purple and pink, they flutter gracefully around the woman's face. These ethereal creatures symbolize the delicate balance of life and the interconnectedness between all living beings.</p>
+                    <p>To further enhance the connection with nature, I have included three butterflies in the painting. Resplendent in darker shades of purple and pink, they flutter gracefully around the woman's face. These ethereal creatures symbolize the delicate balance of life and the interconnectedness between all living beings.</p>
 
-                      <p>"Lady and Butterflies" belongs to the series "In Harmony with Nature." This collection explores the profound connection and interdependence between humans and the natural world. Through my art, I strive to inspire viewers to embrace compassion, appreciate the beauty of nature, and live in harmony with our surroundings.</p>
+                    <p>"Lady and Butterflies" belongs to the series "In Harmony with Nature." This collection explores the profound connection and interdependence between humans and the natural world. Through my art, I strive to inspire viewers to embrace compassion, appreciate the beauty of nature, and live in harmony with our surroundings.</p>
 
-                      <h5 className="font-extrabold text-xl">Capturing the Awe-Inspiring Connection</h5>
-                      <p>With "Lady and Butterflies", I aimed to capture the profound and awe-inspiring connection between humans and nature. The woman's gentle smile and loving gaze reflect her appreciation for the beauty that surrounds her. It is a reminder that we, too, can experience this sense of wonder and unity by embracing our role as caretakers of the earth.</p>
+                    <h5 className="font-serif text-lg font-medium text-slate-900 pt-2 text-left">Capturing the Awe-Inspiring Connection</h5>
+                    <p>With "Lady and Butterflies", I aimed to capture the profound and awe-inspiring connection between humans and nature. The woman's gentle smile and loving gaze reflect her appreciation for the beauty that surrounds her. It is a reminder that we, too, can experience this sense of wonder and unity by embracing our role as caretakers of the earth.</p>
 
-                      <h5 className="font-extrabold text-xl">Living in Harmony with Nature</h5>
-                      <p>Through this artwork, I hope to convey the importance of living in harmony with nature. Our actions, both individually and collectively, reverberate through the delicate balance of ecosystems. By fostering empathy for all creatures, we can mitigate the negative impacts of human activities and strive towards a more sustainable coexistence.</p>
+                    <h5 className="font-serif text-lg font-medium text-slate-900 pt-2 text-left">Living in Harmony with Nature</h5>
+                    <p>Through this artwork, I hope to convey the importance of living in harmony with nature. Our actions, both individually and collectively, reverberate through the delicate balance of ecosystems. By fostering empathy for all creatures, we can mitigate the negative impacts of human activities and strive towards a more sustainable coexistence.</p>
 
-                      <p>In this series, I use symmetrical forms—squares, rectangles, checks, and butterflies—to cover the human figures. These geometric shapes represent the pursuit of perfection and balance, encapsulating the aspirations and struggles we all face as individuals striving for fulfillment.</p>
-                    </div>
+                    <p>In this series, I use symmetrical forms—squares, rectangles, checks, and butterflies—to cover the human figures. These geometric shapes represent the pursuit of perfection and balance, encapsulating the aspirations and struggles we all face as individuals striving for fulfillment.</p>
                   </ArtworkStatement>
-                </div>
+                </motion.div>
               </motion.div>
             )}
 
@@ -634,111 +857,174 @@ export default function ProductDetail() {
             {/* Shipping & Returns Tab */}
             {tab === 'shipping' && (
               <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
+                key="shipping-tab"
+                variants={shippingSectionVariants}
+                initial="hidden"
+                animate="visible"
                 className="space-y-6"
               >
                 {/* Shipping & Returns Policy Header */}
-                <div className="border-l-4 border-[#c9a96e] pl-4">
-                  <h3 className="text-2xl font-bold text-slate-900 mb-1">Shipping & Returns Policy</h3>
-                  <p className="text-sm text-slate-600">Worldwide delivery with care</p>
-                </div>
+                <motion.div 
+                  variants={{
+                    hidden: { opacity: 0, y: 15 },
+                    visible: { opacity: 1, y: 0, transition: { duration: 0.55, delay: 0.08, ease: [0.16, 1, 0.3, 1] } }
+                  }} 
+                  className="flex items-center gap-3.5 mb-6"
+                >
+                  <motion.span 
+                    className="h-[2px] bg-gradient-to-r from-[#c9a96e] to-[#d4af7a] rounded-full inline-block flex-shrink-0"
+                    initial={{ width: 0, opacity: 0 }}
+                    animate={{ width: 45, opacity: 1 }}
+                    transition={{ duration: 0.45, delay: 0.16, ease: [0.16, 1, 0.3, 1] }}
+                  />
+                  <div>
+                    <h3 className="text-2xl sm:text-3xl font-serif font-normal text-slate-900 tracking-tight">
+                      Shipping & Returns Policy
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-500 font-light mt-0.5">Worldwide delivery with care</p>
+                  </div>
+                </motion.div>
 
                 {/* Delivery Timeline Section */}
-                <div className="bg-slate-50 rounded-lg p-6 border border-slate-200">
-                  <h4 className="font-bold text-slate-900 text-lg mb-4">Delivery Timeline</h4>
+                <motion.div 
+                  variants={shippingItemFadeUp}
+                  whileHover={{ y: -4, transition: { duration: 0.38, ease: [0.16, 1, 0.3, 1] } }}
+                  className="group relative bg-slate-50/90 hover:bg-[#fcfaf5] rounded-xl pl-6 pr-5 py-5 sm:p-6 sm:pl-7 border border-slate-200/90 hover:border-[#c9a96e]/60 shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_28px_rgba(201,169,110,0.12)] transition-all duration-400 ease-out overflow-hidden"
+                >
+                  {/* Left Vertical Gold Accent */}
+                  <div className="absolute left-0 top-3.5 bottom-3.5 w-[2.5px] rounded-r bg-gradient-to-b from-[#c9a96e] via-[#d4af7a] to-[#c9a96e] opacity-25 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+
+                  <motion.div variants={shippingCardHeaderFade} className="flex items-center gap-2.5 mb-4">
+                    <Clock size={16} className="text-[#c9a96e] group-hover:text-[#b8935f] transform group-hover:scale-110 group-hover:-translate-y-0.5 transition-all duration-300 ease-out flex-shrink-0" />
+                    <h4 className="font-serif text-lg font-medium text-slate-900 group-hover:text-slate-950 transition-colors duration-300 tracking-tight">Delivery Timeline</h4>
+                  </motion.div>
                   
-                  <div className="space-y-3">
-                    <div className="bg-white p-4 rounded-md border border-slate-200">
-                      <div className="font-semibold text-slate-900 mb-1">Domestic Shipping</div>
-                      <p className="text-sm text-slate-600">5-7 business days</p>
+                  <motion.div variants={shippingCardBodyFade} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div className="bg-white p-4 rounded-lg border border-slate-200/80 shadow-xs">
+                      <div className="text-xs uppercase tracking-[0.14em] font-semibold text-slate-400 mb-1">Domestic Shipping</div>
+                      <p className="text-sm font-medium text-slate-800">5-7 business days</p>
                     </div>
                     
-                    <div className="bg-white p-4 rounded-md border border-slate-200">
-                      <div className="font-semibold text-slate-900 mb-1">International Shipping</div>
-                      <p className="text-sm text-slate-600">10-20 business days (varies by country)</p>
+                    <div className="bg-white p-4 rounded-lg border border-slate-200/80 shadow-xs">
+                      <div className="text-xs uppercase tracking-[0.14em] font-semibold text-slate-400 mb-1">International Shipping</div>
+                      <p className="text-sm font-medium text-slate-800">10-20 business days <span className="text-xs text-slate-500 font-normal">(varies by country)</span></p>
                     </div>
-                  </div>
-                </div>
+                  </motion.div>
+                </motion.div>
 
                 {/* Shipping Cost Section */}
-                <div className="bg-slate-50 rounded-lg p-6 border border-slate-200">
-                  <h4 className="font-bold text-slate-900 text-lg mb-4">Shipping Cost</h4>
+                <motion.div 
+                  variants={shippingItemFadeUp}
+                  whileHover={{ y: -4, transition: { duration: 0.38, ease: [0.16, 1, 0.3, 1] } }}
+                  className="group relative bg-slate-50/90 hover:bg-[#fcfaf5] rounded-xl pl-6 pr-5 py-5 sm:p-6 sm:pl-7 border border-slate-200/90 hover:border-[#c9a96e]/60 shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_28px_rgba(201,169,110,0.12)] transition-all duration-400 ease-out overflow-hidden"
+                >
+                  {/* Left Vertical Gold Accent */}
+                  <div className="absolute left-0 top-3.5 bottom-3.5 w-[2.5px] rounded-r bg-gradient-to-b from-[#c9a96e] via-[#d4af7a] to-[#c9a96e] opacity-25 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+
+                  <motion.div variants={shippingCardHeaderFade} className="flex items-center gap-2.5 mb-4">
+                    <Truck size={16} className="text-[#c9a96e] group-hover:text-[#b8935f] transform group-hover:scale-110 group-hover:-translate-y-0.5 transition-all duration-300 ease-out flex-shrink-0" />
+                    <h4 className="font-serif text-lg font-medium text-slate-900 group-hover:text-slate-950 transition-colors duration-300 tracking-tight">Shipping Cost</h4>
+                  </motion.div>
                   
-                  <div className="space-y-3">
-                    <div className="bg-white p-4 rounded-md border border-green-200">
-                      <p className="text-sm text-slate-700">
-                        <strong className="text-slate-900">Free shipping</strong> included in artwork price
+                  <motion.div variants={shippingCardBodyFade} className="space-y-2.5">
+                    <div className="bg-[#fdfbf7] p-4 rounded-lg border border-[#c9a96e]/35 shadow-xs flex items-center gap-3">
+                      <div className="p-1 rounded-full bg-[#c9a96e]/15 text-[#a88242]">
+                        <CheckCircle size={15} className="text-[#a88242] flex-shrink-0" />
+                      </div>
+                      <p className="text-xs sm:text-sm text-slate-700">
+                        <strong className="text-slate-900 font-medium">Free shipping</strong> included in artwork price
                       </p>
                     </div>
                     
-                    <div className="bg-white p-4 rounded-md border border-slate-200">
-                      <p className="text-sm text-slate-700">
-                        Custom duties, octroi & taxes are <strong>customer's responsibility</strong>
+                    <div className="bg-white p-4 rounded-lg border border-slate-200/80 shadow-xs flex items-center gap-3">
+                      <Shield size={15} className="text-[#c9a96e] flex-shrink-0" />
+                      <p className="text-xs sm:text-sm text-slate-700">
+                        Custom duties, octroi & taxes are <strong className="text-slate-900 font-medium">customer's responsibility</strong>
                       </p>
                     </div>
-                  </div>
-                </div>
+                  </motion.div>
+                </motion.div>
 
                 {/* Returns Policy Section */}
-                <div className="bg-slate-50 rounded-lg p-6 border border-slate-200">
-                  <h4 className="font-bold text-slate-900 text-lg mb-4">Returns Policy</h4>
+                <motion.div 
+                  variants={shippingItemFadeUp}
+                  whileHover={{ y: -4, transition: { duration: 0.38, ease: [0.16, 1, 0.3, 1] } }}
+                  className="group relative bg-slate-50/90 hover:bg-[#fcfaf5] rounded-xl pl-6 pr-5 py-5 sm:p-6 sm:pl-7 border border-slate-200/90 hover:border-[#c9a96e]/60 shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_28px_rgba(201,169,110,0.12)] transition-all duration-400 ease-out overflow-hidden"
+                >
+                  {/* Left Vertical Gold Accent */}
+                  <div className="absolute left-0 top-3.5 bottom-3.5 w-[2.5px] rounded-r bg-gradient-to-b from-[#c9a96e] via-[#d4af7a] to-[#c9a96e] opacity-25 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+
+                  <motion.div variants={shippingCardHeaderFade} className="flex items-center gap-2.5 mb-4">
+                    <RefreshCw size={16} className="text-[#c9a96e] group-hover:text-[#b8935f] transform group-hover:scale-110 group-hover:-translate-y-0.5 transition-all duration-300 ease-out flex-shrink-0" />
+                    <h4 className="font-serif text-lg font-medium text-slate-900 group-hover:text-slate-950 transition-colors duration-300 tracking-tight">Returns Policy</h4>
+                  </motion.div>
                   
-                  <div className="space-y-3">
-                    <div className="bg-white p-4 rounded-md border border-slate-200">
-                      <p className="text-sm text-slate-700 mb-2">
-                        <strong className="text-slate-900">24-hour window</strong> from delivery receipt
+                  <motion.div variants={shippingCardBodyFade} className="space-y-2.5">
+                    <div className="bg-white p-4 rounded-lg border border-slate-200/80 shadow-xs">
+                      <p className="text-xs sm:text-sm text-slate-700 mb-1">
+                        <strong className="text-slate-900 font-medium">24-hour window</strong> from delivery receipt
                       </p>
-                      <p className="text-sm text-slate-700">
-                        Returns accepted <strong>only if artwork is damaged</strong>
+                      <p className="text-xs sm:text-sm text-slate-600 font-light">
+                        Returns accepted <strong className="text-slate-900 font-medium">only if artwork is damaged</strong>
                       </p>
                     </div>
                     
-                    <div className="bg-amber-50 p-4 rounded-md border border-amber-200">
-                      <p className="text-sm text-slate-700">
-                        <strong className="text-slate-900">Note:</strong> Commissioned/custom orders are <strong className="text-amber-700">non-returnable</strong>
-                      </p>
+                    <div className="bg-slate-100/80 p-3.5 rounded-lg border border-slate-200/80 text-xs sm:text-sm text-slate-600 font-light">
+                      <strong className="text-slate-800 font-medium">Note:</strong> Commissioned/custom orders are <span className="text-[#a88242] font-medium">non-returnable</span>
                     </div>
-                  </div>
-                </div>
+                  </motion.div>
+                </motion.div>
 
                 {/* Premium Packaging Section */}
-                <div className="bg-slate-50 rounded-lg p-6 border border-slate-200">
-                  <h4 className="font-bold text-slate-900 text-lg mb-4">Premium Packaging</h4>
+                <motion.div 
+                  variants={shippingItemFadeUp}
+                  whileHover={{ y: -4, transition: { duration: 0.38, ease: [0.16, 1, 0.3, 1] } }}
+                  className="group relative bg-slate-50/90 hover:bg-[#fcfaf5] rounded-xl pl-6 pr-5 py-5 sm:p-6 sm:pl-7 border border-slate-200/90 hover:border-[#c9a96e]/60 shadow-[0_2px_8px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_28px_rgba(201,169,110,0.12)] transition-all duration-400 ease-out overflow-hidden"
+                >
+                  {/* Left Vertical Gold Accent */}
+                  <div className="absolute left-0 top-3.5 bottom-3.5 w-[2.5px] rounded-r bg-gradient-to-b from-[#c9a96e] via-[#d4af7a] to-[#c9a96e] opacity-25 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+
+                  <motion.div variants={shippingCardHeaderFade} className="flex items-center gap-2.5 mb-4">
+                    <Package size={16} className="text-[#c9a96e] group-hover:text-[#b8935f] transform group-hover:scale-110 group-hover:-translate-y-0.5 transition-all duration-300 ease-out flex-shrink-0" />
+                    <h4 className="font-serif text-lg font-medium text-slate-900 group-hover:text-slate-950 transition-colors duration-300 tracking-tight">Premium Packaging</h4>
+                  </motion.div>
                   
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <div className="bg-white p-3 rounded-md border border-slate-200 text-sm text-slate-700">
-                      Reinforced tube packaging
+                  <motion.div variants={shippingCardBodyFade} className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div className="bg-white p-3.5 rounded-lg border border-slate-200/80 text-xs sm:text-sm text-slate-700 flex items-center gap-2.5 shadow-xs">
+                      <CheckCircle size={14} className="text-[#c9a96e] flex-shrink-0" />
+                      <span>Reinforced tube packaging</span>
                     </div>
                     
-                    <div className="bg-white p-3 rounded-md border border-slate-200 text-sm text-slate-700">
-                      Professional framing available
+                    <div className="bg-white p-3.5 rounded-lg border border-slate-200/80 text-xs sm:text-sm text-slate-700 flex items-center gap-2.5 shadow-xs">
+                      <CheckCircle size={14} className="text-[#c9a96e] flex-shrink-0" />
+                      <span>Professional framing available</span>
                     </div>
                     
-                    <div className="bg-white p-3 rounded-md border border-slate-200 text-sm text-slate-700">
-                      Insured delivery option
+                    <div className="bg-white p-3.5 rounded-lg border border-slate-200/80 text-xs sm:text-sm text-slate-700 flex items-center gap-2.5 shadow-xs">
+                      <CheckCircle size={14} className="text-[#c9a96e] flex-shrink-0" />
+                      <span>Insured delivery option</span>
                     </div>
                     
-                    <div className="bg-white p-3 rounded-md border border-slate-200 text-sm text-slate-700">
-                      Secure bubble wrap
+                    <div className="bg-white p-3.5 rounded-lg border border-slate-200/80 text-xs sm:text-sm text-slate-700 flex items-center gap-2.5 shadow-xs">
+                      <CheckCircle size={14} className="text-[#c9a96e] flex-shrink-0" />
+                      <span>Secure bubble wrap</span>
                     </div>
-                  </div>
-                </div>
+                  </motion.div>
+                </motion.div>
 
                 {/* SKU Info */}
-                <div className="pt-4 border-t border-slate-200">
-                  <div className="flex items-center justify-between text-sm text-slate-600">
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-slate-900">SKU:</span>
-                      <span className="px-3 py-1 bg-slate-100 rounded-md font-mono text-xs">ART-1005</span>
+                <motion.div variants={shippingItemFadeUp} className="pt-4 border-t border-slate-200/80">
+                  <div className="flex items-center justify-between text-xs sm:text-sm text-slate-600">
+                    <div className="flex items-center gap-2 group/sku">
+                      <span className="text-[10px] uppercase tracking-[0.14em] font-semibold text-slate-400">SKU:</span>
+                      <span className="px-3.5 py-1.5 bg-slate-100/90 hover:bg-[#fcfaf5] border border-slate-200/80 hover:border-[#c9a96e]/40 rounded-md font-mono text-xs text-slate-800 transition-all duration-200 shadow-2xs">ART-1005</span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium text-slate-900">Stock:</span>
-                      <span className="px-3 py-1 bg-green-100 text-green-700 rounded-md font-semibold text-xs">1 of 1</span>
+                    <div className="flex items-center gap-2 group/stock">
+                      <span className="text-[10px] uppercase tracking-[0.14em] font-semibold text-slate-400">Stock:</span>
+                      <span className="px-3.5 py-1.5 bg-[#fbf7ee] hover:bg-[#f8f2e2] text-[#a88242] border border-[#c9a96e]/35 hover:border-[#c9a96e]/60 rounded-md font-medium text-xs transition-all duration-200 shadow-2xs">1 of 1</span>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               </motion.div>
             )}
           </div>
@@ -746,35 +1032,38 @@ export default function ProductDetail() {
 
         {/* Artist Section - Full Width in Left Column */}
         <motion.div 
-          className="mt-16 md:col-span-7 flex flex-col items-center justify-center w-full"
-          initial={{ opacity: 0, y: 60 }}
+          className="mt-16 md:col-span-8 flex flex-col items-center justify-center w-full"
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         >
-          <div className="w-full max-w-5xl mx-auto px-4 md:px-8">
-            <motion.h3 
-              className="text-4xl md:text-5xl font-serif font-extrabold text-slate-900 mb-8 flex items-center justify-center gap-4 group"
-              initial={{ opacity: 0, x: -50 }}
-              whileInView={{ opacity: 1, x: 0 }}
+          <div className="w-full max-w-3xl mx-auto px-2 sm:px-4">
+            <motion.div 
+              className="flex items-center justify-center gap-3.5 mb-6"
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: 0.2 }}
+              transition={{ duration: 0.55, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
             >
               <motion.span 
-                className="h-1 bg-gradient-to-r from-slate-900 via-emerald-600 to-teal-600 group-hover:from-emerald-600 group-hover:to-teal-600 transition-all duration-500 rounded-full shadow-lg"
-                initial={{ width: 0 }}
-                whileInView={{ width: 60 }}
+                className="h-[2px] bg-gradient-to-r from-[#c9a96e] to-[#d4af7a] rounded-full inline-block"
+                initial={{ width: 0, opacity: 0 }}
+                whileInView={{ width: 40, opacity: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 1, delay: 0.4 }}
-                whileHover={{ width: 80, height: 6 }}
-              ></motion.span>
-              <motion.span 
-                className="group-hover:text-emerald-600 transition-colors duration-300"
-                whileHover={{ scale: 1.05, x: 10 }}
-              >
+                transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+              />
+              <h3 className="text-2xl sm:text-3xl font-serif font-normal text-slate-900 tracking-tight">
                 The Artist
-              </motion.span>
-            </motion.h3>
+              </h3>
+              <motion.span 
+                className="h-[2px] bg-gradient-to-r from-[#d4af7a] to-[#c9a96e] rounded-full inline-block"
+                initial={{ width: 0, opacity: 0 }}
+                whileInView={{ width: 40, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+              />
+            </motion.div>
             <div className="flex justify-center">
               <ArtistCardMini name="Pradip Sarkar" image="https://res.cloudinary.com/dp2e8mfvm/image/upload/v1753511549/kwcnlfdzx5kebvxrr1gz.jpg" location="Mumbai, India" />
             </div>
@@ -784,86 +1073,131 @@ export default function ProductDetail() {
         {/* Artist Saga Section - Left Column Only */}
         <motion.div 
           className="mt-16 md:col-span-8"
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.75, ease: [0.16, 1, 0.3, 1] }}
         >
           <ArtistSaga />
         </motion.div>
       </div>
 
-      {/* Right - Completely Fixed Sidebar - Takes 30% - Desktop Only */}
-  <div className="hidden md:flex md:col-span-4 md:fixed md:top-0 md:right-0 md:w-[580px] md:h-screen md:overflow-auto md:justify-center md:items-start md:px-4 md:py-6">
+      {/* Right - Luxury Editorial Sidebar - Desktop Only */}
+      <div className="hidden md:flex md:col-span-4 md:fixed md:top-0 md:right-0 md:w-[460px] lg:w-[490px] xl:w-[530px] md:h-screen md:overflow-y-auto md:px-7 lg:px-9 xl:px-11 md:py-8 bg-white/95 backdrop-blur-md border-l border-slate-100 z-20">
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-  className="w-full min-h-[90vh] flex flex-col bg-white rounded-xl border-2 border-slate-300 text-slate-900 shadow-2xl overflow-hidden"
+          variants={panelContainerVariants}
+          initial="hidden"
+          animate="visible"
+          className="w-full my-auto flex flex-col text-slate-900 pb-6"
         >
-          {/* Top Section - Price & Buttons */}
-          <div className="flex-shrink-0 p-5 sm:p-7 border-b border-slate-200">
-            <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl font-bold">Divine Tunes-11</h1>
-            <a href="#" className="text-sm text-slate-600 block mt-2 hover:underline">Pradip Sarkar</a>
-
-            <div className="mt-6">
-              <div className="text-sm text-slate-500">Price</div>
-              <div className="text-xl sm:text-2xl font-semibold mt-1">₹1,18,300 <span className="text-xs sm:text-sm text-slate-500 font-normal">($1,577.33)</span></div>
-              <div className="text-xs text-slate-500 mt-1">Tax included</div>
-            </div>
-
-            {/* Artwork Details - Added */}
-            <div className="mt-4 pt-3 border-t border-slate-200">
-              <div className="space-y-2.5 text-xs sm:text-sm mb-3">
-                <div>
-                  <p className="text-slate-500 font-medium">Size (inch)</p>
-                  <p className="font-bold text-slate-900">32.00 x 30.00</p>
-                </div>
-                <div>
-                  <p className="text-slate-500 font-medium">Size (cm)</p>
-                  <p className="font-bold text-slate-900">81.28 x 76.20</p>
-                </div>
-                <div>
-                  <p className="text-slate-500 font-medium">Type</p>
-                  <p className="font-bold text-slate-900">Painting</p>
-                </div>
-                <div>
-                  <p className="text-slate-500 font-medium">Year</p>
-                  <p className="font-bold text-slate-900">2023</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="mt-4 space-y-2 text-xs sm:text-sm">
-              <div className="flex items-center space-x-2 text-slate-700"><RefreshCw size={14} className="sm:w-4 sm:h-4 flex-shrink-0" /> <span>14-Days Money Back Guarantee</span></div>
-              <div className="flex items-center space-x-2 text-slate-700"><Shield size={14} className="sm:w-4 sm:h-4 flex-shrink-0" /> <span>100% Secured Payment</span></div>
-              <div className="flex items-center space-x-2 text-slate-700"><CheckCircle size={14} className="sm:w-4 sm:h-4 flex-shrink-0" /> <span>Certificate of Authenticity</span></div>
-              <div className="flex items-center space-x-2 text-slate-700"><Truck size={14} className="sm:w-4 sm:h-4 flex-shrink-0" /> <span>Free shipping world wide</span></div>
-            </div>
-
-            <div className="mt-6 flex flex-col sm:flex-row gap-2">
-              <button className="flex-[0.8] flex items-center justify-center gap-1.5 px-3 py-3 bg-[#c9a96e] hover:bg-[#a87d4d] text-white rounded-lg font-semibold transition-all text-xs sm:text-sm">
-                <ShoppingCart size={15} /> <span>Add to Cart</span>
-              </button>
-              <button 
-                onClick={() => setShowOfferModal(true)}
-                className="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 border-2 border-[#c9a96e] rounded-lg text-[#c9a96e] hover:bg-[#c9a96e] hover:text-white font-semibold bg-white transition-all text-xs sm:text-sm"
-              >
-                <MessageCircle size={15} /> <span>Make an Offer</span>
-              </button>
-              <button className="flex-1 flex items-center justify-center gap-1.5 px-3 py-3 bg-[#c9a96e] hover:bg-[#a87d4d] text-white rounded-lg font-semibold transition-all text-xs sm:text-sm">
-                <CreditCard size={15} /> <span>Buy Now</span>
-              </button>
-            </div>
-
-            {/* Trust Badges - Golden */}
-            <div className="mt-8 pt-6 border-t border-slate-200 space-y-2.5 text-xs sm:text-sm">
-              <div className="flex items-center space-x-2"><RefreshCw size={14} className="text-[#c9a96e] flex-shrink-0" /> <span className="text-[#c9a96e] font-medium">14-Days Money Back Guarantee</span></div>
-              <div className="flex items-center space-x-2"><Shield size={14} className="text-[#c9a96e] flex-shrink-0" /> <span className="text-[#c9a96e] font-medium">100% Secured Payment</span></div>
-              <div className="flex items-center space-x-2"><CheckCircle size={14} className="text-[#c9a96e] flex-shrink-0" /> <span className="text-[#c9a96e] font-medium">Certificate of Authenticity</span></div>
-              <div className="flex items-center space-x-2"><Truck size={14} className="text-[#c9a96e] flex-shrink-0" /> <span className="text-[#c9a96e] font-medium">Free shipping world wide</span></div>
-            </div>
+          {/* Header: Title & Artist */}
+          <div className="space-y-1.5">
+            <motion.h1 
+              variants={subtleFadeUp}
+              className="font-serif text-3xl sm:text-4xl lg:text-[38px] font-normal tracking-tight text-slate-900 leading-[1.16]"
+            >
+              Divine Tunes-11
+            </motion.h1>
+            <motion.a 
+              variants={subtleFadeUp}
+              href="#" 
+              className="inline-block text-xs uppercase tracking-[0.14em] font-medium text-slate-500 hover:text-[#c9a96e] transition-colors duration-200"
+            >
+              Pradip Sarkar
+            </motion.a>
           </div>
+
+          {/* Price Section */}
+          <motion.div variants={subtleFadeUp} className="mt-5 pt-4 border-t border-slate-100">
+            <div className="text-[10px] uppercase tracking-[0.16em] text-slate-400 font-semibold">Price</div>
+            <div className="flex items-baseline gap-2.5 mt-1">
+              <span className="text-2xl lg:text-[28px] font-serif font-normal text-slate-900 tracking-tight">₹1,18,300</span>
+              <span className="text-xs lg:text-sm text-slate-400 font-normal">($1,577.33)</span>
+            </div>
+            <div className="text-[11px] text-slate-400 mt-0.5 font-light tracking-wide">Tax included</div>
+          </motion.div>
+
+          {/* Artwork Specifications */}
+          <motion.div variants={subtleFadeUp} className="mt-4 pt-4 border-t border-slate-100">
+            <div className="text-[10px] uppercase tracking-[0.16em] text-slate-400 font-semibold mb-2.5">Specifications</div>
+            <motion.div 
+              variants={subItemStaggerContainer}
+              className="grid grid-cols-2 gap-y-2.5 gap-x-5 text-xs"
+            >
+              <motion.div variants={subItemFade} className="flex flex-col">
+                <span className="text-slate-400 text-[10px] uppercase tracking-[0.12em] font-medium">Size (inch)</span>
+                <span className="font-medium text-slate-800 mt-0.5 text-xs lg:text-[13px]">32.00 × 30.00</span>
+              </motion.div>
+              <motion.div variants={subItemFade} className="flex flex-col">
+                <span className="text-slate-400 text-[10px] uppercase tracking-[0.12em] font-medium">Size (cm)</span>
+                <span className="font-medium text-slate-800 mt-0.5 text-xs lg:text-[13px]">81.28 × 76.20</span>
+              </motion.div>
+              <motion.div variants={subItemFade} className="flex flex-col">
+                <span className="text-slate-400 text-[10px] uppercase tracking-[0.12em] font-medium">Type</span>
+                <span className="font-medium text-slate-800 mt-0.5 text-xs lg:text-[13px]">Painting</span>
+              </motion.div>
+              <motion.div variants={subItemFade} className="flex flex-col">
+                <span className="text-slate-400 text-[10px] uppercase tracking-[0.12em] font-medium">Year</span>
+                <span className="font-medium text-slate-800 mt-0.5 text-xs lg:text-[13px]">2023</span>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+
+          {/* Trust & Guarantee Badges */}
+          <motion.div variants={subtleFadeUp} className="mt-4 pt-4 border-t border-slate-100">
+            <motion.div 
+              variants={subItemStaggerContainer}
+              className="space-y-2 text-xs"
+            >
+              <motion.div variants={subItemFade} className="flex items-center space-x-2.5 text-slate-600 hover:text-slate-900 transition-colors">
+                <RefreshCw size={13.5} className="text-[#c9a96e] flex-shrink-0" />
+                <span className="tracking-wide text-xs lg:text-[12.5px]">14-Days Money Back Guarantee</span>
+              </motion.div>
+              <motion.div variants={subItemFade} className="flex items-center space-x-2.5 text-slate-600 hover:text-slate-900 transition-colors">
+                <Shield size={13.5} className="text-[#c9a96e] flex-shrink-0" />
+                <span className="tracking-wide text-xs lg:text-[12.5px]">100% Secured Payment</span>
+              </motion.div>
+              <motion.div variants={subItemFade} className="flex items-center space-x-2.5 text-slate-600 hover:text-slate-900 transition-colors">
+                <CheckCircle size={13.5} className="text-[#c9a96e] flex-shrink-0" />
+                <span className="tracking-wide text-xs lg:text-[12.5px]">Certificate of Authenticity</span>
+              </motion.div>
+              <motion.div variants={subItemFade} className="flex items-center space-x-2.5 text-slate-600 hover:text-slate-900 transition-colors">
+                <Truck size={13.5} className="text-[#c9a96e] flex-shrink-0" />
+                <span className="tracking-wide text-xs lg:text-[12.5px]">Free shipping world wide</span>
+              </motion.div>
+            </motion.div>
+          </motion.div>
+
+          {/* Action Buttons */}
+          <motion.div variants={subtleFadeUp} className="mt-5 pt-4 border-t border-slate-100 flex flex-col gap-2">
+            <div className="flex gap-2">
+              <motion.button 
+                whileHover={{ y: -1.5, transition: { duration: 0.2 } }}
+                whileTap={{ scale: 0.98 }}
+                className="flex-1 flex items-center justify-center gap-1.5 px-3.5 py-3 bg-slate-900 hover:bg-black text-white rounded-lg font-medium transition-all duration-200 text-xs sm:text-[13px] tracking-wide shadow-sm hover:shadow cursor-pointer"
+              >
+                <ShoppingCart size={14} /> 
+                <span>Add to Cart</span>
+              </motion.button>
+              <motion.button 
+                whileHover={{ y: -1.5, transition: { duration: 0.2 } }}
+                whileTap={{ scale: 0.98 }}
+                onClick={() => setShowOfferModal(true)}
+                className="flex-1 flex items-center justify-center gap-1.5 px-3.5 py-3 border border-[#c9a96e] rounded-lg text-[#a88242] hover:bg-[#c9a96e]/10 font-medium bg-transparent transition-all duration-200 text-xs sm:text-[13px] tracking-wide cursor-pointer"
+              >
+                <MessageCircle size={14} /> 
+                <span>Make an Offer</span>
+              </motion.button>
+            </div>
+            <motion.button 
+              whileHover={{ y: -1.5, transition: { duration: 0.2 } }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full flex items-center justify-center gap-1.5 px-3.5 py-3 bg-[#c9a96e] hover:bg-[#b8935f] text-white rounded-lg font-medium transition-all duration-200 text-xs sm:text-[13px] tracking-wide shadow-sm hover:shadow cursor-pointer"
+            >
+              <CreditCard size={14} /> 
+              <span>Buy Now</span>
+            </motion.button>
+          </motion.div>
         </motion.div>
       </div>
     </div>

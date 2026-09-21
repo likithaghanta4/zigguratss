@@ -1,8 +1,6 @@
-import React, { useState, useRef } from 'react'
-import { motion, useAnimation } from 'framer-motion'
-import { useInView } from 'react-intersection-observer'
+import React, { useRef } from 'react'
+import { motion } from 'framer-motion'
 import ProductCard from './ProductCard'
-import { Clock, Package, RefreshCw, Shield, MapPin, Globe, CheckCircle } from 'lucide-react'
 import screenshotImage from '../assets/ProductPage-images/Screenshot from 2026-05-08 14-57-58.png'
 import flowersImage from '../assets/ProductPage-images/Screenshot from 2026-05-08 15-14-55.png'
 import './ArtistSaga.css'
@@ -13,9 +11,57 @@ const items = [
   { title: 'Materiality', body: 'Acrylic layers reveal brushwork and tactile presence.' },
 ]
 
+// Editorial luxury art-gallery animation variants
+const sagaContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.1
+    }
+  }
+}
+
+const sagaItemFadeUp = {
+  hidden: { opacity: 0, y: 14 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.55,
+      ease: [0.16, 1, 0.3, 1]
+    }
+  }
+}
+
+const relatedSectionVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.7,
+      ease: [0.16, 1, 0.3, 1]
+    }
+  }
+}
+
+// Staggered entrance variants for narrative theme cards
+const themeCardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: (i) => ({
+    opacity: 1,
+    y: 0,
+    transition: {
+      delay: 0.10 + i * 0.10,
+      duration: 0.6,
+      ease: [0.16, 1, 0.3, 1]
+    }
+  })
+}
+
 export default function ArtistSaga() {
-  const controls = useAnimation()
-  const [ref, inView] = useInView({ threshold: 0.2 })
   const marqueeRef1 = useRef(null)
   const marqueeRef2 = useRef(null)
   const scrollTimeoutRef1 = useRef(null)
@@ -23,38 +69,29 @@ export default function ArtistSaga() {
 
   const handleMarqueeScroll = (containerRef, timeoutRef) => {
     if (!containerRef.current) return
-
     const track = containerRef.current.querySelector('.marquee-track')
     if (!track) return
 
-    // Pause animation during manual scroll
     track.classList.add('paused-scroll')
-
-    // Clear existing timeout
     if (timeoutRef.current) clearTimeout(timeoutRef.current)
 
-    // Resume animation after scroll stops
     timeoutRef.current = setTimeout(() => {
       track.classList.remove('paused-scroll')
     }, 1500)
   }
 
   React.useEffect(() => {
-    if (inView) controls.start('visible')
-  }, [controls, inView])
-
-  React.useEffect(() => {
     const container1 = marqueeRef1.current
     const container2 = marqueeRef2.current
 
     if (container1) {
-      container1.addEventListener('scroll', () => handleMarqueeScroll(marqueeRef1, scrollTimeoutRef1))
-      container1.addEventListener('wheel', () => handleMarqueeScroll(marqueeRef1, scrollTimeoutRef1))
+      container1.addEventListener('scroll', () => handleMarqueeScroll(marqueeRef1, scrollTimeoutRef1), { passive: true })
+      container1.addEventListener('wheel', () => handleMarqueeScroll(marqueeRef1, scrollTimeoutRef1), { passive: true })
     }
 
     if (container2) {
-      container2.addEventListener('scroll', () => handleMarqueeScroll(marqueeRef2, scrollTimeoutRef2))
-      container2.addEventListener('wheel', () => handleMarqueeScroll(marqueeRef2, scrollTimeoutRef2))
+      container2.addEventListener('scroll', () => handleMarqueeScroll(marqueeRef2, scrollTimeoutRef2), { passive: true })
+      container2.addEventListener('wheel', () => handleMarqueeScroll(marqueeRef2, scrollTimeoutRef2), { passive: true })
     }
 
     return () => {
@@ -72,192 +109,126 @@ export default function ArtistSaga() {
   }, [])
 
   return (
-    <section ref={ref} data-artist-section className="mt-6 bg-gradient-to-br from-white via-slate-50/50 to-white p-2 sm:p-6 md:p-8 rounded-2xl border-2 border-slate-200 shadow-lg">
-      <div className="grid grid-cols-1 gap-4 sm:gap-6 md:gap-8 items-start">
+    <motion.section 
+      variants={sagaContainerVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-60px" }}
+      data-artist-section 
+      className="mt-6 bg-gradient-to-b from-slate-50/40 via-white to-[#fcfaf7]/50 p-5 sm:p-7 md:p-9 rounded-2xl border border-slate-200/80 shadow-[0_4px_25px_rgba(0,0,0,0.03)]"
+    >
+      <div className="grid grid-cols-1 gap-6 md:gap-8 items-start">
         {/* Content Section */}
         <div className="space-y-6">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            <h2 className="text-3xl font-serif font-bold text-slate-900 mb-2 bg-gradient-to-r from-slate-900 to-slate-600 bg-clip-text text-transparent">
-              Artist Saga
-            </h2>
-            <div className="text-slate-600 text-sm">A short overview of the artist's themes and practice</div>
+          {/* Section Header */}
+          <motion.div variants={sagaItemFadeUp}>
+            <div className="flex items-center gap-3.5 mb-2">
+              <motion.span 
+                className="h-[2px] bg-gradient-to-r from-[#c9a96e] to-[#d4af7a] rounded-full inline-block"
+                initial={{ width: 0, opacity: 0 }}
+                whileInView={{ width: 40, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+              />
+              <h2 className="text-2xl sm:text-3xl font-serif font-normal text-slate-900 tracking-tight">
+                Artist Saga
+              </h2>
+            </div>
+            <p className="text-xs sm:text-sm text-slate-500 font-light pl-0.5">
+              A short overview of the artist's themes and practice
+            </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 gap-5 max-w-4xl">
-            {items.map((it, i) => (
+          {/* Narrative Themes Grid with Staggered Entrance and Hover Accent */}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 max-w-4xl">
+            {items.map((it, index) => (
               <motion.div
                 key={it.title}
+                custom={index}
+                variants={themeCardVariants}
                 initial="hidden"
-                animate={controls}
-                variants={{
-                  hidden: { opacity: 0, y: 30 },
-                  visible: { opacity: 1, y: 0, transition: { delay: i * 0.15, type: "spring" } },
-                }}
-                whileHover={{ y: -5, scale: 1.02 }}
-                className="relative group p-5 rounded-xl border-2 border-slate-200 bg-white hover:border-slate-300 shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                whileHover={{ y: -3, transition: { duration: 0.25, ease: "easeOut" } }}
+                className="group relative p-5 sm:p-6 rounded-xl border border-slate-200/80 bg-white hover:bg-[#fcfaf5] hover:border-[#c9a96e]/40 shadow-[0_2px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_10px_30px_rgba(201,169,110,0.12)] transition-all duration-350 ease-out overflow-hidden cursor-default"
               >
-                {/* Gradient overlay on hover */}
-                <div className="absolute inset-0 bg-gradient-to-br from-slate-50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                
+                {/* Subtle gold accent line that smoothly grows on hover */}
+                <div className="absolute top-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-[#c9a96e] via-[#d4af7a] to-[#c9a96e] scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-400 ease-out" />
+
                 <div className="relative">
-                  <div className="text-lg font-bold text-slate-900 group-hover:text-slate-700 transition-colors mb-2">
+                  <div className="font-serif text-base sm:text-lg font-medium text-slate-900 group-hover:text-black transition-colors mb-1.5 tracking-tight">
                     {it.title}
                   </div>
-                  <div className="text-slate-600 text-sm leading-relaxed">{it.body}</div>
+                  <div className="text-slate-600 font-light text-xs sm:text-sm leading-relaxed">
+                    {it.body}
+                  </div>
                 </div>
-                
-                {/* Decorative corner accent */}
-                <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-slate-100 to-transparent rounded-bl-3xl opacity-50"></div>
               </motion.div>
             ))}
           </div>
         </div>
       </div>
       
-      {/* Shipping & Returns Section - Enhanced Paragraph Version */}
+      {/* Shipping & Returns Section */}
       <motion.div 
-        className="mt-10 pt-8 border-t-2 border-slate-200 max-w-4xl"
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.6 }}
+        variants={sagaItemFadeUp}
+        className="mt-10 pt-8 border-t border-slate-200/80 max-w-4xl"
       >
-        {/* Enhanced Heading with Animation */}
-        <motion.div
-          initial={{ opacity: 0, x: -30 }}
-          whileInView={{ opacity: 1, x: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="mb-6"
-        >
-          <motion.h3 
-            className="font-bold text-2xl text-slate-900 flex items-center gap-3 relative"
-            whileHover={{ x: 5 }}
-            transition={{ duration: 0.3 }}
-          >
-            {/* Animated Golden Bar */}
-            <motion.span 
-              className="w-1.5 h-8 bg-gradient-to-b from-[#c9a96e] via-[#d4af7a] to-[#b8935f] rounded-full shadow-md"
-              animate={{ 
-                scaleY: [1, 1.1, 1],
-                boxShadow: [
-                  "0 0 10px rgba(201, 169, 110, 0.3)",
-                  "0 0 20px rgba(201, 169, 110, 0.6)",
-                  "0 0 10px rgba(201, 169, 110, 0.3)"
-                ]
-              }}
-              transition={{ duration: 2, repeat: Infinity }}
-            ></motion.span>
-            
-            {/* Heading Text with Gradient */}
-            <span className="bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 bg-clip-text text-transparent">
-              Shipping & Returns
-            </span>
+        <div className="mb-5 flex items-center gap-3">
+          <span className="w-1.5 h-5 bg-gradient-to-b from-[#c9a96e] to-[#b8935f] rounded-full inline-block" />
+          <h3 className="font-serif text-xl sm:text-2xl font-normal text-slate-900 tracking-tight">
+            Shipping & Returns
+          </h3>
+        </div>
 
-            {/* Animated Underline */}
-            <motion.div 
-              className="absolute -bottom-2 left-12 h-0.5 bg-gradient-to-r from-[#c9a96e] via-[#d4af7a] to-transparent rounded-full"
-              initial={{ width: 0 }}
-              whileInView={{ width: "200px" }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-            ></motion.div>
-          </motion.h3>
-        </motion.div>
+        <div className="p-5 sm:p-6 rounded-xl bg-white border border-slate-200/80 shadow-[0_2px_12px_rgba(0,0,0,0.03)]">
+          <div className="text-xs sm:text-sm text-slate-700 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-baseline gap-1.5 sm:gap-3 p-3 bg-slate-50/70 rounded-lg border border-slate-100">
+              <span className="text-[#a88242] font-semibold min-w-[110px] text-xs uppercase tracking-wider">Delivery Time:</span>
+              <span className="text-slate-600 font-light">It takes <strong className="text-slate-900 font-medium">5–7 working days</strong> for domestic shipments, <strong className="text-slate-900 font-medium">10–20 working days</strong> for international shipments depending upon the country.</span>
+            </div>
 
-        {/* Enhanced Container with Golden Border Animation */}
-        <motion.div 
-          className="mt-4 relative p-6 rounded-xl overflow-hidden"
-          style={{
-            background: "linear-gradient(135deg, rgba(248, 250, 252, 1) 0%, rgba(255, 255, 255, 1) 50%, rgba(248, 250, 252, 1) 100%)"
-          }}
-          whileHover={{ scale: 1.01 }}
-          transition={{ duration: 0.3 }}
-        >
-          {/* Animated Golden Border */}
-          <motion.div
-            className="absolute inset-0 rounded-xl"
-            style={{
-              padding: "2px",
-              background: "linear-gradient(45deg, #c9a96e, #d4af7a, #c9a96e, #b8935f)",
-              backgroundSize: "300% 300%",
-              WebkitMask: "linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)",
-              WebkitMaskComposite: "xor",
-              maskComposite: "exclude"
-            }}
-            animate={{
-              backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"]
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-          >
-            {/* Glowing Corner Effects */}
-            <motion.div
-              className="absolute top-0 left-0 w-20 h-20 bg-gradient-to-br from-[#c9a96e]/20 to-transparent rounded-full blur-xl"
-              animate={{
-                opacity: [0.3, 0.6, 0.3],
-                scale: [1, 1.2, 1]
-              }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-            <motion.div
-              className="absolute bottom-0 right-0 w-20 h-20 bg-gradient-to-tl from-[#d4af7a]/20 to-transparent rounded-full blur-xl"
-              animate={{
-                opacity: [0.3, 0.6, 0.3],
-                scale: [1, 1.2, 1]
-              }}
-              transition={{ duration: 2, repeat: Infinity, delay: 1 }}
-            />
-          </motion.div>
+            <div className="flex flex-col sm:flex-row sm:items-baseline gap-1.5 sm:gap-3 p-3 bg-slate-50/70 rounded-lg border border-slate-100">
+              <span className="text-[#a88242] font-semibold min-w-[110px] text-xs uppercase tracking-wider">Delivery Cost:</span>
+              <span className="text-slate-600 font-light">Only <strong className="text-slate-900 font-medium">Shipping fee is included</strong> in the price of the Artwork. Custom Duties, Octroi and Taxes will be <strong className="text-slate-900 font-medium">borne by the Customer</strong>.</span>
+            </div>
 
-          {/* Content */}
-          <div className="relative z-10">
-            <div className="text-sm text-slate-700 space-y-4">
-            <motion.div 
-              className="flex gap-3 p-3 bg-white rounded-lg border border-slate-100 hover:border-[#c9a96e]/30 transition-colors"
-              whileHover={{ x: 5 }}
-            >
-              <span className="text-[#c9a96e] font-bold min-w-fit">Delivery Time:</span>
-              <span className="text-slate-700">It takes <strong className="text-slate-900">5–7 working days</strong> for domestic shipments, <strong className="text-slate-900">10–20 working days</strong> for international shipments depending upon the country.</span>
-            </motion.div>
-
-            <motion.div 
-              className="flex gap-3 p-3 bg-white rounded-lg border border-slate-100 hover:border-[#c9a96e]/30 transition-colors"
-              whileHover={{ x: 5 }}
-            >
-              <span className="text-[#c9a96e] font-bold min-w-fit">Delivery Cost:</span>
-              <span className="text-slate-700">Only <strong className="text-green-600">Shipping fee is included</strong> in the price of the Artwork. Custom Duties, Octroi and Taxes will be <strong className="text-slate-900">borne by the Customer</strong>.</span>
-            </motion.div>
-
-            <motion.div 
-              className="flex gap-3 p-3 bg-white rounded-lg border border-slate-100 hover:border-[#c9a96e]/30 transition-colors"
-              whileHover={{ x: 5 }}
-            >
-              <span className="text-[#c9a96e] font-bold min-w-fit">Returns:</span>
-              <span className="text-slate-700">Return will be accepted within <strong className="text-red-600">24 hours</strong> of receipt of artwork, only if artwork is found <strong className="text-slate-900">damaged</strong> (except order made on commission).</span>
-            </motion.div>
+            <div className="flex flex-col sm:flex-row sm:items-baseline gap-1.5 sm:gap-3 p-3 bg-slate-50/70 rounded-lg border border-slate-100">
+              <span className="text-[#a88242] font-semibold min-w-[110px] text-xs uppercase tracking-wider">Returns:</span>
+              <span className="text-slate-600 font-light">Return will be accepted within <strong className="text-slate-900 font-medium">24 hours</strong> of receipt of artwork, only if artwork is found <strong className="text-slate-900 font-medium">damaged</strong> (except order made on commission).</span>
+            </div>
           </div>
-          </div>
-        </motion.div>
+        </div>
       </motion.div>
 
       {/* Other Artworks Section - Infinite Marquee Slider */}
-      <div className="mt-10 max-w-full">
-        <h4 className="font-extrabold text-2xl text-slate-900 mb-4 flex items-center gap-3 px-4">
-          <span className="w-8 h-[2px] bg-gradient-to-r from-slate-900 to-slate-400"></span>
-          OTHER ARTWORKS FROM PRADIP SARKAR
-        </h4>
+      <motion.div 
+        variants={relatedSectionVariants} 
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-40px" }}
+        className="mt-10 max-w-full"
+      >
+        <div className="flex items-center gap-3 mb-4 px-1">
+          <motion.span 
+            className="h-[2px] bg-gradient-to-r from-[#c9a96e] to-[#d4af7a] rounded-full inline-block flex-shrink-0"
+            initial={{ width: 0, opacity: 0 }}
+            whileInView={{ width: 40, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.55, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          />
+          <h4 className="text-xs uppercase tracking-[0.16em] font-semibold text-slate-800">
+            OTHER ARTWORKS FROM PRADIP SARKAR
+          </h4>
+        </div>
         
-        {/* Marquee Container */}
-        <div ref={marqueeRef1} className="marquee-container bg-slate-50 rounded-lg py-4">
-          <div className="marquee-track" onMouseEnter={(e) => e.currentTarget.style.animationPlayState = 'paused'} onMouseLeave={(e) => e.currentTarget.style.animationPlayState = 'running'}>
+        {/* Marquee Container with edge fade mask */}
+        <div ref={marqueeRef1} className="marquee-container bg-slate-50/60 rounded-xl py-3 border border-slate-200/60">
+          <div 
+            className="marquee-track" 
+            onMouseEnter={(e) => { e.currentTarget.style.animationPlayState = 'paused' }} 
+            onMouseLeave={(e) => { e.currentTarget.style.animationPlayState = 'running' }}
+          >
             {/* Original items */}
             {[
               { id: 1, title: 'Divine Tunes-11', artist: 'Pradip Sarkar', image: flowersImage, price: '₹1,18,300' },
@@ -283,18 +254,36 @@ export default function ArtistSaga() {
             ))}
           </div>
         </div>
-      </div>
+      </motion.div>
 
       {/* Other Artists Section - Infinite Marquee Slider */}
-      <div className="mt-10 max-w-full">
-        <h4 className="font-extrabold text-2xl text-slate-900 mb-4 flex items-center gap-3 px-4">
-          <span className="w-8 h-[2px] bg-gradient-to-r from-slate-900 to-slate-400"></span>
-          ARTWORKS FROM OTHER ARTIST'S
-        </h4>
+      <motion.div 
+        variants={relatedSectionVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-40px" }}
+        className="mt-10 max-w-full"
+      >
+        <div className="flex items-center gap-3 mb-4 px-1">
+          <motion.span 
+            className="h-[2px] bg-gradient-to-r from-[#c9a96e] to-[#d4af7a] rounded-full inline-block flex-shrink-0"
+            initial={{ width: 0, opacity: 0 }}
+            whileInView={{ width: 40, opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.55, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          />
+          <h4 className="text-xs uppercase tracking-[0.16em] font-semibold text-slate-800">
+            ARTWORKS FROM OTHER ARTIST'S
+          </h4>
+        </div>
         
-        {/* Marquee Container */}
-        <div ref={marqueeRef2} className="marquee-container bg-slate-50 rounded-lg py-4">
-          <div className="marquee-track" onMouseEnter={(e) => e.currentTarget.style.animationPlayState = 'paused'} onMouseLeave={(e) => e.currentTarget.style.animationPlayState = 'running'}>
+        {/* Marquee Container with edge fade mask */}
+        <div ref={marqueeRef2} className="marquee-container bg-slate-50/60 rounded-xl py-3 border border-slate-200/60">
+          <div 
+            className="marquee-track" 
+            onMouseEnter={(e) => { e.currentTarget.style.animationPlayState = 'paused' }} 
+            onMouseLeave={(e) => { e.currentTarget.style.animationPlayState = 'running' }}
+          >
             {/* Original items */}
             {[
               { id: 'o1', title: 'Tune Of Bengal — 4', artist: 'Sekhar Roy', image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?q=80&w=1200&auto=format', price: '₹45,000' },
@@ -320,7 +309,7 @@ export default function ArtistSaga() {
             ))}
           </div>
         </div>
-      </div>
-    </section>
+      </motion.div>
+    </motion.section>
   )
 }

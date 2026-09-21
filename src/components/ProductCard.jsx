@@ -1,15 +1,29 @@
 import React, { useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+import { X } from 'lucide-react'
 import CTAButtons from './CTAButtons'
 
 export default function ProductCard({ title, artist, image, price, href = '#', verified = false, variant = 'tall', hidden = false }) {
   const [open, setOpen] = useState(false)
 
+  // Scroll lock and Escape key listener
   useEffect(() => {
     if (!open) return
-    const previous = document.body.style.overflow
+    const originalOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = previous }
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' || e.key === 'Esc') {
+        setOpen(false)
+      }
+    }
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.body.style.overflow = originalOverflow
+      window.removeEventListener('keydown', handleKeyDown)
+    }
   }, [open])
 
   // variant: 'tall' or 'short' -> controls image frame height for masonry-like look
@@ -42,8 +56,9 @@ export default function ProductCard({ title, artist, image, price, href = '#', v
   return (
     <>
       <motion.article
-        className="relative glass-card rounded-lg overflow-hidden shadow-sm product-card"
-        whileHover={!hidden ? { y: -6 } : {}}
+        className="group relative bg-white rounded-xl overflow-hidden border border-slate-200/80 hover:border-[#c9a96e]/45 shadow-[0_2px_10px_rgba(0,0,0,0.03)] hover:shadow-[0_10px_28px_rgba(201,169,110,0.10)] transition-all duration-350 ease-out product-card"
+        whileHover={!hidden ? { y: -3, transition: { duration: 0.35, ease: [0.16, 1, 0.3, 1] } } : {}}
+        whileTap={!hidden ? { scale: 0.985 } : {}}
         animate={{ 
           opacity: hidden ? 0 : 1,
           y: hidden ? 20 : 0
@@ -57,34 +72,80 @@ export default function ProductCard({ title, artist, image, price, href = '#', v
           display: hidden ? 'none' : 'block'
         }}
       >
-  <button onClick={() => setOpen(true)} className={`block w-full ${sizeClasses} overflow-hidden relative p-2 sm:p-4 md:p-6 bg-transparent`}> 
-          <div className="product-image-frame w-full h-full rounded-md relative flex items-center justify-center" style={{ border: '4px solid #000000' }}>
-            <img loading="lazy" src={image} alt={title} className="w-full h-full object-cover product-image" />
+        {/* Card Gold Bottom Accent (Option A) */}
+        <div className="absolute bottom-0 left-0 right-0 h-[1.5px] bg-gradient-to-r from-[#c9a96e] via-[#d4af7a] to-[#c9a96e] scale-x-0 group-hover:scale-x-100 origin-center transition-transform duration-350 ease-out pointer-events-none z-10" />
+
+        <div className={`block w-full ${sizeClasses} overflow-hidden relative p-2.5 sm:p-3.5 bg-slate-50/50 select-none`}> 
+          <div className="product-image-frame w-full h-full rounded-lg relative flex items-center justify-center overflow-hidden border border-slate-200/70 bg-slate-100 shadow-2xs">
+            <img 
+              loading="lazy" 
+              src={image} 
+              alt={title} 
+              className="w-full h-full object-cover transform group-hover:scale-[1.025] transition-transform duration-350 ease-out product-image cursor-pointer" 
+              onClick={() => setOpen(true)}
+            />
             <div className="image-veil" />
           </div>
 
           {price && (
-            <div className="absolute top-2 right-2 sm:top-3 sm:right-3 md:top-4 md:right-4 product-price-badge">{price}</div>
+            <div className="absolute top-4 right-4 sm:top-5 sm:right-5 px-2.5 py-1 bg-white/95 backdrop-blur-xs text-slate-800 border border-slate-200/80 rounded-md font-serif text-xs font-semibold shadow-2xs group-hover:border-[#c9a96e]/40 transition-colors">
+              {price}
+            </div>
           )}
-        </button>
+        </div>
 
-        <div className="p-2 sm:p-3 md:p-4">
-          <h4 className="font-serif text-sm text-slate-900 line-clamp-2">{title}</h4>
+        <div className="p-3 sm:p-4">
+          <h4 className="font-serif text-sm font-medium text-slate-900 group-hover:text-black transition-colors duration-250 line-clamp-1 tracking-tight">{title}</h4>
           <div className="flex items-center justify-between mt-1">
-            <p className="text-xs muted-text">{artist}</p>
+            <p className="text-xs text-slate-500 group-hover:text-slate-700 transition-colors duration-250 font-light">{artist}</p>
           </div>
 
-          <div className="mt-3 flex items-center gap-3">
-            <button onClick={() => window.location.href = '/'} className="text-xs px-3 py-2 bg-[#065F46] text-white rounded-md">Quick View</button>
-            <button className="text-xs px-3 py-2 border border-white/10 rounded-md text-white/90 bg-white/6">Add</button>
+          <div className="mt-3 flex items-center gap-2">
+            <button 
+              onClick={() => setOpen(true)} 
+              className="text-xs px-3 py-1.5 bg-slate-900 hover:bg-black text-white rounded-md font-medium tracking-wide shadow-2xs hover:shadow-xs transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
+            >
+              Quick View
+            </button>
+            <button 
+              onClick={() => window.location.href = '/'} 
+              className="text-xs px-3 py-1.5 border border-slate-200 hover:border-[#c9a96e]/50 text-slate-700 hover:text-slate-900 rounded-md font-medium bg-white hover:bg-[#fcfaf5] transition-all duration-200 hover:-translate-y-0.5 cursor-pointer"
+            >
+              View Details
+            </button>
           </div>
         </div>
       </motion.article>
 
-      {open && (
-        <motion.div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-          <motion.div className="quickview-modal relative max-w-6xl w-full bg-white rounded-lg" initial={{ scale: 0.98 }} animate={{ scale: 1 }} exit={{ scale: 0.98 }}>
-            <button onClick={() => setOpen(false)} className="absolute top-4 right-4 z-50 p-2 rounded bg-white/90 border border-slate-200"></button>
+      {typeof document !== 'undefined' && createPortal(
+        <AnimatePresence>
+          {open && (
+            <motion.div 
+              key="quickview-backdrop"
+              className="fixed inset-0 z-[90000] flex items-center justify-center bg-black/75 backdrop-blur-xs p-3 sm:p-6" 
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.25 }}
+              onClick={() => setOpen(false)}
+            >
+              <motion.div 
+                className="quickview-modal relative max-w-5xl w-full bg-white rounded-2xl overflow-hidden shadow-2xl max-h-[90vh] overflow-y-auto" 
+                initial={{ scale: 0.97, opacity: 0, y: 10 }} 
+                animate={{ scale: 1, opacity: 1, y: 0 }} 
+                exit={{ scale: 0.97, opacity: 0, y: 10 }}
+                transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                {/* Prominent High-Contrast Close Button */}
+                <button 
+                  onClick={() => setOpen(false)} 
+                  className="absolute top-4 right-4 z-50 p-2.5 rounded-full bg-slate-900 hover:bg-black text-white hover:text-[#c9a96e] border border-slate-700 shadow-lg hover:scale-105 transition-all duration-200 cursor-pointer flex items-center justify-center group"
+                  aria-label="Close Quick View"
+                  title="Close Quick View (Esc)"
+                >
+                  <X size={18} className="transition-transform group-hover:rotate-90 duration-200" />
+                </button>
 
             <div className="quickview-layout p-6">
               <div className="quickview-top grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -212,9 +273,12 @@ export default function ProductCard({ title, artist, image, price, href = '#', v
                 </aside>
               </div>
             </div>
+            </motion.div>
           </motion.div>
-        </motion.div>
-      )}
+        )}
+      </AnimatePresence>,
+      document.body
+    )}
     </>
   )
 }

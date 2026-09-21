@@ -1,155 +1,108 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { ArrowRight, MapPin, Sparkles, Award } from 'lucide-react'
+import { ArrowRight, MapPin, Award } from 'lucide-react'
+
+// Editorial luxury art-gallery animation variants
+const cardContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.07,
+      delayChildren: 0.1
+    }
+  }
+}
+
+const itemFadeUp = {
+  hidden: { opacity: 0, y: 12 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.55,
+      ease: [0.16, 1, 0.3, 1]
+    }
+  }
+}
 
 export default function ArtistCardMini({ name = 'Pradip Sarkar', image = '', location = 'Mumbai, India' }) {
   const params = new URLSearchParams({ name, image, location })
   
   return (
     <motion.div 
-      initial={{ opacity: 0, y: 50, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ duration: 0.8, ease: "easeOut" }}
-      whileHover={{ y: -8, scale: 1.02 }}
-      className="relative group bg-gradient-to-br from-white via-slate-50 to-white p-6 sm:p-8 md:p-10 pb-8 sm:pb-10 md:pb-12 rounded-2xl sm:rounded-3xl border-2 border-slate-200 shadow-xl hover:shadow-2xl hover:border-amber-200 transition-all duration-500 overflow-hidden cursor-pointer w-full max-w-3xl min-h-[280px] sm:min-h-[300px]"
+      variants={cardContainerVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-40px" }}
+      whileHover={{ y: -4, transition: { duration: 0.35, ease: "easeOut" } }}
+      onClick={() => { window.location.href = `/artist?${params.toString()}` }}
+      className="group relative bg-white hover:bg-[#fcfaf5] p-6 sm:p-8 rounded-2xl border border-slate-200/80 hover:border-[#c9a96e]/40 shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_12px_35px_rgba(0,0,0,0.09)] transition-all duration-400 ease-out w-full max-w-3xl cursor-pointer overflow-hidden"
     >
-      {/* Animated gradient overlays - More visible */}
-      <div className="absolute top-0 right-0 w-32 h-32 sm:w-48 sm:h-48 bg-gradient-to-br from-amber-200 via-yellow-100 to-transparent opacity-50 rounded-full blur-3xl group-hover:opacity-90 group-hover:scale-125 transition-all duration-700"></div>
-      <div className="absolute bottom-0 left-0 w-24 h-24 sm:w-40 sm:h-40 bg-gradient-to-tr from-amber-200 to-transparent opacity-40 rounded-full blur-2xl group-hover:opacity-80 group-hover:scale-110 transition-all duration-700"></div>
-      
-      {/* Shimmer effect on hover - More prominent */}
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-      </div>
-      
-      {/* Border glow effect */}
-      <div className="absolute inset-0 rounded-2xl sm:rounded-3xl bg-gradient-to-r from-amber-400 to-yellow-400 opacity-0 group-hover:opacity-20 blur-xl transition-all duration-500"></div>
-      
-      <div className="relative flex flex-col sm:flex-row items-start gap-4 sm:gap-6">
-        {/* Artist Image - Square with animations */}
+      {/* Subtle gold top accent line that reveals on card hover */}
+      <div className="absolute top-0 left-8 right-8 h-[1.5px] bg-gradient-to-r from-transparent via-[#c9a96e]/60 to-transparent opacity-0 group-hover:opacity-100 scale-x-75 group-hover:scale-x-100 transition-all duration-500 ease-out rounded-full pointer-events-none" />
+
+      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 sm:gap-8">
+        {/* Artist Image Frame */}
         <motion.div 
-          className="relative flex-shrink-0 mx-auto sm:mx-0"
-          whileHover={{ scale: 1.1, rotate: 3 }}
-          transition={{ type: "spring", stiffness: 200, damping: 10 }}
+          variants={itemFadeUp}
+          className="relative flex-shrink-0"
         >
-          {/* Animated gradient ring - More visible */}
-          <div className="absolute -inset-2 sm:-inset-3 bg-gradient-to-br from-amber-400 via-yellow-400 to-amber-500 rounded-xl sm:rounded-2xl blur-xl opacity-60 group-hover:opacity-100 group-hover:blur-2xl transition-all duration-500 animate-pulse"></div>
-          
-          <div className="relative w-24 h-24 sm:w-32 sm:h-32 md:w-36 md:h-36 rounded-xl sm:rounded-2xl overflow-hidden ring-2 sm:ring-4 ring-white shadow-2xl group-hover:ring-amber-200">
+          <div className="relative w-28 h-28 sm:w-36 sm:h-36 rounded-xl overflow-hidden border border-slate-200/90 group-hover:border-[#c9a96e]/50 shadow-sm group-hover:shadow-[0_6px_20px_rgba(201,169,110,0.20)] bg-slate-100 transition-all duration-400 ease-out">
             <img 
               src={image} 
               alt={name} 
-              className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-125 group-hover:rotate-2" 
+              className="w-full h-full object-cover select-none transition-transform duration-400 ease-out group-hover:scale-[1.04]" 
             />
-            {/* Overlay gradient on image - More visible */}
-            <div className="absolute inset-0 bg-gradient-to-t from-amber-900/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
           </div>
-          
-          {/* Animated Badge - More prominent */}
-          <motion.div 
-            className="absolute -bottom-2 -right-2 sm:-bottom-3 sm:-right-3 bg-gradient-to-r from-amber-600 to-yellow-600 p-1.5 sm:p-2.5 rounded-lg sm:rounded-xl shadow-2xl"
-            animate={{ 
-              rotate: [0, 15, -15, 0],
-              scale: [1, 1.15, 1]
-            }}
-            transition={{ 
-              duration: 2,
-              repeat: Infinity,
-              repeatDelay: 2
-            }}
-            whileHover={{ scale: 1.2, rotate: 180 }}
-          >
-            <Sparkles className="w-3 h-3 sm:w-5 sm:h-5 text-white drop-shadow-lg" />
-          </motion.div>
         </motion.div>
         
         {/* Artist Info */}
         <div className="flex-1 min-w-0 text-center sm:text-left w-full">
           <motion.h4 
-            className="text-xl sm:text-2xl font-bold text-slate-900 mb-2 tracking-tight group-hover:text-amber-600 group-hover:scale-105 transition-all duration-300"
-            initial={{ opacity: 0, x: -30 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.3, type: "spring" }}
-            whileHover={{ x: 5 }}
+            variants={itemFadeUp}
+            className="font-serif text-2xl sm:text-3xl font-normal text-slate-900 group-hover:text-black tracking-tight mb-2 transition-all duration-300"
           >
             {name}
           </motion.h4>
           
           <motion.div 
-            className="flex items-center justify-center sm:justify-start gap-2 text-slate-600 mb-3 sm:mb-4"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
+            variants={itemFadeUp}
+            className="flex items-center justify-center sm:justify-start gap-1.5 text-xs sm:text-sm text-slate-500 group-hover:text-slate-700 font-light mb-3 transition-colors duration-300"
           >
-            <motion.div
-              animate={{ rotate: [0, 10, -10, 0] }}
-              transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-            >
-              <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600 group-hover:scale-125 transition-transform" />
-            </motion.div>
-            <span className="text-xs sm:text-sm font-semibold">{location}</span>
+            <MapPin size={14} className="text-[#c9a96e] group-hover:text-[#b8935f] transition-colors duration-300 flex-shrink-0" />
+            <span>{location}</span>
           </motion.div>
           
           <motion.div
-            className="flex items-center justify-center sm:justify-start gap-2 mb-3 sm:mb-4 bg-amber-50 px-2 py-1.5 sm:px-3 sm:py-2 rounded-lg group-hover:bg-amber-100 transition-colors"
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5 }}
-            whileHover={{ scale: 1.05 }}
+            variants={itemFadeUp}
+            className="inline-flex items-center gap-2 py-1 px-3 bg-slate-100/80 group-hover:bg-[#fbf7ee] rounded-full border border-slate-200/80 group-hover:border-[#c9a96e]/40 text-xs text-slate-700 group-hover:text-slate-800 font-medium mb-3 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:shadow-xs"
           >
-            <motion.div
-              animate={{ 
-                rotate: [0, 360],
-                scale: [1, 1.2, 1]
-              }}
-              transition={{ 
-                duration: 3, 
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            >
-              <Award className="w-4 h-4 sm:w-5 sm:h-5 text-amber-600" />
-            </motion.div>
-            <span className="text-xs sm:text-sm text-slate-700 font-bold">70+ International Exhibitions</span>
+            <Award size={13} className="text-[#c9a96e] flex-shrink-0" />
+            <span>70+ International Exhibitions</span>
           </motion.div>
           
           <motion.p 
-            className="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4 sm:mb-6 group-hover:text-slate-700"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
+            variants={itemFadeUp}
+            className="text-xs sm:text-sm text-slate-600 group-hover:text-slate-700 font-light leading-relaxed mb-5 transition-colors duration-300"
           >
             Contemporary artist specializing in geometric abstraction
           </motion.p>
           
-          {/* Action Button with enhanced animations */}
-          <motion.button 
-            onClick={() => { window.location.href = `/artist?${params.toString()}` }} 
-            className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-5 sm:px-7 py-2.5 sm:py-3.5 bg-gradient-to-r from-amber-600 via-yellow-500 to-yellow-600 text-white rounded-xl text-xs sm:text-sm font-bold shadow-xl hover:shadow-2xl hover:from-amber-700 hover:via-yellow-600 hover:to-yellow-700 transition-all duration-300 group/btn relative overflow-hidden border-2 border-transparent hover:border-white"
-            whileHover={{ scale: 1.08, y: -2 }}
-            whileTap={{ scale: 0.95 }}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.7, type: "spring" }}
-          >
-            {/* Button shimmer effect - More visible */}
-            <span className="absolute inset-0 bg-gradient-to-r from-transparent via-white/50 to-transparent -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700"></span>
-            
-            {/* Pulsing background */}
-            <motion.span 
-              className="absolute inset-0 bg-white/20 rounded-xl"
-              animate={{ opacity: [0, 0.5, 0] }}
-              transition={{ duration: 2, repeat: Infinity }}
-            />
-            
-            <span className="relative font-bold text-sm sm:text-base">Explore Profile</span>
-            <motion.div
-              animate={{ x: [0, 5, 0] }}
-              transition={{ duration: 1, repeat: Infinity }}
+          {/* Action CTA Button */}
+          <motion.div variants={itemFadeUp}>
+            <button 
+              type="button"
+              onClick={(e) => { 
+                e.stopPropagation()
+                window.location.href = `/artist?${params.toString()}` 
+              }} 
+              className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-5 sm:px-6 py-2.5 sm:py-3 bg-slate-900 group-hover:bg-black text-white rounded-lg text-xs sm:text-[13px] font-medium tracking-wide shadow-sm group-hover:shadow-md group-hover:-translate-y-0.5 transition-all duration-300 cursor-pointer"
             >
-              <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 relative group-hover/btn:translate-x-2 transition-transform duration-300" />
-            </motion.div>
-          </motion.button>
+              <span>Explore Profile</span>
+              <ArrowRight size={14} className="text-[#c9a96e] group-hover:translate-x-1.5 transition-transform duration-300 ease-out" />
+            </button>
+          </motion.div>
         </div>
       </div>
     </motion.div>

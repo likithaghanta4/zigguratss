@@ -59,8 +59,8 @@ export const CustomCursor = () => {
   }, []);
 
   return (
-    // Z-index 9999 to ensure it stays above everything
-    <div className="fixed inset-0 pointer-events-none z-[9999] overflow-hidden">
+    // Z-index 100000 to ensure it stays above everything including modals and overlays
+    <div className="fixed inset-0 pointer-events-none z-[100000] overflow-hidden">
       <svg className="w-full h-full">
         <path
           ref={pathRef}

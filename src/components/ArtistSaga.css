@@ -1,36 +1,32 @@
-/* Marquee Slider Styles */
+/* Marquee Slider Styles for Artist Saga */
 .marquee-container {
   width: 100%;
-  overflow-x: auto;
+  overflow-x: hidden;
   overflow-y: hidden;
   position: relative;
-  background: linear-gradient(to right, rgba(248, 250, 252, 1) 0%, rgba(255, 255, 255, 0.8) 50%, rgba(248, 250, 252, 1) 100%);
-  scroll-behavior: smooth;
-}
-
-/* Hide scrollbar but keep scrolling functional */
-.marquee-container::-webkit-scrollbar {
-  display: none;
-}
-
-.marquee-container {
+  background: transparent;
+  padding: 0.5rem 0;
   -ms-overflow-style: none;
   scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%);
+}
+
+.marquee-container::-webkit-scrollbar {
+  display: none;
 }
 
 .marquee-track {
   display: flex;
   gap: 1.5rem;
-  padding: 1rem 0;
-  animation: scroll-left 20s linear infinite;
+  padding: 0.75rem 0;
+  animation: scroll-left 30s linear infinite;
   width: max-content;
+  will-change: transform;
 }
 
+.marquee-track:hover,
 .marquee-track.paused-scroll {
-  animation-play-state: paused;
-}
-
-.marquee-track:hover {
   animation-play-state: paused;
 }
 
@@ -45,60 +41,48 @@
 
 .marquee-item {
   flex-shrink: 0;
-  width: 300px;
-  padding: 0 0.75rem;
+  width: 280px;
+  padding: 0 0.5rem;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.marquee-item .glass-card {
-  margin: 0 !important;
+.marquee-item:hover {
+  transform: translateY(-3px);
+  z-index: 10;
 }
 
-.marquee-item .product-card {
-  margin: 0 !important;
-}
-
-/* Override ProductCard margin */
+.marquee-item .product-card,
 .marquee-item article {
   margin: 0 !important;
-}
-
-/* Smooth scrolling performance */
-.marquee-track {
-  will-change: transform;
-}
-
-/* Add fade edges effect */
-.marquee-container::before,
-.marquee-container::after {
-  display: none;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .marquee-item {
     width: 240px;
-    padding: 0 0.5rem;
+    padding: 0 0.4rem;
   }
 
   .marquee-track {
     gap: 1rem;
+    animation-duration: 24s;
   }
 }
 
 @media (max-width: 480px) {
   .marquee-item {
-    width: 180px;
-    padding: 0 0.4rem;
+    width: 200px;
+    padding: 0 0.25rem;
   }
 
   .marquee-track {
     gap: 0.75rem;
-    padding: 0.75rem 0;
-  }
-
-  .marquee-container::before,
-  .marquee-container::after {
-    width: 60px;
+    animation-duration: 20s;
   }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation-play-state: paused;
+  }
+}
