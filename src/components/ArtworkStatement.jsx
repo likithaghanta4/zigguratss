@@ -14,36 +14,24 @@ const statementContentVariants = {
   }
 }
 
-const statementItemVariants = {
-  hidden: { opacity: 0, y: 8 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 0.4,
-      ease: [0.16, 1, 0.3, 1]
-    }
-  }
-}
-
 export default function ArtworkStatement({ title = 'Lady and Butterflies', children, defaultOpen = true }) {
   const [open, setOpen] = useState(defaultOpen)
 
   return (
-    <div className="mt-8 pt-6 border-t border-slate-200/80">
+    <div className="mt-8 pt-6 border-t border-neutral-800/80">
       <div className="flex items-center justify-between gap-4 mb-4">
-        <h4 className="font-serif text-xl sm:text-2xl font-normal text-slate-900 tracking-tight">
+        <h4 className="font-serif text-xl sm:text-2xl font-normal text-white tracking-tight">
           {title}
         </h4>
         <button 
           onClick={() => setOpen((s) => !s)} 
-          className="inline-flex items-center gap-1.5 text-xs tracking-wider uppercase font-medium text-slate-500 hover:text-[#c9a96e] transition-colors duration-200 cursor-pointer group select-none py-1 px-2 rounded-md hover:bg-slate-50"
+          className="inline-flex items-center gap-1.5 text-xs tracking-wider uppercase font-semibold text-[#dfb76c] hover:text-[#f7d794] transition-colors duration-200 cursor-pointer group select-none py-1.5 px-3 rounded-xl bg-neutral-900 border border-neutral-800 hover:border-[#dfb76c]/40"
           aria-expanded={open}
         >
           <span>{open ? 'Collapse' : 'Read Full Statement'}</span>
           <ChevronDown 
             size={14} 
-            className={`transition-transform duration-300 text-slate-400 group-hover:text-[#c9a96e] ${open ? 'rotate-180' : ''}`} 
+            className={`transition-transform duration-300 text-[#dfb76c] ${open ? 'rotate-180' : ''}`} 
           />
         </button>
       </div>
@@ -62,7 +50,7 @@ export default function ArtworkStatement({ title = 'Lady and Butterflies', child
               variants={statementContentVariants}
               initial="hidden"
               animate="visible"
-              className="text-slate-600 leading-relaxed font-light text-[15px] space-y-4 pt-1"
+              className="text-neutral-300 leading-relaxed font-light text-[15px] space-y-4 pt-2"
             >
               {children}
             </motion.div>

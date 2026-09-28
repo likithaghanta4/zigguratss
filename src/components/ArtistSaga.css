@@ -2,14 +2,13 @@
 .marquee-container {
   width: 100%;
   overflow-x: hidden;
-  overflow-y: hidden;
   position: relative;
   background: transparent;
-  padding: 0.5rem 0;
+  padding: 0.75rem 0;
   -ms-overflow-style: none;
   scrollbar-width: none;
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%);
-  mask-image: linear-gradient(to right, transparent 0%, black 4%, black 96%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 1%, black 99%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 1%, black 99%, transparent 100%);
 }
 
 .marquee-container::-webkit-scrollbar {
@@ -19,8 +18,8 @@
 .marquee-track {
   display: flex;
   gap: 1.5rem;
-  padding: 0.75rem 0;
-  animation: scroll-left 30s linear infinite;
+  padding: 0.5rem 0;
+  animation: scroll-left 32s linear infinite;
   width: max-content;
   will-change: transform;
 }
@@ -41,13 +40,13 @@
 
 .marquee-item {
   flex-shrink: 0;
-  width: 280px;
+  width: 300px;
   padding: 0 0.5rem;
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .marquee-item:hover {
-  transform: translateY(-3px);
+  transform: translateY(-4px);
   z-index: 10;
 }
 
@@ -85,4 +84,31 @@
   .marquee-track {
     animation-play-state: paused;
   }
+}
+
+/* Product Page TrustBar Contrast Enhancement */
+.product-page-trustbar {
+  background: linear-gradient(135deg, rgba(21, 21, 28, 0.95), rgba(16, 16, 22, 0.95));
+  border: 1px solid rgba(223, 183, 108, 0.25);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.product-page-trustbar .text-slate-700 {
+  color: #d1d5db !important; /* light silvery gray for 100% legibility */
+  font-weight: 300 !important;
+  margin-top: 2px !important;
+}
+
+.product-page-trustbar .text-sm.font-semibold {
+  color: #ffffff !important; /* bright pure white */
+  letter-spacing: 0.02em !important;
+}
+
+.product-page-trustbar svg {
+  color: #dfb76c !important;
+  stroke: #dfb76c !important;
+}
+
+.product-page-trustbar svg path[fill="currentColor"] {
+  fill: #dfb76c !important;
 }

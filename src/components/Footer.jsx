@@ -22,10 +22,10 @@ const Footer = () => {
 
   return (
     <footer className="w-full overflow-x-hidden border-t border-[#d4af3726] bg-[radial-gradient(ellipse_at_15%_0%,#18140b_0%,#080603_60%,#030201_100%)] px-5 py-10 text-[#cdc5a8] md:px-10">
-      
+
       {/* Nav Grid */}
       <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:grid-cols-5">
-        
+
         {/* Buyers */}
         <div>
           <h3 className="mb-4 inline-block border-b border-[#e4b363] pb-1 text-sm uppercase tracking-[0.12em] text-[#e4b363]">
@@ -77,10 +77,10 @@ const Footer = () => {
         {/* About */}
         <div>
           <h3 className="mb-4 inline-block border-b border-[#e4b363] pb-1 text-sm uppercase tracking-[0.12em] text-[#e4b363]">
-            
+
             <Link to="/about" className="hover:text-[#e4b363]">
- About Us
-</Link>
+              About Us
+            </Link>
           </h3>
 
           <ul className="space-y-2 text-sm text-[#a0987a]">
@@ -142,7 +142,7 @@ const Footer = () => {
       {/* Newsletter */}
       <div className="rounded-2xl border border-[#d4af3726] bg-[#0e0b0699] p-6 backdrop-blur-md">
         <div className="flex flex-col items-start justify-between gap-5 lg:flex-row lg:items-center">
-          
+
           <div>
             <h2 className="mb-2 text-2xl text-[#e4b363]">
               Stay Inspired
@@ -216,17 +216,17 @@ const Footer = () => {
 
       {/* Copyright */}
       <div className="mt-8 flex flex-col items-center justify-between gap-4 border-t border-[#d4af3726] pt-6 text-center text-sm text-[#5e5240] md:flex-row">
-        
+
         <p>© 2026 Zigguratss Artwork LLP. All Rights Reserved.</p>
 
         <div className="flex flex-wrap justify-center gap-5 uppercase tracking-wider">
           <Link to="/Privacy" className="hover:text-[#e4b363]">
-  Privacy Policy
-</Link>
+            Privacy Policy
+          </Link>
 
-<Link to="/Terms" className="hover:text-[#e4b363]">
-  Terms of Use
-</Link>
+          <Link to="/Terms" className="hover:text-[#e4b363]">
+            Terms of Use
+          </Link>
 
           <a href="#" className="hover:text-[#e4b363]">
             Cookie Policy
@@ -242,11 +242,10 @@ const Footer = () => {
             behavior: "smooth",
           })
         }
-        className={`fixed bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-r from-[#b8860b] to-[#e4b363] text-black shadow-lg transition-all duration-300 ${
-          showBackToTop
+        className={`fixed bottom-6 right-6 z-50 flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-r from-[#b8860b] to-[#e4b363] text-black shadow-lg transition-all duration-300 ${showBackToTop
             ? "translate-y-0 opacity-100"
             : "pointer-events-none translate-y-5 opacity-0"
-        }`}
+          }`}
       >
         ↑
       </button>
