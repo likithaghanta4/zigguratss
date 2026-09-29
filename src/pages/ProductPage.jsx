@@ -14,7 +14,7 @@ export default function ProductPage() {
   })
 
   return (
-    <div className="min-h-screen w-full bg-[#0a0a0d] text-neutral-100 selection:bg-[#dfb76c]/30 selection:text-[#f3e3ba] relative overflow-x-hidden">
+    <div className="product-page-root min-h-screen w-full bg-[#0a0a0d] text-neutral-100 selection:bg-[#dfb76c]/30 selection:text-[#f3e3ba] relative overflow-x-hidden">
       {/* Editorial Top Golden Reading Progress Line */}
       <motion.div
         className="fixed top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-[#c9a96e] via-[#f7d794] to-[#c9a96e] origin-left z-50 shadow-[0_1px_12px_rgba(223,183,108,0.5)]"
@@ -26,13 +26,13 @@ export default function ProductPage() {
       {/* ========================================================= */}
       <CosmosGalleryBackground />
 
-      {/* Main Content Container */}
-      <div className="relative z-10 w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-10 xl:px-12 pt-6 pb-28 sm:pt-10 sm:pb-36">
+      {/* Main Content Container (pt-20 sm:pt-24 ensures clear margin below fixed Navbar) */}
+      <div className="product-detail-container relative z-10 w-full max-w-[1440px] mx-auto px-3.5 sm:px-6 lg:px-10 xl:px-12 pt-20 sm:pt-24 lg:pt-28 pb-20 sm:pb-28 lg:pb-36">
         <ProductDetail />
         
         {/* Editorial Trust & Collector Confidence Bar */}
-        <div className="mt-20 pt-10 border-t border-neutral-800/80">
-          <div className="product-page-trustbar rounded-3xl p-8 sm:p-10 shadow-[0_12px_45px_rgba(0,0,0,0.6)] backdrop-blur-xl">
+        <div className="mt-14 sm:mt-20 pt-8 sm:pt-10 border-t border-neutral-800/80">
+          <div className="product-page-trustbar rounded-2xl sm:rounded-3xl p-4 sm:p-8 md:p-10 shadow-[0_12px_45px_rgba(0,0,0,0.6)] backdrop-blur-xl">
             <TrustBar />
           </div>
         </div>
