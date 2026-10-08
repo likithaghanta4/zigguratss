@@ -6,7 +6,8 @@ import defaultPradipImage from '../assets/User-images/Pradip Sarkar.jpeg'
 export default function ArtistCardMini({ 
   name = 'Pradip Sarkar', 
   image = defaultPradipImage, 
-  location = 'Mumbai, India' 
+  location = 'Mumbai, India',
+  isHighlighted = false
 }) {
   const shouldReduceMotion = useReducedMotion()
   const params = new URLSearchParams({ name, location })
@@ -17,12 +18,21 @@ export default function ArtistCardMini({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.65, ease: [0.16, 1, 0.3, 1] }}
+      animate={{
+        scale: isHighlighted ? 1.025 : 1.0,
+      }}
       whileHover={shouldReduceMotion ? {} : { y: -4, transition: { duration: 0.3 } }}
       onClick={() => { window.location.href = `/artist?${params.toString()}` }}
-      className="group relative bg-[#121217]/90 hover:bg-[#16161f] p-5 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl border border-neutral-800 hover:border-[#dfb76c]/60 shadow-[0_12px_40px_rgba(0,0,0,0.5)] hover:shadow-[0_20px_50px_rgba(223,183,108,0.18)] backdrop-blur-xl transition-all duration-400 w-full max-w-4xl cursor-pointer overflow-hidden"
+      className={`group relative p-5 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl backdrop-blur-xl transition-all duration-500 w-full max-w-4xl cursor-pointer overflow-hidden ${
+        isHighlighted
+          ? 'bg-gradient-to-br from-[#181824] via-[#121217] to-[#0e0e14] border-2 border-[#dfb76c] ring-2 ring-[#dfb76c]/40 shadow-[0_0_40px_rgba(223,183,108,0.28)]'
+          : 'bg-[#121217]/90 hover:bg-[#16161f] border border-neutral-800 hover:border-[#dfb76c]/60 shadow-[0_12px_40px_rgba(0,0,0,0.5)] hover:shadow-[0_20px_50px_rgba(223,183,108,0.18)]'
+      }`}
     >
       {/* Top subtle golden light accent */}
-      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#dfb76c] to-transparent opacity-40 group-hover:opacity-100 transition-opacity duration-400" />
+      <div className={`absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#dfb76c] to-transparent transition-opacity duration-400 ${
+        isHighlighted ? 'opacity-100' : 'opacity-40 group-hover:opacity-100'
+      }`} />
 
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-5 sm:gap-8 md:gap-10">
         {/* Artist Image Frame */}

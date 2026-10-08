@@ -1,3 +1,7 @@
+/* ========================================================= */
+/* MAISON DES ÉLITES LUXURY STYLING FOR ZIGGURATSS SAGA     */
+/* ========================================================= */
+
 /* Marquee Slider Styles for Artist Saga */
 .marquee-container {
   width: 100%;
@@ -7,8 +11,8 @@
   padding: 0.75rem 0;
   -ms-overflow-style: none;
   scrollbar-width: none;
-  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 1%, black 99%, transparent 100%);
-  mask-image: linear-gradient(to right, transparent 0%, black 1%, black 99%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 1.5%, black 98.5%, transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 1.5%, black 98.5%, transparent 100%);
 }
 
 .marquee-container::-webkit-scrollbar {
@@ -55,7 +59,7 @@
   margin: 0 !important;
 }
 
-/* Responsive adjustments */
+/* Responsive adjustments for marquee */
 @media (max-width: 768px) {
   .marquee-item {
     width: 260px;
@@ -77,6 +81,18 @@
   .marquee-track {
     gap: 0.75rem;
     animation-duration: 22s;
+  }
+}
+
+@media (max-width: 360px) {
+  .marquee-item {
+    width: 215px;
+    padding: 0 0.2rem;
+  }
+
+  .marquee-track {
+    gap: 0.5rem;
+    animation-duration: 20s;
   }
 }
 
@@ -201,35 +217,93 @@
   white-space: nowrap !important;
 }
 
-.product-header-bar {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  flex-wrap: nowrap !important;
+
+
+
+/* ========================================================= */
+/* LUXURY FLOATING & CURVED REVEAL ANIMATIONS (MDE / AWWWARDS) */
+/* ========================================================= */
+
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-16px) rotate(2deg);
+  }
 }
 
-.product-breadcrumbs {
-  display: flex !important;
-  flex-direction: row !important;
-  align-items: center !important;
-  flex-wrap: nowrap !important;
-  min-width: 0 !important;
-  overflow: hidden !important;
+@keyframes float-reverse {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(16px) rotate(-2deg);
+  }
 }
 
-/* Ensure global top navigation bar maintains horizontal alignment when viewed on Product Page */
-nav.fixed,
-nav.fixed > div,
-nav.fixed .flex,
-nav.fixed ul {
-  flex-direction: row !important;
+@keyframes radar-pulse {
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(223, 183, 108, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 16px rgba(223, 183, 108, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(223, 183, 108, 0);
+  }
 }
 
-nav.fixed button,
-nav.fixed a {
-  display: inline-flex !important;
-  align-items: center !important;
+@keyframes sheen-sweep {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
+.animate-float-slow {
+  animation: float-slow 7s ease-in-out infinite;
+}
+
+.animate-float-reverse {
+  animation: float-reverse 8s ease-in-out infinite;
+}
+
+.animate-radar {
+  animation: radar-pulse 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Curved Section Reveal Divider (Inspired by MDE Beauty) */
+.curved-section-divider {
+  position: relative;
+  width: 100%;
+  height: 48px;
+  overflow: hidden;
+  line-height: 0;
+}
+
+.curved-section-divider svg {
+  position: relative;
+  display: block;
+  width: calc(100% + 1.3px);
+  height: 48px;
+}
+
+.curved-section-divider .shape-fill {
+  fill: #0c0c12;
+}
+
+/* Gold Gradient Shimmer Text */
+.gold-shimmer-text {
+  background: linear-gradient(90deg, #dfb76c 0%, #f7d794 50%, #c9a96e 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: sheen-sweep 4s linear infinite;
+}
 

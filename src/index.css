@@ -30,6 +30,8 @@ body {
   @apply overflow-x-hidden w-full antialiased;
 }
 
-body, a, button {
-  cursor: none !important;
+@media (hover: hover) and (pointer: fine) {
+  body, a, button {
+    cursor: none !important;
+  }
 }

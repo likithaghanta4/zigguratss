@@ -1,69 +1,74 @@
 import React, { useState, useEffect } from 'react';
 import '../styles/out-for-delivery-slider.css';
+import FlightRadarMap from './FlightRadarMap';
 
 const OutForDeliverySlider = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [routeAnimation, setRouteAnimation] = useState(true);
   const [isAutoPlay, setIsAutoPlay] = useState(true);
+  const [currentDestination, setCurrentDestination] = useState(null);
 
   const deliverySteps = [
     {
       id: 1,
       phase: 'Phase 1',
-      title: 'Loaded for Delivery',
+      title: 'Loaded on Air Cargo',
       description:
-        'Your package has been loaded onto the delivery van along with other parcels destined for your area. The delivery route is being optimized for efficiency.',
+        'Your master artwork is securely placed in the pressurized, climate-controlled cabin of our dedicated air freight carrier, verified for direct flight to your state.',
       image: new URL('../Screenshot from 2026-03-16 13-50-54.png', import.meta.url).href,
-      eta: 'Starting delivery route',
+      eta: 'Air Cargo Departure Ready',
     },
     {
       id: 2,
       phase: 'Phase 2',
-      title: 'On the Route',
+      title: 'In Flight Transit',
       description:
-        'Your delivery vehicle is traveling through the city, making stops to deliver packages to customers. Your package is safely secured in the van.',
+        'The aeroplane is currently airborne, cruising at 34,000 feet directly towards your destination (e.g. Tamil Nadu / Regional Art Hub) with live satellite radar telemetry.',
       image: new URL('../Screenshot from 2026-03-16 13-51-13.png', import.meta.url).href,
-      eta: 'Approaching your area',
+      eta: 'Cruising to Your State',
     },
     {
       id: 3,
       phase: 'Phase 3',
-      title: 'Getting Closer',
+      title: 'Air Terminal Arrival',
       description:
-        'The delivery vehicle is now in your neighborhood and approaching your address. The driver has your package ready for delivery.',
+        'The flight has touched down at the regional art terminal. Our specialized courier team is receiving your artwork with white-glove handling.',
       image: new URL('../Screenshot from 2026-03-16 13-51-23.png', import.meta.url).href,
-      eta: 'Next in delivery queue',
+      eta: 'Arrived at Destination Airport',
     },
     {
       id: 4,
       phase: 'Phase 4',
-      title: 'At Your Location',
+      title: 'Dispatched to Address',
       description:
-        'The delivery van has arrived at your address. The driver is carefully extracting your package and preparing it for hand-over to you.',
+        'Your artwork is in the final delivery vehicle traveling from the airport directly to your street address with scheduled appointment tracking.',
       image: new URL('../Screenshot from 2026-03-16 13-51-37.png', import.meta.url).href,
-      eta: 'Driver approaching',
+      eta: 'Approaching Your Doorstep',
     },
     {
       id: 5,
       phase: 'Phase 5',
       title: 'Ready for Handover',
       description:
-        'The delivery agent is at your doorstep with your precious artwork. Please be ready to receive and sign for your package.',
+        'The delivery agent is at your doorstep with your authenticated artwork and Certificate of Provenance. Please be ready to receive and sign.',
       image: new URL('../Screenshot from 2026-03-16 13-51-47.png', import.meta.url).href,
-      eta: 'Awaiting your confirmation',
+      eta: 'Awaiting Your Signature',
     },
   ];
 
-  // Auto-play functionality
+  // Auto-play functionality with extended duration for Step 3
   useEffect(() => {
     if (!isAutoPlay) return;
 
-    const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % deliverySteps.length);
-    }, 5000); // Change slide every 5 seconds
+    // Step 3 (index 2: Air Terminal / Transit) gets extended 10,000ms duration
+    const slideDuration = currentSlide === 2 ? 10000 : 5000;
 
-    return () => clearInterval(interval);
-  }, [isAutoPlay, deliverySteps.length]);
+    const timer = setTimeout(() => {
+      setCurrentSlide((prev) => (prev + 1) % deliverySteps.length);
+    }, slideDuration);
+
+    return () => clearTimeout(timer);
+  }, [isAutoPlay, currentSlide, deliverySteps.length]);
 
   const handleNext = () => {
     setCurrentSlide((prev) => (prev + 1) % deliverySteps.length);
@@ -80,21 +85,13 @@ const OutForDeliverySlider = () => {
   return (
     <section className="out-delivery-section">
       <div className="delivery-header">
-        <h2 className="delivery-title">Out for Delivery</h2>
-        <p className="delivery-subtitle">Almost At Your Doorstep</p>
+        <h2 className="delivery-title">Worldwide Air Cargo Delivery</h2>
+        <p className="delivery-subtitle">Live Global Flight Radar & Worldwide Delivery Circuit</p>
       </div>
 
-      {/* Animated Route Map */}
-      <div className="delivery-map-container">
-        <div className={`delivery-map ${routeAnimation ? 'animate' : ''}`}>
-          <div className="map-vehicle">
-            <span className="vehicle-icon">🚐</span>
-          </div>
-          <div className="map-route"></div>
-          <div className="map-destination">
-            <span className="destination-icon">🏠</span>
-          </div>
-        </div>
+      {/* Visible Global Flight Radar Map */}
+      <div className="w-full max-w-5xl mb-10 px-2 sm:px-4">
+        <FlightRadarMap />
       </div>
 
       <div className="delivery-container">

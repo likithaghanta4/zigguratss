@@ -144,82 +144,93 @@ const Navbar = () => {
       <nav 
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
-        className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between h-16 sm:h-20 px-4 md:px-10 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] transform-gpu origin-top ${rollClass} ${glassStyle}`}
+        className={`fixed top-0 left-0 right-0 z-50 flex items-center justify-between h-16 sm:h-20 px-3 xs:px-4 sm:px-6 md:px-10 transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] transform-gpu origin-top ${rollClass} ${glassStyle}`}
       >
 
-        {/* ── Hamburger ── */}
+        {/* ── Hamburger (Mobile / Tablet) ── */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="lg:hidden flex flex-col justify-center gap-[5px] w-10 h-10 flex-shrink-0 z-50"
+          aria-label="Toggle navigation menu"
+          style={{ display: 'flex', flexDirection: 'column' }}
+          className="lg:hidden flex flex-col justify-center items-center gap-[5px] w-9 h-9 xs:w-10 xs:h-10 rounded-lg bg-white/5 hover:bg-white/10 flex-shrink-0 z-50 cursor-pointer"
         >
-          <span className={`block h-0.5 bg-[#C5A059] transition-all duration-300 ${mobileOpen ? 'w-6 rotate-45 translate-y-[7px]' : 'w-6'}`} />
-          <span className={`block h-0.5 bg-[#C5A059] transition-all duration-300 ${mobileOpen ? 'w-0 opacity-0' : 'w-6'}`} />
-          <span className={`block h-0.5 bg-[#C5A059] transition-all duration-300 ${mobileOpen ? 'w-6 -rotate-45 -translate-y-[7px]' : 'w-6'}`} />
+          <span className={`block h-0.5 bg-[#C5A059] transition-all duration-300 ${mobileOpen ? 'w-5 xs:w-6 rotate-45 translate-y-[7px]' : 'w-5 xs:w-6'}`} />
+          <span className={`block h-0.5 bg-[#C5A059] transition-all duration-300 ${mobileOpen ? 'w-0 opacity-0' : 'w-5 xs:w-6'}`} />
+          <span className={`block h-0.5 bg-[#C5A059] transition-all duration-300 ${mobileOpen ? 'w-5 xs:w-6 -rotate-45 -translate-y-[7px]' : 'w-5 xs:w-6'}`} />
         </button>
 
-        {/* ── Logo ── */}
-        <div className="absolute left-1/2 -translate-x-1/2 lg:static lg:left-auto lg:translate-x-0">
+        {/* ── Logo (Responsive sizing and safe positioning) ── */}
+        <div className={`transition-all duration-300 ${isSearchOpen ? 'hidden xs:block absolute left-1/2 -translate-x-1/2 lg:static lg:left-auto lg:translate-x-0' : 'absolute left-1/2 -translate-x-1/2 lg:static lg:left-auto lg:translate-x-0'}`}>
           <a href="#/" onClick={() => { setMobileOpen(false); setMobileExpand(null); }}>
-            <img src={logo} alt="Logo" className="h-8 sm:h-10 md:h-12 w-auto object-contain" />
+            <img src={logo} alt="Zigguratss Logo" className="h-7 xs:h-8 sm:h-10 md:h-12 w-auto object-contain" />
           </a>
         </div>
 
-        {/* ── Desktop Nav ── */}
+        {/* ── Desktop Nav Links ── */}
         <ul className="hidden lg:flex items-center gap-4 xl:gap-8 text-[11px] xl:text-[13px] font-sans uppercase tracking-[0.2em] text-gray-200/85">
           <li>{navLink('/', 'Home', '/')}</li>
           <li onMouseEnter={() => onEnter('artwork')} className="relative py-7">
             <Link
-    to="/artwork"
-    className="uppercase tracking-widest hover:text-[#C5A059] transition-colors cursor-pointer"
-  >
-    Artwork
-  </Link>
+              to="/artwork"
+              className="uppercase tracking-widest hover:text-[#C5A059] transition-colors cursor-pointer"
+            >
+              Artwork
+            </Link>
           </li>
           <li onMouseEnter={() => onEnter('artist')} className="relative py-7">
-             <Link
-    to="/artist"
-    className="uppercase tracking-widest hover:text-[#C5A059]"
-  >
-    Artists
-  </Link>
+            <Link
+              to="/artist"
+              className="uppercase tracking-widest hover:text-[#C5A059] transition-colors cursor-pointer"
+            >
+              Artists
+            </Link>
           </li>
-          <li><Link to="/about">About</Link></li>
+          <li><Link to="/about" className="hover:text-[#C5A059] transition-colors">About</Link></li>
           <li>{navLink('/blog', 'Blog', '/blog')}</li>
-<li>{navLink('/contact', 'Contact', '/contact')}</li>
-
-
+          <li>{navLink('/contact', 'Contact', '/contact')}</li>
         </ul>
 
-        {/* ── Right Icons ── */}
-        <div className="flex items-center gap-1 sm:gap-3">
-          <div ref={searchRef} className={`relative flex items-center transition-all duration-500 ${isSearchOpen ? 'w-[140px] xs:w-[180px] sm:w-64' : 'w-8 sm:w-10'}`}>
-            <input type="text" placeholder="Search..."
-              className={`w-full bg-white/5 border border-white/10 rounded-full py-1.5 pl-4 pr-10 text-xs text-gray-100 focus:outline-none focus:border-[#C5A059]/50 transition-all ${isSearchOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-90 pointer-events-none'}`} />
-            <button onClick={() => setIsSearchOpen(!isSearchOpen)} className="absolute right-0 p-2 text-[#C5A059] hover:scale-110 transition-transform">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+        {/* ── Right Icons (Search, User, Cart) ── */}
+        <div className="flex items-center gap-1 sm:gap-2.5">
+          <div ref={searchRef} className={`relative flex items-center transition-all duration-500 ${isSearchOpen ? 'w-[125px] xs:w-[160px] sm:w-60' : 'w-8 sm:w-10'}`}>
+            <input 
+              type="text" 
+              placeholder="Search..."
+              className={`w-full bg-white/5 border border-white/10 rounded-full py-1.5 pl-3 pr-8 text-xs text-gray-100 focus:outline-none focus:border-[#C5A059]/50 transition-all ${isSearchOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-90 pointer-events-none'}`} 
+            />
+            <button 
+              onClick={() => setIsSearchOpen(!isSearchOpen)} 
+              aria-label="Search"
+              className="absolute right-0 p-1.5 sm:p-2 text-[#C5A059] hover:scale-110 transition-transform cursor-pointer"
+            >
+              <svg className="w-4 h-4 xs:w-5 xs:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
             </button>
           </div>
-          <div className={`${isSearchOpen ? 'hidden xs:flex' : 'flex'} items-center gap-1 sm:gap-2`}>
+          <div className={`${isSearchOpen ? 'hidden xs:flex' : 'flex'} items-center gap-0.5 sm:gap-1.5`}>
             <Link
-  to="/login"
-  className="p-2 text-[#C5A059] hover:scale-110 transition-transform"
->
-  <svg
-    className="w-5 h-5"
-    fill="none"
-    stroke="currentColor"
-    viewBox="0 0 24 24"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth="2"
-      d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-    />
-  </svg>
-</Link>
-            <button className="p-2 text-[#C5A059] hover:scale-110 transition-transform">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
+              to="/login"
+              aria-label="User account"
+              className="p-1.5 sm:p-2 text-[#C5A059] hover:scale-110 transition-transform cursor-pointer"
+            >
+              <svg
+                className="w-4 h-4 xs:w-5 xs:h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
+              </svg>
+            </Link>
+            <button 
+              aria-label="Shopping bag"
+              className="p-1.5 sm:p-2 text-[#C5A059] hover:scale-110 transition-transform cursor-pointer"
+            >
+              <svg className="w-4 h-4 xs:w-5 xs:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" /></svg>
             </button>
           </div>
         </div>

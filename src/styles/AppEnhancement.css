@@ -1,35 +1,24 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
-/* Improve input size globally */
-input[type="text"],
-input[type="email"],
-input[type="password"] {
+/* Scoped styles for Login/Signup page */
+.login-page input[type="text"],
+.login-page input[type="email"],
+.login-page input[type="password"],
+.signup-layout-scene input[type="text"],
+.signup-layout-scene input[type="email"],
+.signup-layout-scene input[type="password"] {
   padding: 12px !important;
   font-size: 14px !important;
   transition: all 0.3s ease;
 }
 
-/* Smooth hover animation */
-button {
-  transition: all 0.3s ease;
-}
-
-button:hover {
-  transform: scale(1.04);
-}
-
-/* Professional focus glow */
-input:focus {
+.login-page input:focus,
+.signup-layout-scene input:focus {
   box-shadow: 0 0 0 2px rgba(234, 179, 8, 0.4);
 }
 
-/* Responsive improvement */
 @media (max-width: 1024px) {
-  .w-1\/2 {
+  .login-page .w-1\/2,
+  .signup-layout-scene .w-1\/2 {
     width: 100% !important;
-  }
-
-  .flex {
-    flex-direction: column !important;
   }
 }
 
@@ -317,11 +306,12 @@ input:focus {
   }
 }
 
-body, input, select, option, textarea, button {
+.login-page, .signup-layout-scene {
   font-family: 'Inter', sans-serif;
 }
 
-h1, h2, h3, button {
+.login-page h1, .login-page h2, .login-page h3,
+.signup-layout-scene h1, .signup-layout-scene h2, .signup-layout-scene h3 {
   font-family: 'Cormorant Garamond', serif;
   letter-spacing: 0.02em;
 }

@@ -144,12 +144,6 @@ main.order-tracking-journey {
 
 /* Small devices and mobile phones (600px and below) */
 @media (max-width: 600px) {
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
   body {
     font-size: 13px;
     line-height: 1.5;

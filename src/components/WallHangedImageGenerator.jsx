@@ -1,13 +1,19 @@
 import React, { useEffect, useRef } from 'react'
-import mainBackgroundImage from '../assets/ProductPage-images/mainbackground.png'
+import livingRoomImg from '../assets/rooms/living_room.jpg'
 
 /**
  * WallHangedImageGenerator
- * Converts any image into a wall-hung mockup using canvas with dynamic background
- * Fills entire canvas with landscape background and hangs image on the wall
- * One-time setup - any future image will automatically adjust
+ * Converts any artwork image into a real-room wall-hung mockup using high-performance HTML5 canvas
+ * Centers and mounts the artwork on realistic luxury interior walls
  */
-export default function WallHangedImageGenerator({ src, alt = 'Wall hung image', width = 500, height = 300, onImageReady = null }) {
+export default function WallHangedImageGenerator({ 
+  src, 
+  alt = 'Wall hung image', 
+  width = 500, 
+  height = 300, 
+  bgSrc = livingRoomImg,
+  onImageReady = null 
+}) {
   const canvasRef = useRef(null)
 
   useEffect(() => {
@@ -16,11 +22,10 @@ export default function WallHangedImageGenerator({ src, alt = 'Wall hung image',
     const canvas = canvasRef.current
     const ctx = canvas.getContext('2d')
     
-    // Set canvas size (landscape orientation for full width usage)
+    // Set high-DPI canvas size
     canvas.width = width
     canvas.height = height
 
-    // Load both the artwork image and background image
     const img = new Image()
     const bgImg = new Image()
     img.crossOrigin = 'anonymous'
@@ -30,70 +35,70 @@ export default function WallHangedImageGenerator({ src, alt = 'Wall hung image',
     const totalImages = 2
     
     const renderCanvas = () => {
-      // Fill entire canvas with background image (landscape, full coverage)
-      // Scale background larger to completely fill and cover entire canvas area
-      const bgScale = 1.35  // Scale background 35% larger for complete coverage
-      const scaledBgWidth = width * bgScale
-      const scaledBgHeight = height * bgScale
-      const bgOffsetX = (width - scaledBgWidth) / 2
-      const bgOffsetY = (height - scaledBgHeight) / 2
-      ctx.drawImage(bgImg, bgOffsetX, bgOffsetY, scaledBgWidth, scaledBgHeight)
+      // Draw luxury interior room background (cover entire canvas)
+      ctx.drawImage(bgImg, 0, 0, width, height)
       
-      // Calculate frame dimensions (smaller, hung on wall)
-      const frameWidth = width * 0.38  // 38% of canvas width (slightly smaller)
-      const frameHeight = height * 0.58  // 58% of canvas height (slightly smaller)
-      const frameX = (width - frameWidth) / 2  // center horizontally
-      const frameY = height * 0.15  // positioned in upper part of wall
+      // Calculate realistic artwork wall dimensions (28% of room width)
+      const frameWidth = width * 0.28
+      const frameHeight = frameWidth * (img.height / img.width || 0.95)
+      const frameX = (width - frameWidth) / 2
+      const frameY = height * 0.22 // Positioned naturally on center accent wall
       
-      // Frame border thickness
-      const borderThickness = 8
+      const borderThickness = Math.max(3, Math.round(width * 0.012))
       
-      // Draw outer frame border (dark wood)
-      ctx.fillStyle = '#1a1a1a'
-      ctx.fillRect(frameX - borderThickness, frameY - borderThickness, frameWidth + borderThickness * 2, frameHeight + borderThickness * 2)
+      // Soft radial ambient spotlight on the wall
+      const spotlight = ctx.createRadialGradient(
+        width / 2, frameY + frameHeight / 2, 10,
+        width / 2, frameY + frameHeight / 2, frameWidth * 1.6
+      )
+      spotlight.addColorStop(0, 'rgba(255, 245, 220, 0.25)')
+      spotlight.addColorStop(1, 'rgba(0, 0, 0, 0)')
+      ctx.fillStyle = spotlight
+      ctx.fillRect(0, 0, width, height)
+
+      // Cast drop shadow below frame
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.65)'
+      ctx.shadowBlur = Math.round(width * 0.035)
+      ctx.shadowOffsetX = 0
+      ctx.shadowOffsetY = Math.round(width * 0.02)
       
-      // Draw frame gradient for depth (lighter edges)
-      ctx.fillStyle = '#333333'
-      ctx.fillRect(frameX - borderThickness + 2, frameY - borderThickness + 2, frameWidth + borderThickness * 2 - 4, borderThickness - 2)
-      ctx.fillRect(frameX - borderThickness + 2, frameY + frameHeight + borderThickness - 2, frameWidth + borderThickness * 2 - 4, borderThickness - 4)
-      
-      // Draw metallic/copper inner border
+      // Draw outer luxury gold frame border
       ctx.fillStyle = '#c9a96e'
-      ctx.fillRect(frameX - 3, frameY - 3, frameWidth + 6, frameHeight + 6)
+      ctx.fillRect(
+        frameX - borderThickness, 
+        frameY - borderThickness, 
+        frameWidth + borderThickness * 2, 
+        frameHeight + borderThickness * 2
+      )
       
-      // Draw white mat/mat board inside frame
-      ctx.fillStyle = '#ffffff'
-      const matThickness = 8
+      // Reset shadow for inner elements
+      ctx.shadowColor = 'transparent'
+      ctx.shadowBlur = 0
+      ctx.shadowOffsetX = 0
+      ctx.shadowOffsetY = 0
+      
+      // Draw white mat board
+      const matThickness = Math.max(2, Math.round(width * 0.008))
+      ctx.fillStyle = '#fbf9f4'
       ctx.fillRect(frameX, frameY, frameWidth, frameHeight)
       
-      // Calculate image dimensions to fit in the mat (auto-adjust)
-      const maxWidth = frameWidth - matThickness * 2
-      const maxHeight = frameHeight - matThickness * 2
+      // Draw inner artwork canvas
+      const innerX = frameX + matThickness
+      const innerY = frameY + matThickness
+      const innerW = frameWidth - matThickness * 2
+      const innerH = frameHeight - matThickness * 2
       
-      let imgWidth = maxWidth
-      let imgHeight = (img.height / img.width) * imgWidth
+      ctx.drawImage(img, innerX, innerY, innerW, innerH)
       
-      // If image is too tall, fit by height instead
-      if (imgHeight > maxHeight) {
-        imgHeight = maxHeight
-        imgWidth = (img.width / img.height) * imgHeight
-      }
+      // Glass sheen gradient reflection
+      const sheen = ctx.createLinearGradient(innerX, innerY, innerX + innerW, innerY + innerH)
+      sheen.addColorStop(0, 'rgba(255, 255, 255, 0.15)')
+      sheen.addColorStop(0.5, 'rgba(255, 255, 255, 0.02)')
+      sheen.addColorStop(1, 'rgba(255, 255, 255, 0.1)')
+      ctx.fillStyle = sheen
+      ctx.fillRect(innerX, innerY, innerW, innerH)
       
-      // Center image in the mat
-      const imgX = frameX + matThickness + (maxWidth - imgWidth) / 2
-      const imgY = frameY + matThickness + (maxHeight - imgHeight) / 2
-      
-      // Draw the actual artwork image
-      ctx.drawImage(img, imgX, imgY, imgWidth, imgHeight)
-      
-      // Add subtle shadow/depth effect below frame
-      const shadowGradient = ctx.createLinearGradient(frameX, frameY + frameHeight + borderThickness, frameX, frameY + frameHeight + borderThickness + 15)
-      shadowGradient.addColorStop(0, 'rgba(0,0,0,0.25)')
-      shadowGradient.addColorStop(1, 'rgba(0,0,0,0)')
-      ctx.fillStyle = shadowGradient
-      ctx.fillRect(frameX - borderThickness - 5, frameY + frameHeight + borderThickness, frameWidth + borderThickness * 2 + 10, 15)
-      
-      // Call callback if provided (for saving the image)
+      // Call callback if provided
       if (onImageReady) {
         canvas.toBlob((blob) => {
           onImageReady(blob)
@@ -116,8 +121,8 @@ export default function WallHangedImageGenerator({ src, alt = 'Wall hung image',
     }
     
     img.src = src
-    bgImg.src = mainBackgroundImage
-  }, [src, width, height, onImageReady])
+    bgImg.src = bgSrc
+  }, [src, bgSrc, width, height, onImageReady])
 
   return (
     <canvas
