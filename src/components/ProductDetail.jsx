@@ -1394,25 +1394,25 @@ export default function ProductDetail({ onReplayEntrance }) {
               </div>
 
               {/* Primary Action Buttons */}
-              <div className="space-y-2 sm:space-y-3 pt-0.5">
+              <div className="space-y-2 sm:space-y-2.5 pt-0.5 max-w-[300px] xs:max-w-[340px] sm:max-w-[360px] mx-auto w-full">
                 <motion.button
                   whileHover={shouldReduceMotion ? {} : { scale: 1.01 }}
                   whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
                   onClick={handleAddToCart}
-                  className="w-full py-3 sm:py-3.5 md:py-4 px-3 sm:px-6 bg-gradient-to-r from-[#dfb76c] via-[#f7d794] to-[#dfb76c] hover:from-[#f7d794] hover:to-[#dfb76c] text-neutral-950 rounded-xl sm:rounded-2xl text-[10.5px] xs:text-[11px] sm:text-xs uppercase tracking-[0.12em] sm:tracking-[0.18em] font-bold transition-all duration-300 shadow-[0_8px_30px_rgba(223,183,108,0.3)] hover:shadow-[0_12px_40px_rgba(223,183,108,0.45)] flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer"
+                  className="w-full py-2 sm:py-2.5 px-3 sm:px-5 bg-gradient-to-r from-[#dfb76c] via-[#f7d794] to-[#dfb76c] hover:from-[#f7d794] hover:to-[#dfb76c] text-neutral-950 rounded-lg sm:rounded-xl text-[10px] sm:text-[11px] uppercase tracking-[0.12em] sm:tracking-[0.15em] font-bold transition-all duration-300 shadow-[0_4px_20px_rgba(223,183,108,0.25)] hover:shadow-[0_8px_30px_rgba(223,183,108,0.4)] flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  <CreditCard size={14} className="shrink-0" />
+                  <CreditCard size={13} className="shrink-0" />
                   <span className="truncate">Acquire Artwork • ₹1,18,300</span>
                 </motion.button>
 
-                <div className="grid grid-cols-2 gap-2 sm:gap-3 w-full">
+                <div className="grid grid-cols-2 gap-2 sm:gap-2.5 w-full">
                   <motion.button
                     whileHover={shouldReduceMotion ? {} : { scale: 1.01 }}
                     whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
                     onClick={() => setShowOfferModal(true)}
-                    className="py-2.5 sm:py-3 md:py-3.5 px-2 sm:px-4 rounded-xl sm:rounded-2xl border border-[#dfb76c] text-[#dfb76c] hover:bg-[#dfb76c]/10 text-[9.5px] xs:text-[10px] sm:text-xs uppercase tracking-wider font-semibold transition-all flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer bg-neutral-900/60"
+                    className="py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg sm:rounded-xl border border-[#dfb76c] text-[#dfb76c] hover:bg-[#dfb76c]/10 text-[9px] sm:text-[10px] uppercase tracking-wider font-semibold transition-all flex items-center justify-center gap-1 cursor-pointer bg-neutral-900/60"
                   >
-                    <MessageCircle size={12} className="shrink-0" />
+                    <MessageCircle size={11} className="shrink-0" />
                     <span>Make Offer</span>
                   </motion.button>
 
@@ -1420,9 +1420,9 @@ export default function ProductDetail({ onReplayEntrance }) {
                     whileHover={shouldReduceMotion ? {} : { scale: 1.01 }}
                     whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
                     onClick={handleAddToCart}
-                    className="py-2.5 sm:py-3 md:py-3.5 px-2 sm:px-4 rounded-xl sm:rounded-2xl border border-neutral-700 hover:border-neutral-500 text-neutral-200 hover:bg-neutral-800 text-[9.5px] xs:text-[10px] sm:text-xs uppercase tracking-wider font-semibold transition-all flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer bg-neutral-900/60"
+                    className="py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg sm:rounded-xl border border-neutral-700 hover:border-neutral-500 text-neutral-200 hover:bg-neutral-800 text-[9px] sm:text-[10px] uppercase tracking-wider font-semibold transition-all flex items-center justify-center gap-1 cursor-pointer bg-neutral-900/60"
                   >
-                    <ShoppingCart size={12} className="shrink-0" />
+                    <ShoppingCart size={11} className="shrink-0" />
                     <span>Add to Cart</span>
                   </motion.button>
                 </div>
