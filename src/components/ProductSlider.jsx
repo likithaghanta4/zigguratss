@@ -79,8 +79,6 @@ const products = [
 ];
 
 export default function ProductSlider() {
-
-    useLenis()
     const containerRef = useRef();
 
     // text animation code

@@ -428,9 +428,6 @@ const TermsAndConditions = () => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    const lenis = new Lenis({ duration: 1.6, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), smoothWheel: true, lerp: 0.05 });
-    function raf(t) { lenis.raf(t); requestAnimationFrame(raf); }
-    requestAnimationFrame(raf); return () => lenis.destroy();
   }, []);
 
   return (

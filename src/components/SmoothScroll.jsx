@@ -12,12 +12,13 @@ export const SmoothScroll = ({ children }) => {
   useEffect(() => {
     // Initialize the physics-based scroll
     const lenis = new Lenis({
-      duration: 1.2, // Creates that heavy, deliberate deceleration
+      duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: 'vertical',
       gestureOrientation: 'vertical',
       smoothWheel: true,
-      wheelMultiplier: 1,
+      syncTouch: false,
+      touchMultiplier: 1.2,
     });
 
     lenisRef.current = lenis;
@@ -25,17 +26,21 @@ export const SmoothScroll = ({ children }) => {
     // The Critical Sync: Tell ScrollTrigger to update every time Lenis scrolls
     lenis.on('scroll', ScrollTrigger.update);
 
-    // Sync Lenis's requestAnimationFrame with GSAP's ticker
-    gsap.ticker.add((time) => {
+    // Named ticker function for clean teardown
+    const updateTicker = (time) => {
       lenis.raf(time * 1000);
-    });
+    };
+
+    // Sync Lenis's requestAnimationFrame with GSAP's ticker
+    gsap.ticker.add(updateTicker);
 
     // Prevent GSAP from trying to catch up on missed frames (prevents lag spikes)
     gsap.ticker.lagSmoothing(0);
 
     return () => {
+      gsap.ticker.remove(updateTicker);
       lenis.destroy();
-      gsap.ticker.remove(lenis.raf);
+      lenisRef.current = null;
     };
   }, []);
 

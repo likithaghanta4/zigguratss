@@ -1,32 +1,13 @@
 import { useEffect } from 'react'
-import { gsap, ScrollTrigger } from './gsap'
-import Lenis from 'lenis'
 
+/**
+ * Global smooth scroll is unified and managed at the root by SmoothScroll in App.jsx.
+ * useLenis is kept as a safe pass-through hook to prevent redundant competing instances.
+ */
 const useLenis = () => {
-
     useEffect(() => {
-        const lenis = new Lenis({
-            lerp: 0.05,
-            duration: 5,
-        })
-
-        // Sync Lenis with ScrollTrigger
-        lenis.on('scroll', ScrollTrigger.update)
-
-        // Store function reference
-        const raf = (time) => {
-            lenis.raf(time * 1000)
-        }
-
-        gsap.ticker.add(raf)
-        gsap.ticker.lagSmoothing(0)
-
-        return () => {
-            gsap.ticker.remove(raf) // now works correctly
-            lenis.destroy()
-        }
+        // No-op: global instance in SmoothScroll handles window smooth scrolling
     }, [])
-
 }
 
-export default useLenis
+export default useLenis
