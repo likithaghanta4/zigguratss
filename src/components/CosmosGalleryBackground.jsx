@@ -305,7 +305,7 @@ export default function CosmosGalleryBackground() {
     <canvas
       ref={canvasRef}
       className="fixed inset-0 w-full h-full pointer-events-none z-0 select-none"
-      style={{ width: '100%', height: '100%', display: 'block' }}
+      style={{ width: '100%', height: '100%', display: 'block', touchAction: 'pan-y' }}
     />
   )
 }

@@ -835,6 +835,7 @@ export default function ProductDetail({ onReplayEntrance }) {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
               className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-[#0c0c12] border border-neutral-800 hover:border-[#dfb76c]/40 shadow-[0_16px_50px_rgba(0,0,0,0.6)] group flex flex-col w-full"
+              style={{ touchAction: 'pan-y' }}
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}

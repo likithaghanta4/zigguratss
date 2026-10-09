@@ -359,6 +359,7 @@ export default function RealRoom3DVisualizer({
       className={`relative w-full rounded-2xl sm:rounded-3xl overflow-hidden bg-[#0a0a0e] border border-neutral-800 shadow-2xl ${
         isFullscreen ? 'fixed inset-0 z-50 rounded-none h-screen bg-black' : ''
       } ${className}`}
+      style={{ touchAction: isFullscreen ? 'none' : 'pan-y' }}
     >
       {/* ── TOP HEADER / REAL ROOM HUD BAR ── */}
       <div className="relative z-30 flex items-center justify-between gap-2 px-3 py-2.5 sm:px-4 sm:py-3 bg-[#0c0c12]/95 backdrop-blur-md border-b border-neutral-800/80">

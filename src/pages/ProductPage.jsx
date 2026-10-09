@@ -16,7 +16,10 @@ export default function ProductPage() {
   })
 
   return (
-    <div className="product-page-root min-h-screen w-full bg-[#0a0a0d] text-neutral-100 selection:bg-[#dfb76c]/30 selection:text-[#f3e3ba] relative overflow-x-hidden">
+    <div 
+      className="product-page-root min-h-screen w-full bg-[#0a0a0d] text-neutral-100 selection:bg-[#dfb76c]/30 selection:text-[#f3e3ba] relative overflow-x-hidden"
+      style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}
+    >
       {/* 3D Cinematic Entrance Intro Hero */}
       <AnimatePresence mode="wait">
         {showEntrance && (
@@ -29,7 +32,7 @@ export default function ProductPage() {
 
       {/* Editorial Top Golden Reading Progress Line */}
       <motion.div
-        className="fixed top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-[#c9a96e] via-[#f7d794] to-[#c9a96e] origin-left z-50 shadow-[0_1px_12px_rgba(223,183,108,0.5)]"
+        className="fixed top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-[#c9a96e] via-[#f7d794] to-[#c9a96e] origin-left z-50 shadow-[0_1px_12px_rgba(223,183,108,0.5)] pointer-events-none"
         style={{ scaleX }}
       />
 
@@ -37,7 +40,10 @@ export default function ProductPage() {
       <CosmosGalleryBackground />
 
       {/* Main Content Container */}
-      <div className="product-detail-container relative z-10 w-full max-w-[1440px] mx-auto px-2.5 xs:px-4 sm:px-6 lg:px-10 xl:px-12 pt-16 xs:pt-20 sm:pt-24 lg:pt-28 pb-16 sm:pb-28 lg:pb-36">
+      <div 
+        className="product-detail-container relative z-10 w-full max-w-[1440px] mx-auto px-2.5 xs:px-4 sm:px-6 lg:px-10 xl:px-12 pt-16 xs:pt-20 sm:pt-24 lg:pt-28 pb-16 sm:pb-28 lg:pb-36"
+        style={{ touchAction: 'pan-y' }}
+      >
         <ProductDetail onReplayEntrance={() => setShowEntrance(true)} />
         
         {/* Editorial Trust & Collector Confidence Bar */}
