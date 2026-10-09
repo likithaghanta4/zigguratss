@@ -284,7 +284,6 @@ export default function ProductDetail({ onReplayEntrance }) {
   const [mouseOffset, setMouseOffset] = useState({ x: 0, y: 0 })
   const [isDragging, setIsDragging] = useState(false)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
-  const [scaleMultiplier, setScaleMultiplier] = useState(1.0)
   const [yOffset, setYOffset] = useState(0) // Fine-tune wall height offset %
   const [showAdvancedTools, setShowAdvancedTools] = useState(false)
 
@@ -577,7 +576,7 @@ export default function ProductDetail({ onReplayEntrance }) {
 
   const finalRotateY = currentAnglePreset.rotateY + mouseOffset.x + manualRotation.rotateY
   const finalRotateX = currentAnglePreset.rotateX + mouseOffset.y + manualRotation.rotateX
-  const finalScale = (currentAnglePreset.scale || 1.0) * scaleMultiplier
+  const finalScale = currentAnglePreset.scale || 1.0
 
   // 3D Parallax Tilt Handler on Artwork Stage
   const handleStageMouseMove = (e) => {
@@ -907,10 +906,9 @@ export default function ProductDetail({ onReplayEntrance }) {
                     onClick={() => {
                       setManualRotation({ rotateX: 0, rotateY: 0 })
                       setCameraAngleId('center')
-                      setScaleMultiplier(1.0)
                     }}
                     className="p-1.5 sm:p-2 bg-[#14141d] hover:bg-neutral-800 text-neutral-400 hover:text-white rounded-lg border border-neutral-800 transition-all cursor-pointer shrink-0"
-                    title="Reset 3D Angle & Zoom"
+                    title="Reset 3D Perspective Angle"
                   >
                     <Compass size={12} className="sm:w-3.5 sm:h-3.5" />
                   </button>
@@ -1152,59 +1150,25 @@ export default function ProductDetail({ onReplayEntrance }) {
               </div>
             </div>
 
-            {/* ── ROW 2: FRAME STYLES & ZOOM / POSITION CONTROLS BAR ── */}
-            <div className="bg-[#121217]/90 p-2 sm:p-3 rounded-xl border border-neutral-800/80 space-y-2 w-full">
-              <div className="flex flex-col xs:flex-row items-start xs:items-center justify-between gap-2 text-[10px] sm:text-xs">
-                {/* Frame Style Pills */}
-                <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto max-w-full pb-0.5" style={{ scrollbarWidth: 'none' }}>
-                  <span className="text-neutral-400 uppercase tracking-wider font-semibold text-[8.5px] sm:text-[10px] pr-1 flex items-center gap-1 shrink-0">
-                    <Box size={10} className="text-[#dfb76c]" /> Frame:
-                  </span>
-                  {FRAME_STYLES.map((frame) => (
-                    <button
-                      key={frame.id}
-                      onClick={() => setActiveFrameId(frame.id)}
-                      className={`px-2 py-0.5 sm:py-1 rounded-lg border transition-all text-[8.5px] sm:text-[10px] font-medium whitespace-nowrap cursor-pointer shrink-0 ${
-                        activeFrameId === frame.id
-                          ? 'bg-[#dfb76c]/20 border-[#dfb76c] text-[#f7d794] font-semibold'
-                          : 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white'
-                      }`}
-                    >
-                      {frame.name.split(' (')[0]}
-                    </button>
-                  ))}
-                </div>
-
-                {/* 3D Camera Zoom Controls */}
-                <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto max-w-full pb-0.5 shrink-0" style={{ scrollbarWidth: 'none' }}>
-                  <span className="text-neutral-400 uppercase tracking-wider font-semibold text-[8.5px] sm:text-[10px] flex items-center gap-1 shrink-0">
-                    <ZoomIn size={10} className="text-[#dfb76c]" /> Zoom:
-                  </span>
+            {/* ── ROW 2: FRAME STYLES BAR ── */}
+            <div className="bg-[#121217]/90 p-2 sm:p-2.5 rounded-xl border border-neutral-800/80 w-full">
+              <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto max-w-full pb-0.5" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
+                <span className="text-neutral-400 uppercase tracking-wider font-semibold text-[8.5px] sm:text-[10px] pr-1 flex items-center gap-1 shrink-0">
+                  <Box size={10} className="text-[#dfb76c]" /> Frame:
+                </span>
+                {FRAME_STYLES.map((frame) => (
                   <button
-                    onClick={() => setScaleMultiplier(1.0)}
-                    className={`px-1.5 sm:px-2 py-0.5 rounded border text-[8.5px] sm:text-[9px] font-mono cursor-pointer shrink-0 ${
-                      scaleMultiplier === 1.0 ? 'bg-[#dfb76c]/20 border-[#dfb76c] text-[#f7d794]' : 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white'
+                    key={frame.id}
+                    onClick={() => setActiveFrameId(frame.id)}
+                    className={`px-2 py-0.5 sm:py-1 rounded-lg border transition-all text-[8.5px] sm:text-[10px] font-medium whitespace-nowrap cursor-pointer shrink-0 ${
+                      activeFrameId === frame.id
+                        ? 'bg-[#dfb76c]/20 border-[#dfb76c] text-[#f7d794] font-semibold'
+                        : 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white'
                     }`}
                   >
-                    1.0x Room
+                    {frame.name.split(' (')[0]}
                   </button>
-                  <button
-                    onClick={() => setScaleMultiplier(1.2)}
-                    className={`px-1.5 sm:px-2 py-0.5 rounded border text-[8.5px] sm:text-[9px] font-mono cursor-pointer shrink-0 ${
-                      scaleMultiplier === 1.2 ? 'bg-[#dfb76c]/20 border-[#dfb76c] text-[#f7d794]' : 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white'
-                    }`}
-                  >
-                    1.2x Focus
-                  </button>
-                  <button
-                    onClick={() => setScaleMultiplier(1.45)}
-                    className={`px-1.5 sm:px-2 py-0.5 rounded border text-[8.5px] sm:text-[9px] font-mono cursor-pointer shrink-0 ${
-                      scaleMultiplier === 1.45 ? 'bg-[#dfb76c]/20 border-[#dfb76c] text-[#f7d794]' : 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white'
-                    }`}
-                  >
-                    1.45x Detail
-                  </button>
-                </div>
+                ))}
               </div>
             </div>
 
