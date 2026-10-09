@@ -89,11 +89,11 @@ const PageTransition = ({ children }) => {
                 ))}
             </div>
 
-            {/* fade overlay — opacity only, never transforms page content */}
+            {/* fade overlay — obsidian brand dark, opacity only, never transforms page content */}
             <div
                 ref={fadeRef}
-                className="fixed inset-0 z-40 bg-white pointer-events-none"
-                style={{ opacity: 1 }}
+                className="fixed inset-0 z-40 bg-[#0a0a0d] pointer-events-none"
+                style={{ opacity: 0 }}
             />
 
             {/* page content — never wrapped in any transform */}

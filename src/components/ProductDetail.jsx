@@ -999,9 +999,9 @@ export default function ProductDetail({ onReplayEntrance }) {
                       left: `${currentRoom.wall.left}%`,
                       top: `${currentRoom.wall.top}%`,
                       transform: 'translate(-50%, -50%) translateZ(2px)',
-                      width: `${(activeArtwork.wallWidthPct || 18.0) * (currentRoom.wall.scaleFactor || 1.0) * scaleMultiplier}%`,
+                      width: `${(activeArtwork.wallWidthPct || 18.0) * (currentRoom.wall.scaleFactor || 1.0)}%`,
                       maxWidth: activeArtwork.orientation === 'landscape' ? '380px' : activeArtwork.orientation === 'portrait' ? '280px' : '310px',
-                      maxHeight: `${(currentRoom.wall.maxHeightPct || 32.0) * scaleMultiplier}%`,
+                      maxHeight: `${currentRoom.wall.maxHeightPct || 32.0}%`,
                       transformStyle: 'preserve-3d'
                     }}
                   >
