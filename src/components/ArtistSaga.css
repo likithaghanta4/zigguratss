@@ -307,3 +307,19 @@
   animation: sheen-sweep 4s linear infinite;
 }
 
+/* ========================================================= */
+/* MULTI-SECTION STICKY PRODUCT DOSSIER TRACK               */
+/* Keeps the single hero product details box visible across */
+/* all page sections on desktop while stacking on mobile.   */
+/* ========================================================= */
+@media (min-width: 1024px) {
+  .product-details-sticky-track {
+    grid-column: 8 / span 5 !important;
+    grid-row: 1 / span 2 !important;
+    position: sticky !important;
+    top: 5.5rem !important;
+    align-self: start !important;
+    z-index: 20;
+  }
+}
+

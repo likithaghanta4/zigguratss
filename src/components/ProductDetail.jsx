@@ -15,6 +15,7 @@ import WallHangedImageGenerator from './WallHangedImageGenerator'
 import FlightRadarMap from './FlightRadarMap'
 import ArchivalPreparationScene from './ArchivalPreparationScene'
 import WhiteGloveDoorstepScene from './WhiteGloveDoorstepScene'
+import ProductGuidelineOverlayManager from './ProductGuidelineModals'
 import RealRoom3DVisualizer, { 
   ROOM_PRESETS, 
   ARTWORK_PRESETS, 
@@ -96,29 +97,113 @@ export default function ProductDetail({ onReplayEntrance }) {
   const [showUploadModal, setShowUploadModal] = useState(false)
   const [activeTrustIndex, setActiveTrustIndex] = useState(0)
   const [isTrustHovered, setIsTrustHovered] = useState(false)
-
-  // Sequential cycling states for multi-box sections
   const [activeSpecIdx, setActiveSpecIdx] = useState(0)
   const [isSpecHovered, setIsSpecHovered] = useState(false)
-
   const [activeMilestoneIdx, setActiveMilestoneIdx] = useState(0)
   const [isMilestoneHovered, setIsMilestoneHovered] = useState(false)
-
   const [activeArtistSuiteIdx, setActiveArtistSuiteIdx] = useState(0)
   const [isArtistSuiteHovered, setIsArtistSuiteHovered] = useState(false)
-
   const [activeDimBoxIdx, setActiveDimBoxIdx] = useState(0)
   const [activeFilmstripIdx, setActiveFilmstripIdx] = useState(0)
+  const [isFilmstripHovered, setIsFilmstripHovered] = useState(false)
   const [activeAccreditationIdx, setActiveAccreditationIdx] = useState(0)
+  const [selectedRetrospectiveArt, setSelectedRetrospectiveArt] = useState(null)
+  const [activeGuideline, setActiveGuideline] = useState(null)
+  const [isGuidelinePinned, setIsGuidelinePinned] = useState(false)
+  const hoverGuidelineTimeoutRef = useRef(null)
+  const hoverIntentTimeoutRef = useRef(null)
+
+  const handleGuidelineMouseEnter = (id) => {
+    // Clear any pending auto-dismiss timer
+    if (hoverGuidelineTimeoutRef.current) {
+      clearTimeout(hoverGuidelineTimeoutRef.current)
+    }
+    // Clear any previous hover intent timer
+    if (hoverIntentTimeoutRef.current) {
+      clearTimeout(hoverIntentTimeoutRef.current)
+    }
+
+    if (isGuidelinePinned) {
+      return
+    }
+
+    // Hover Intent Delay: wait ~250ms so accidental swipes do not trigger
+    hoverIntentTimeoutRef.current = setTimeout(() => {
+      setActiveGuideline(id)
+      setIsGuidelinePinned(false)
+
+      // Auto-dismiss preview timer: exactly 7 seconds for all guidelines on hover
+      hoverGuidelineTimeoutRef.current = setTimeout(() => {
+        setActiveGuideline(null)
+      }, 7000)
+    }, 250)
+  }
+
+  const handleGuidelineMouseLeave = () => {
+    // Cancel opening if cursor leaves before intent delay
+    if (hoverIntentTimeoutRef.current) {
+      clearTimeout(hoverIntentTimeoutRef.current)
+    }
+    // If not pinned, the 7-second timer continues to its scheduled close
+  }
+
+  const handleGuidelineClick = (id) => {
+    if (hoverIntentTimeoutRef.current) {
+      clearTimeout(hoverIntentTimeoutRef.current)
+    }
+    if (hoverGuidelineTimeoutRef.current) {
+      clearTimeout(hoverGuidelineTimeoutRef.current)
+    }
+    if (activeGuideline === id && isGuidelinePinned) {
+      setActiveGuideline(null)
+      setIsGuidelinePinned(false)
+    } else {
+      setActiveGuideline(id)
+      setIsGuidelinePinned(true)
+    }
+  }
+
+  const handleGuidelineKeyDown = (e, id) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      handleGuidelineClick(id)
+    }
+  }
+
+  const handleCloseGuideline = () => {
+    if (hoverIntentTimeoutRef.current) {
+      clearTimeout(hoverIntentTimeoutRef.current)
+    }
+    if (hoverGuidelineTimeoutRef.current) {
+      clearTimeout(hoverGuidelineTimeoutRef.current)
+    }
+    setActiveGuideline(null)
+    setIsGuidelinePinned(false)
+  }
+
+  const handleMouseEnterModal = () => {
+    // Cursor is inside modal panel: keep 7-second countdown active
+  }
+
+  const handleMouseLeaveModal = () => {
+    // Keep 7-second countdown running unless pinned
+  }
+
+  const handlePinGuideline = () => {
+    if (hoverGuidelineTimeoutRef.current) {
+      clearTimeout(hoverGuidelineTimeoutRef.current)
+    }
+    setIsGuidelinePinned(true)
+  }
 
   // Sequential cycling of the 4 features: 1 -> 2 -> 3 -> 4 -> 1 (Expands/Grows big then shrinks back)
   useEffect(() => {
-    if (isTrustHovered) return
+    if (isTrustHovered || activeGuideline) return
     const interval = setInterval(() => {
       setActiveTrustIndex((prev) => (prev + 1) % TRUST_GUARANTEE_ITEMS.length)
     }, 2800)
     return () => clearInterval(interval)
-  }, [isTrustHovered])
+  }, [isTrustHovered, activeGuideline])
 
   // Sequential cycling of the 8 Artwork Specification cards
   useEffect(() => {
@@ -157,11 +242,12 @@ export default function ProductDetail({ onReplayEntrance }) {
 
   // Sequential cycling of Artist Filmstrip cards
   useEffect(() => {
+    if (isFilmstripHovered) return
     const interval = setInterval(() => {
-      setActiveFilmstripIdx((prev) => (prev + 1) % 5)
-    }, 2400)
+      setActiveFilmstripIdx((prev) => (prev + 1) % 8)
+    }, 2800)
     return () => clearInterval(interval)
-  }, [])
+  }, [isFilmstripHovered])
 
   // Sequential cycling of Provenance Accreditations
   useEffect(() => {
@@ -169,6 +255,21 @@ export default function ProductDetail({ onReplayEntrance }) {
       setActiveAccreditationIdx((prev) => (prev + 1) % 3)
     }, 2500)
     return () => clearInterval(interval)
+  }, [])
+
+  // Floating Acquisition Dock when scrolled past primary stage
+  const [showFloatingDock, setShowFloatingDock] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 980) {
+        setShowFloatingDock(true)
+      } else {
+        setShowFloatingDock(false)
+      }
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true })
+    return () => window.removeEventListener('scroll', handleScroll)
   }, [])
   
   // Mobile Touch Swipe States
@@ -299,7 +400,7 @@ export default function ProductDetail({ onReplayEntrance }) {
   const [previewImage, setPreviewImage] = useState(null)
   const [uploadedImages, setUploadedImages] = useState([])
 
-  // Authentic Zigguratss Gallery Dataset (6 Master Artworks from Repository)
+  // Authentic Zigguratss Gallery Dataset (Single Master Artwork Divine Tunes-11)
   const [galleryThumbs, setGalleryThumbs] = useState([
     {
       id: 'divine-tunes',
@@ -313,74 +414,6 @@ export default function ProductDetail({ onReplayEntrance }) {
       dimensions: '32 × 30 in (81.3 × 76.2 cm)',
       wallWidthPct: 18.0,
       maxHeightPct: 33.0
-    },
-    {
-      id: 'butterfly-sonata',
-      title: 'The Butterfly Sonata',
-      src: flowersImage,
-      label: 'Butterfly Sonata',
-      alt: 'The Butterfly Sonata - floral motif',
-      defaultRoom: 'master-bedroom',
-      aspectRatio: 549 / 710, // 0.773 (Portrait)
-      orientation: 'portrait',
-      dimensions: '30 × 38 in (76.2 × 96.5 cm)',
-      wallWidthPct: 17.5,
-      maxHeightPct: 34.0
-    },
-    {
-      id: 'geometric-symmetry',
-      title: 'Geometric Symmetry',
-      src: image9,
-      label: 'Geometric Symmetry',
-      alt: 'Geometric Symmetry - form and balance',
-      defaultRoom: 'gallery-salon',
-      aspectRatio: 735 / 913, // 0.805 (Portrait)
-      orientation: 'portrait',
-      dimensions: '32 × 40 in (81.3 × 101.6 cm)',
-      wallWidthPct: 17.5,
-      maxHeightPct: 34.0
-    },
-    {
-      id: 'wall-mount-1',
-      title: 'Curatorial Wall Mount',
-      src: testImage,
-      label: 'Wall Mount 1',
-      alt: 'Curatorial wall mount plate',
-      defaultRoom: 'gallery-salon',
-      aspectRatio: 1200 / 1022, // 1.174 (Near Square)
-      orientation: 'square',
-      dimensions: '36 × 31 in (91.4 × 78.7 cm)',
-      wallWidthPct: 21.0,
-      maxHeightPct: 31.0,
-      isWallHung: true
-    },
-    {
-      id: 'framed-canvas',
-      title: 'Studio Framed Canvas',
-      src: testImage2,
-      label: 'Framed Canvas',
-      alt: 'Studio framed canvas',
-      defaultRoom: 'living-room',
-      aspectRatio: 1080 / 1350, // 0.800 (Portrait)
-      orientation: 'portrait',
-      dimensions: '30 × 37.5 in (76.2 × 95.3 cm)',
-      wallWidthPct: 17.5,
-      maxHeightPct: 34.0,
-      isWallHung: true
-    },
-    {
-      id: 'museum-setting',
-      title: 'Archival Museum Setting',
-      src: hansImage,
-      label: 'Museum Setting',
-      alt: 'Archival museum setting plate',
-      defaultRoom: 'executive-lounge',
-      aspectRatio: 736 / 736, // 1.000 (Square)
-      orientation: 'square',
-      dimensions: '34 × 34 in (86.4 × 86.4 cm)',
-      wallWidthPct: 20.0,
-      maxHeightPct: 32.0,
-      isWallHung: true
     }
   ])
 
@@ -394,13 +427,14 @@ export default function ProductDetail({ onReplayEntrance }) {
   // Room 4 (Penthouse Lounge)     -> Images 1 to 6
   // Loop back to Room 1
   // =========================================================
+  const [currentRoomIndex, setCurrentRoomIndex] = useState(0)
   const [stepIndex, setStepIndex] = useState(0)
 
-  const totalArtworks = galleryThumbs.length || 6
+  const totalArtworks = galleryThumbs.length || 1
   const totalRooms = ROOM_PRESETS.length || 4
-  const totalSteps = totalArtworks * totalRooms
+  const totalSteps = totalArtworks
 
-  const roomIndex = Math.floor(stepIndex / totalArtworks) % totalRooms
+  const roomIndex = currentRoomIndex % totalRooms
   const active = stepIndex % totalArtworks
 
   const currentRoom = ROOM_PRESETS[roomIndex] || ROOM_PRESETS[0]
@@ -412,41 +446,244 @@ export default function ProductDetail({ onReplayEntrance }) {
       setStepIndex((prev) => {
         const curActive = prev % totalArtworks
         const nextActive = target(curActive)
-        const curRoomIdx = Math.floor(prev / totalArtworks) % totalRooms
-        return curRoomIdx * totalArtworks + ((nextActive + totalArtworks) % totalArtworks)
+        return (nextActive + totalArtworks) % totalArtworks
       })
     } else {
-      setStepIndex(roomIndex * totalArtworks + ((target + totalArtworks) % totalArtworks))
+      setStepIndex((target + totalArtworks) % totalArtworks)
     }
   }
 
   const setActiveRoomId = (targetRoom) => {
-    if (typeof targetRoom === 'function') {
-      setStepIndex((prev) => {
-        const curRoomIdx = Math.floor(prev / totalArtworks) % totalRooms
-        const curRoomObj = ROOM_PRESETS[curRoomIdx] || ROOM_PRESETS[0]
-        const nextRoomId = targetRoom(curRoomObj.id)
-        const nextIdx = ROOM_PRESETS.findIndex((r) => r.id === nextRoomId)
-        const safeIdx = nextIdx >= 0 ? nextIdx : 0
-        return safeIdx * totalArtworks + 0
-      })
-    } else {
-      const nextIdx = ROOM_PRESETS.findIndex((r) => r.id === targetRoom)
-      const safeIdx = nextIdx >= 0 ? nextIdx : 0
-      setStepIndex(safeIdx * totalArtworks + 0)
-    }
+    const nextIdx = ROOM_PRESETS.findIndex((r) => r.id === targetRoom)
+    if (nextIdx >= 0) setCurrentRoomIndex(nextIdx)
   }
 
-  // Pradip Sarkar Portfolio Filmstrip
+  // Verified Artwork Technical Specifications Ledger (Zigguratss Curatorial Archives)
+  const artworkSpecs = [
+    {
+      id: 'category',
+      label: 'Category',
+      value: 'Portrait / Abstract',
+      heading: 'Category Classification',
+      shortDesc: 'Contemporary figurative portraiture fused with meditative geometric abstraction and nature symbolism.',
+      detail: 'Contemporary Indian fine art merging expressive figurative portraiture with meditative abstraction. The composition centers on a serene muse adorned with symbolic butterflies, exploring internal tranquility and spiritual resonance.',
+      highlight: 'Contemporary Indian Fine Art',
+      curatorialNote: 'A benchmark piece bridging traditional Indian aesthetic sensibility and international modern abstraction.',
+      provenanceSource: 'Zigguratss Curatorial Registry',
+      icon: Palette
+    },
+    {
+      id: 'style',
+      label: 'Style',
+      value: 'Geometric Abstraction',
+      heading: 'Artistic Style & Movement',
+      shortDesc: 'Harmonic cubic matrices and architectural planes creating structured visual cadences on canvas.',
+      detail: 'Architectural planes, rhythmic cubic grids, and structured geometric matrices inspired by Indian modernism. Sarkar partitions the canvas into harmonious tonal blocks that guide the viewer\'s eye through dimensional visual cadences.',
+      highlight: 'Signature Cubist Modernism',
+      curatorialNote: 'Distinguished by precise linear discipline paired with emotional warmth and contemplative stillness.',
+      provenanceSource: 'Zigguratss Style Archive',
+      icon: Layers
+    },
+    {
+      id: 'techniques',
+      label: 'Techniques',
+      value: 'Layered Impasto',
+      heading: 'Execution Technique',
+      shortDesc: 'Multi-pass palette knife application and thick pigment relief catching natural ambient lighting.',
+      detail: 'Executed through meticulous multi-pass palette knife application and dense impasto layering. The raised physical ridges catch ambient gallery lighting, yielding an ever-shifting surface luminosity that flat reproduction cannot convey.',
+      highlight: 'Master Palette Knife Relief',
+      curatorialNote: 'Rich textural relief built through successive glaze cycles and sculptural paint application.',
+      provenanceSource: 'Zigguratss Studio Records',
+      icon: Feather
+    },
+    {
+      id: 'medium',
+      label: 'Medium Used',
+      value: 'Acrylic on Canvas',
+      heading: 'Medium & Substrate',
+      shortDesc: 'Artist-grade lightfast acrylic emulsions on heavyweight Belgian primed cotton-linen canvas.',
+      detail: 'Premium artist-grade, lightfast acrylic emulsions formulated for permanent color saturation and archival stability. The pigment is bonded to heavyweight Belgian cotton-linen canvas primed with museum-grade acid-free titanium gesso.',
+      highlight: '100% Archival Grade Materials',
+      curatorialNote: 'Lightfastness rated ASTM I (100+ year gallery preservation index without pigment degradation).',
+      provenanceSource: 'Zigguratss Materials Ledger',
+      icon: Box
+    },
+    {
+      id: 'size',
+      label: 'Size (Inches)',
+      value: unit === 'cm' ? '81.28 × 76.20 cm' : '32.00 × 30.00 in',
+      heading: 'Physical Dimensions & Scale',
+      shortDesc: unit === 'cm' ? '81.28 × 76.20 cm (32 × 30 in) calibrated for salon & residential spaces.' : '32.00 × 30.00 in (81.28 × 76.20 cm) calibrated for salon & residential spaces.',
+      detail: 'Museum-proportioned scale measuring exactly 32.00 × 30.00 inches (81.28 × 76.20 cm). Perfectly calibrated for prominent salon placement, collector living suites, and high-ceiling architectural environments without visual crowding.',
+      highlight: 'Curated Architectural Scale',
+      curatorialNote: 'Includes an additional 2.5-inch perimeter margin of unpainted archival canvas for customized gallery stretching or floating frame mounting.',
+      provenanceSource: 'Zigguratss Dimension Registry',
+      icon: Move
+    },
+    {
+      id: 'valuation',
+      label: 'Valuation',
+      value: '₹1,18,300 ($1,577)',
+      heading: 'Acquisition Valuation',
+      shortDesc: 'Studio-direct pricing indexed against artist auction records and verified gallery registry.',
+      detail: 'Primary market acquisition valuation indexed directly from Pradip Sarkar\'s registered studio catalog and verified gallery sales history. Fully inclusive of all museum packaging, provenance verification, and comprehensive air transit insurance.',
+      highlight: 'Registered Studio Provenance',
+      curatorialNote: 'Accompanied by an official commercial gallery bill of sale and registered appraisal certification.',
+      provenanceSource: 'Zigguratss Pricing Index',
+      icon: CreditCard
+    },
+    {
+      id: 'year',
+      label: 'Year Created',
+      value: '2023 (Archival)',
+      heading: 'Creation Chronology',
+      shortDesc: 'Executed in Mumbai studio as the cornerstone masterwork of the Divine Tunes suite.',
+      detail: 'Completed in 2023 within Pradip Sarkar\'s Mumbai studio. Formally cataloged as a vital pillar work within the internationally exhibited \'Divine Tunes\' series, representing the peak maturity of his cubic spiritual abstraction period.',
+      highlight: 'Master Mature Period (2023)',
+      curatorialNote: 'Personally titled, dated, and signed by the artist in pigment on the lower canvas face and in archival ink on reverse.',
+      provenanceSource: 'Zigguratss Catalog Raisonné',
+      icon: Clock
+    },
+    {
+      id: 'delivery',
+      label: 'Delivery Format',
+      value: 'Rolled in Archival Tube',
+      heading: 'Packaging & Transit Spec',
+      shortDesc: 'Protected with acid-free glassine sheets and sealed inside heavy-duty rigid cylinder.',
+      detail: 'Carefully dismounted from studio stretcher bars, insulated with acid-free glassine sheets and cellular shock wrap, and sealed within a rigid heavy-duty archival cylinder with waterproof end caps for optimal preservation during transport.',
+      highlight: 'Global White-Glove Transit',
+      curatorialNote: 'Ready for custom local framing upon arrival; detailed professional stretching instructions included.',
+      provenanceSource: 'Zigguratss Logistics Protocol',
+      icon: Package
+    }
+  ]
+
+  // Four Verified Artist Milestone Pillars (Placed in Artist Section)
+  const artistMilestones = [
+    {
+      id: 'origin',
+      origin: 'Origin',
+      title: 'Dhanbad, Jharkhand',
+      desc: 'Commerce Graduate, Ranchi University • Cultural roots in Eastern India heritage',
+      extended: 'Born with a deep aesthetic curiosity, Sarkar completed his Commerce degree at Ranchi University before dedicating his life fully to fine arts, drawing early inspiration from classical Indian musical traditions and spatial geometry.',
+      icon: MapPin,
+      badge: 'Heritage & Roots',
+      source: 'Ranchi University Registry'
+    },
+    {
+      id: 'academic',
+      origin: 'Academic',
+      title: 'Diploma in Fine Art',
+      desc: 'British Institute, Mumbai • Rigorous classical fine art & modern cubism training',
+      extended: 'Mastered classical draughtsmanship, colour chemistry, and modernist spatial geometry at the prestigious British Institute in Mumbai, pioneering his signature cubic impasto language.',
+      icon: Award,
+      badge: 'Academic Pedigree',
+      source: 'British Institute Mumbai'
+    },
+    {
+      id: 'exhibitions',
+      origin: 'Exhibitions',
+      title: '70+ Curated Shows',
+      desc: 'Active Indian contemporary master since 1995 across premier art galleries',
+      extended: 'Over three decades of solo and curated group exhibitions in premier cultural capitals including Mumbai, New Delhi, Kolkata, Dubai, London, and Singapore.',
+      icon: Palette,
+      badge: 'Global Retrospective',
+      source: 'Curatorial Archive (1995–2024)'
+    },
+    {
+      id: 'presence',
+      origin: 'Presence',
+      title: 'Lalit Kala Akademi',
+      desc: 'Featured across prestigious national institutions & distinguished global collections',
+      extended: 'Regular participation and permanent cataloging at the Lalit Kala Akademi, Jehangir Art Gallery Mumbai, and prestigious private and corporate collections worldwide.',
+      icon: Shield,
+      badge: 'Institutional Provenance',
+      source: 'National Art Institutions'
+    }
+  ]
+
+  // Pradip Sarkar Master Retrospective Portfolio (8 Iconic Archival Masterworks)
   const artistFilmstrip = [
-    { title: 'Divine Tunes-11', image: flowersImage, year: '2023' },
-    { title: 'Divine Tunes-09', image: screenshotImage, year: '2022' },
-    { title: 'Geometric Sonata', image: diff3, year: '2021' },
-    { title: 'Spiritual Symphony', image: image2, year: '2020' },
-    { title: 'Exhibition Plate', image: akhImage, year: '1995-2024' },
-    { title: 'Color In Space', image: diff1, year: '2019' },
-    { title: 'Heritage Retrospective', image: historyImage, year: 'Archive' },
-    { title: 'Natural Cadence', image: diff5, year: '2018' },
+    { 
+      id: 'dt-11',
+      title: 'Divine Tunes-11', 
+      subtitle: 'Archival Masterpiece', 
+      image: flowersImage, 
+      year: '2023', 
+      medium: 'Acrylic on Canvas', 
+      dimensions: '32 × 30 in (81.3 × 76.2 cm)',
+      description: 'The defining apex of Pradip Sarkar\'s cubic impasto period. Layered pigments with translucent glazes capture the meditative stillness of spiritual melodies.'
+    },
+    { 
+      id: 'dt-09',
+      title: 'Divine Tunes-09', 
+      subtitle: 'Studio Vault Selection', 
+      image: screenshotImage, 
+      year: '2022', 
+      medium: 'Acrylic on Canvas', 
+      dimensions: '30 × 28 in (76.2 × 71.1 cm)',
+      description: 'Luminous warm ochre and saffron tones evoking the harmonic geometry of twilight ragas, featuring Sarkar\'s iconic square impasto segmentation.'
+    },
+    { 
+      id: 'geom-sonata',
+      title: 'Geometric Sonata', 
+      subtitle: 'Cubic Abstraction Series', 
+      image: diff3, 
+      year: '2021', 
+      medium: 'Acrylic on Canvas', 
+      dimensions: '36 × 36 in (91.4 × 91.4 cm)',
+      description: 'An architectural study in tonal equilibrium, balancing structured vertical planes with fluid organic chromatic transitions.'
+    },
+    { 
+      id: 'spirit-sym',
+      title: 'Spiritual Symphony', 
+      subtitle: 'Harmonic Color Studies', 
+      image: image2, 
+      year: '2020', 
+      medium: 'Acrylic on Canvas', 
+      dimensions: '30 × 30 in (76.2 × 76.2 cm)',
+      description: 'Exploration of meditative consciousness through deep ultramarine blues and vibrant gold highlights inspired by Indian classical musical modes.'
+    },
+    { 
+      id: 'exhib-plate',
+      title: 'Exhibition Plate', 
+      subtitle: 'Career Retrospective Plate', 
+      image: akhImage, 
+      year: '1995–2024', 
+      medium: 'Mixed Media Archival', 
+      dimensions: '24 × 32 in (61.0 × 81.3 cm)',
+      description: 'Curatorial retrospective monograph plate documenting Sarkar\'s three-decade exhibition history across national and international salons.'
+    },
+    { 
+      id: 'color-space',
+      title: 'Color In Space', 
+      subtitle: 'Atmospheric Field Study', 
+      image: diff1, 
+      year: '2019', 
+      medium: 'Acrylic on Canvas', 
+      dimensions: '28 × 34 in (71.1 × 86.4 cm)',
+      description: 'Spatial dynamic color fields illustrating the resonance between painted surface texture and ambient gallery illumination.'
+    },
+    { 
+      id: 'heritage-retro',
+      title: 'Heritage Retrospective', 
+      subtitle: 'Archival Museum Loan', 
+      image: historyImage, 
+      year: 'Archive Loan', 
+      medium: 'Oil & Acrylic on Linen', 
+      dimensions: '40 × 40 in (101.6 × 101.6 cm)',
+      description: 'Monumental masterwork bridging Sarkar\'s early figurative draughtsmanship with mature modernist spatial cubism.'
+    },
+    { 
+      id: 'natural-cadence',
+      title: 'Natural Cadence', 
+      subtitle: 'Early Figurative Study', 
+      image: diff5, 
+      year: '2018', 
+      medium: 'Acrylic on Canvas', 
+      dimensions: '32 × 28 in (81.3 × 71.1 cm)',
+      description: 'Lyrical flora and avian motifs integrated within rhythmic color planes, demonstrating the natural world as spiritual inspiration.'
+    },
   ]
 
   // Shipping & Logistics 4-Stage Animated Delivery Pipeline
@@ -498,7 +735,7 @@ export default function ProductDetail({ onReplayEntrance }) {
       shippingStep === 0 ? 14400 : 
       shippingStep === 1 ? 10000 :
       shippingStep === 2 ? 12000 : 
-      shippingStep === 3 ? 10000 : 4800
+      shippingStep === 3 ? 32000 : 4800
 
     const timer = setTimeout(() => {
       setShippingStep((prev) => (prev + 1) % shippingStages.length)
@@ -521,21 +758,16 @@ export default function ProductDetail({ onReplayEntrance }) {
     return () => clearInterval(interval)
   }, [shippingStep, galleryThumbs.length])
 
-  // Combined In-Room Artwork & Room Environment Auto-Tour:
-  // Shows all 6 artwork images sequentially in Room 1 (2.8s each),
-  // then automatically advances to Room 2 for all 6 images,
-  // then Room 3 for all 6 images,
-  // then Room 4 for all 6 images,
-  // then loops back to Room 1 (24 total steps).
+  // Room Auto-Tour: smoothly cycle across all 4 rooms to showcase artwork mounted in all interior environments
   useEffect(() => {
     if (!isAutoPlay || isRoomHovered) return
 
     const timer = setInterval(() => {
-      setStepIndex((prev) => (prev + 1) % totalSteps)
-    }, 2800)
+      setCurrentRoomIndex((prev) => (prev + 1) % totalRooms)
+    }, 4800)
 
     return () => clearInterval(timer)
-  }, [isAutoPlay, isRoomHovered, totalSteps])
+  }, [isAutoPlay, isRoomHovered, totalRooms])
 
   // Preload all 4 room background images eagerly so room transitions are instant and buttery smooth
   useEffect(() => {
@@ -760,6 +992,229 @@ export default function ProductDetail({ onReplayEntrance }) {
     }, 2500)
   }
 
+  // Reusable Product Purchase Dossier Box (rendered on right side of Acts 1-5 and Acts 7-8)
+  const renderProductDossierBox = (keySuffix = 'main', isSecondary = false) => (
+            <div className="bg-[#121217]/95 backdrop-blur-2xl p-4 xs:p-5 sm:p-7 lg:p-8 xl:p-9 rounded-2xl sm:rounded-3xl border border-neutral-800 shadow-[0_16px_50px_rgba(0,0,0,0.5)] space-y-4 sm:space-y-6 w-full">
+              {/* Header: Title & Artist */}
+              <div className="space-y-1.5 sm:space-y-2 pb-4 sm:pb-6 border-b border-neutral-800/80">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="text-[9px] sm:text-xs uppercase tracking-[0.22em] text-[#dfb76c] font-semibold block">
+                    Archival Masterpiece
+                  </span>
+                  <span className="font-mono text-[8px] sm:text-[9px] text-neutral-400 bg-neutral-900 px-2 py-0.5 rounded border border-neutral-800">
+                    0{active + 1} / 0{galleryThumbs.length}
+                  </span>
+                </div>
+                <h1 className="font-serif text-2xl xs:text-3xl sm:text-4xl lg:text-[40px] font-normal text-white tracking-tight leading-tight break-words">
+                  Divine Tunes-11
+                </h1>
+                <div className="flex items-center gap-2 pt-0.5 sm:pt-1">
+                  <span className="text-xs sm:text-sm text-neutral-400 font-light">By</span>
+                  <a
+                    href="#artist-section"
+                    className="text-xs sm:text-sm font-medium text-white hover:text-[#dfb76c] transition-colors underline underline-offset-4 decoration-[#dfb76c]/50"
+                  >
+                    Pradip Sarkar
+                  </a>
+                  <CheckCircle2 size={15} className="text-[#dfb76c]" />
+                </div>
+              </div>
+
+              {/* Dimensions & Unit Switcher */}
+              <div className="pb-4 sm:pb-6 border-b border-neutral-800/80 space-y-2.5 sm:space-y-3">
+                <div className="flex flex-row items-center justify-between gap-2">
+                  <span className="text-[9.5px] sm:text-xs uppercase tracking-[0.18em] text-neutral-400 font-medium truncate">
+                    Dimensions & Medium
+                  </span>
+                  <div className="product-unit-toggle bg-neutral-900 p-0.5 sm:p-1 rounded-lg sm:rounded-xl border border-neutral-700/80 inline-flex flex-row items-center shrink-0 flex-nowrap">
+                    <button
+                      onClick={() => setUnit('inch')}
+                      className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-md text-[9.5px] sm:text-xs uppercase tracking-wider font-semibold transition-all cursor-pointer shrink-0 ${
+                        unit === 'inch' ? 'bg-[#dfb76c] text-neutral-950 shadow-sm' : 'text-neutral-400 hover:text-white'
+                      }`}
+                    >
+                      Inches
+                    </button>
+                    <button
+                      onClick={() => setUnit('cm')}
+                      className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-md text-[9.5px] sm:text-xs uppercase tracking-wider font-semibold transition-all cursor-pointer shrink-0 ${
+                        unit === 'cm' ? 'bg-[#dfb76c] text-neutral-950 shadow-sm' : 'text-neutral-400 hover:text-white'
+                      }`}
+                    >
+                      Centimeters
+                    </button>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 sm:gap-3 text-xs w-full">
+                  <motion.div 
+                    onClick={() => setActiveDimBoxIdx(0)}
+                    animate={{
+                      scale: activeDimBoxIdx === 0 ? 1.02 : 1.0,
+                    }}
+                    transition={{ type: 'spring', stiffness: 350, damping: 24 }}
+                    className={`p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl border transition-all duration-300 cursor-pointer relative overflow-hidden ${
+                      activeDimBoxIdx === 0
+                        ? 'bg-gradient-to-br from-[#202030] via-[#161622] to-[#101016] border-[#dfb76c] ring-1 ring-[#dfb76c]/40 shadow-[0_4px_20px_rgba(223,183,108,0.2)]'
+                        : 'bg-neutral-900/90 border-neutral-800 opacity-80'
+                    }`}
+                  >
+                    {activeDimBoxIdx === 0 && (
+                      <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#dfb76c]" />
+                    )}
+                    <span className={`text-[9.5px] sm:text-[11px] uppercase tracking-wider block mb-0.5 sm:mb-1 transition-colors ${
+                      activeDimBoxIdx === 0 ? 'text-[#f7d794] font-semibold' : 'text-neutral-400'
+                    }`}>Canvas Size</span>
+                    <span className={`font-medium text-[11px] xs:text-xs sm:text-sm break-words transition-colors ${
+                      activeDimBoxIdx === 0 ? 'text-white font-semibold' : 'text-neutral-200'
+                    }`}>
+                      {unit === 'inch' ? '32 × 30 in' : '81.28 × 76.2 cm'}
+                    </span>
+                  </motion.div>
+
+                  <motion.div 
+                    onClick={() => setActiveDimBoxIdx(1)}
+                    animate={{
+                      scale: activeDimBoxIdx === 1 ? 1.02 : 1.0,
+                    }}
+                    transition={{ type: 'spring', stiffness: 350, damping: 24 }}
+                    className={`p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl border transition-all duration-300 cursor-pointer relative overflow-hidden ${
+                      activeDimBoxIdx === 1
+                        ? 'bg-gradient-to-br from-[#202030] via-[#161622] to-[#101016] border-[#dfb76c] ring-1 ring-[#dfb76c]/40 shadow-[0_4px_20px_rgba(223,183,108,0.2)]'
+                        : 'bg-neutral-900/90 border-neutral-800 opacity-80'
+                    }`}
+                  >
+                    {activeDimBoxIdx === 1 && (
+                      <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#dfb76c]" />
+                    )}
+                    <span className={`text-[9.5px] sm:text-[11px] uppercase tracking-wider block mb-0.5 sm:mb-1 transition-colors ${
+                      activeDimBoxIdx === 1 ? 'text-[#f7d794] font-semibold' : 'text-neutral-400'
+                    }`}>Medium</span>
+                    <span className={`font-medium text-[11px] xs:text-xs sm:text-sm break-words transition-colors ${
+                      activeDimBoxIdx === 1 ? 'text-white font-semibold' : 'text-neutral-200'
+                    }`}>
+                      Acrylic on Canvas
+                    </span>
+                  </motion.div>
+                </div>
+              </div>
+
+              {/* Primary Action Buttons (Acquire Artwork & Make Offer - Identical Dimensions) */}
+              <div className="grid grid-cols-2 gap-2.5 pt-0.5 w-full">
+                <motion.button
+                  whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
+                  whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
+                  onClick={handleAddToCart}
+                  className="w-full h-11 sm:h-12 bg-gradient-to-r from-[#dfb76c] via-[#f7d794] to-[#dfb76c] hover:from-[#f7d794] hover:to-[#dfb76c] text-neutral-950 rounded-xl text-[10px] sm:text-[11px] uppercase tracking-[0.14em] font-bold transition-all duration-300 shadow-[0_4px_20px_rgba(223,183,108,0.25)] hover:shadow-[0_8px_30px_rgba(223,183,108,0.4)] flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer"
+                >
+                  <CreditCard size={14} className="shrink-0" />
+                  <span className="truncate">Acquire Artwork</span>
+                </motion.button>
+
+                <motion.button
+                  whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
+                  whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
+                  onClick={() => setShowOfferModal(true)}
+                  className="w-full h-11 sm:h-12 rounded-xl border border-[#dfb76c] text-[#dfb76c] hover:bg-[#dfb76c]/15 text-[10px] sm:text-[11px] uppercase tracking-wider font-semibold transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer bg-neutral-900/80 hover:border-[#f7d794]"
+                >
+                  <MessageCircle size={14} className="shrink-0" />
+                  <span className="truncate">Make Offer</span>
+                </motion.button>
+              </div>
+
+              {/* 4 Interactive Product Guidelines with Interactive Panels & 3D Scene */}
+              <div 
+                onMouseEnter={() => setIsTrustHovered(true)}
+                onMouseLeave={() => {
+                  setIsTrustHovered(false)
+                  handleGuidelineMouseLeave()
+                }}
+                className="pt-4 sm:pt-5 border-t border-neutral-800/80 space-y-2 sm:space-y-2.5 relative"
+                aria-label="Interactive Product Guidelines"
+              >
+                {TRUST_GUARANTEE_ITEMS.map((item, idx) => {
+                  const IconComp = item.icon
+                  const isCurrentModal = activeGuideline === item.id
+                  const isHighlighted = isCurrentModal || (activeTrustIndex === idx && !activeGuideline)
+
+                  return (
+                    <motion.div
+                      key={`${item.id}-${keySuffix}`}
+                      role="button"
+                      tabIndex={0}
+                      aria-haspopup="dialog"
+                      aria-expanded={isCurrentModal}
+                      aria-label={`${item.text} - Tap or hover to view details`}
+                      onMouseEnter={() => handleGuidelineMouseEnter(item.id)}
+                      onMouseLeave={handleGuidelineMouseLeave}
+                      onClick={() => handleGuidelineClick(item.id)}
+                      onKeyDown={(e) => handleGuidelineKeyDown(e, item.id)}
+                      animate={{
+                        scale: isHighlighted ? 1.018 : 1.0,
+                        x: isHighlighted ? 3 : 0,
+                      }}
+                      transition={{ 
+                        type: 'spring', 
+                        stiffness: 380, 
+                        damping: 24, 
+                        mass: 0.8 
+                      }}
+                      className={`group flex flex-row items-center justify-between p-2.5 sm:p-3 rounded-xl transition-all duration-300 cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#dfb76c] select-none ${
+                        isHighlighted
+                          ? 'bg-gradient-to-r from-[#dfb76c]/20 via-[#dfb76c]/10 to-neutral-900/60 border border-[#dfb76c]/70 shadow-[0_4px_22px_rgba(223,183,108,0.22)]'
+                          : 'hover:bg-neutral-900/60 border border-neutral-800/60 opacity-80 hover:opacity-100 hover:border-neutral-700'
+                      }`}
+                    >
+                      <div className="flex flex-row items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
+                        <div 
+                          className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg transition-all duration-300 flex-shrink-0 flex items-center justify-center ${
+                            isHighlighted
+                              ? 'bg-[#dfb76c] text-neutral-950 shadow-[0_0_14px_rgba(223,183,108,0.65)]'
+                              : 'bg-neutral-800/90 text-[#dfb76c] group-hover:bg-[#dfb76c]/20'
+                          }`}
+                        >
+                          <IconComp size={15} className="stroke-[2.2]" />
+                        </div>
+                        <span 
+                          className={`transition-all duration-300 text-left text-xs xs:text-[13px] sm:text-[14px] leading-snug font-medium line-clamp-2 ${
+                            isHighlighted
+                              ? 'text-white tracking-normal drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]'
+                              : 'text-neutral-300 group-hover:text-white'
+                          }`}
+                        >
+                          {item.text}
+                        </span>
+                      </div>
+
+                      {/* Interactive Visual Cue Badge */}
+                      <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[8.5px] sm:text-[9.5px] uppercase tracking-wider font-semibold transition-all ${
+                          isHighlighted
+                            ? 'bg-[#dfb76c]/25 text-[#f7d794] border border-[#dfb76c]/50 shadow-[0_0_8px_rgba(223,183,108,0.3)]'
+                            : 'bg-neutral-900/80 text-neutral-400 border border-neutral-800 opacity-70 group-hover:opacity-100 group-hover:border-[#dfb76c]/30 group-hover:text-[#dfb76c]'
+                        }`}>
+                          <span className={`w-1.5 h-1.5 rounded-full ${isHighlighted ? 'bg-[#dfb76c] animate-pulse' : 'bg-neutral-600'}`} />
+                          <span className="hidden xs:inline">{item.tag}</span>
+                          <ChevronRight size={11} className={`transition-transform duration-200 ${isHighlighted ? 'translate-x-0.5 text-[#dfb76c]' : 'text-neutral-500'}`} />
+                        </span>
+                      </div>
+                    </motion.div>
+                  )
+                })}
+              </div>
+
+              {/* Four Interactive Guideline Modals Overlay */}
+              <ProductGuidelineOverlayManager 
+                activeGuideline={activeGuideline} 
+                isPinned={isGuidelinePinned}
+                onClose={handleCloseGuideline} 
+                onPin={handlePinGuideline}
+                onMouseEnter={handleMouseEnterModal}
+                onMouseLeave={handleMouseLeaveModal}
+              />
+            </div>
+  )
+
   return (
     <div className="product-detail-root space-y-16 sm:space-y-24 lg:space-y-32 w-full">
 
@@ -826,8 +1281,8 @@ export default function ProductDetail({ onReplayEntrance }) {
 
         {/* Hero Grid: Clean Two-Column Gallery & Acquisition Dossier */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-10 xl:gap-12 items-start w-full">
-          {/* LEFT: MASTER ARTWORK GALLERY (7 Columns) */}
-          <div className="lg:col-span-7 xl:col-span-7 space-y-3.5 sm:space-y-5 w-full min-w-0">
+          {/* LEFT: MASTER ARTWORK GALLERY (7 Columns, Row 1) */}
+          <div className="order-1 lg:order-none lg:col-span-7 xl:col-span-7 lg:row-start-1 space-y-3.5 sm:space-y-5 w-full min-w-0">
             {/* Main Cinematic Real-Room 3D Artwork Stage */}
             <motion.div
               initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.98, y: 12 }}
@@ -851,76 +1306,27 @@ export default function ProductDetail({ onReplayEntrance }) {
                 />
               </div>
 
-              {/* Dedicated Non-Colliding Real-Room HUD Control Bar */}
-              <div className="relative z-30 flex items-center justify-between gap-1.5 sm:gap-2 px-2.5 py-2 sm:px-4 sm:py-3 bg-[#0c0c12]/95 backdrop-blur-md border-b border-neutral-800/80 w-full">
-                <div className="flex items-center gap-1.5 sm:gap-2.5 min-w-0 flex-1 overflow-hidden">
-                  <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-[#dfb76c]/15 border border-[#dfb76c]/40 flex items-center justify-center text-sm shadow-[0_0_12px_rgba(223,183,108,0.25)] shrink-0">
-                    <Rotate3d size={14} className={`text-[#dfb76c] ${isAutoPlay ? 'animate-spin-slow' : ''}`} />
-                  </div>
-                  <div className="min-w-0 overflow-hidden">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-[10px] sm:text-xs font-serif uppercase tracking-[0.16em] sm:tracking-[0.18em] text-[#dfb76c] font-semibold truncate">
-                        3D Real Room
-                      </span>
-                      <span className="px-1.5 py-0.2 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[8px] sm:text-[9px] font-mono tracking-wider font-semibold shrink-0">
-                        LIVE
-                      </span>
-                    </div>
-                    <p className="text-[10px] sm:text-xs text-neutral-300 font-light flex items-center gap-1 min-w-0 truncate">
-                      <span className="text-[#dfb76c] font-mono font-semibold shrink-0">0{active + 1}.</span>
-                      <span className="truncate text-white font-medium">{galleryThumbs[active]?.label}</span>
-                      <span className="text-neutral-500 hidden xs:inline">•</span>
-                      <span className="text-neutral-400 hidden xs:inline truncate">{currentRoom.name}</span>
-                    </p>
-                  </div>
-                </div>
+              {/* Dedicated Real-Room Stage Control Bar */}
+              <div className="relative z-30 flex items-center justify-end gap-1.5 sm:gap-2 px-2.5 py-1.5 sm:px-4 sm:py-2 bg-[#0c0c12]/95 backdrop-blur-md border-b border-neutral-800/80 w-full">
+                <button
+                  onClick={() => setIsSpotlightOn(!isSpotlightOn)}
+                  className={`p-1.5 sm:p-2 rounded-lg border transition-all cursor-pointer shrink-0 ${
+                    isSpotlightOn
+                      ? 'bg-[#dfb76c]/20 border-[#dfb76c]/60 text-[#dfb76c]'
+                      : 'bg-[#14141d] border-neutral-800 text-neutral-400 hover:text-white'
+                  }`}
+                  title="Toggle Ambient Gallery Spotlight"
+                >
+                  <Sun size={12} className="sm:w-3.5 sm:h-3.5" />
+                </button>
 
-                {/* Right Stage Controls */}
-                <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 ml-auto">
-                  <button
-                    onClick={(e) => { e.stopPropagation(); setIsAutoPlay(!isAutoPlay) }}
-                    className={`p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border text-[9px] sm:text-xs font-semibold transition-all cursor-pointer flex items-center gap-1 shrink-0 ${
-                      isAutoPlay 
-                        ? 'bg-[#dfb76c]/20 border-[#dfb76c] text-[#f7d794]' 
-                        : 'bg-[#14141d] border-neutral-800 text-neutral-400 hover:text-white'
-                    }`}
-                    title="Toggle 3D Rotation Auto Pan"
-                  >
-                    {isAutoPlay ? <Pause size={12} className="text-[#dfb76c]" /> : <Play size={12} />}
-                    <span className="hidden sm:inline">{isAutoPlay ? '3D Orbiting' : 'Orbit Paused'}</span>
-                  </button>
-
-                  <button
-                    onClick={() => setIsSpotlightOn(!isSpotlightOn)}
-                    className={`p-1.5 sm:p-2 rounded-lg border transition-all cursor-pointer shrink-0 ${
-                      isSpotlightOn
-                        ? 'bg-[#dfb76c]/20 border-[#dfb76c]/60 text-[#dfb76c]'
-                        : 'bg-[#14141d] border-neutral-800 text-neutral-400 hover:text-white'
-                    }`}
-                    title="Toggle Ambient Gallery Spotlight"
-                  >
-                    <Sun size={12} className="sm:w-3.5 sm:h-3.5" />
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setManualRotation({ rotateX: 0, rotateY: 0 })
-                      setCameraAngleId('center')
-                    }}
-                    className="p-1.5 sm:p-2 bg-[#14141d] hover:bg-neutral-800 text-neutral-400 hover:text-white rounded-lg border border-neutral-800 transition-all cursor-pointer shrink-0"
-                    title="Reset 3D Perspective Angle"
-                  >
-                    <Compass size={12} className="sm:w-3.5 sm:h-3.5" />
-                  </button>
-
-                  <button
-                    onClick={() => setOpenFullscreen(true)}
-                    className="p-1.5 sm:p-2 bg-[#14141d] hover:bg-[#dfb76c] hover:text-neutral-950 rounded-lg border border-neutral-800 hover:border-[#dfb76c] text-neutral-200 transition-all cursor-pointer shrink-0"
-                    title="Fullscreen Ultra Zoom"
-                  >
-                    <Maximize2 size={12} className="sm:w-3.5 sm:h-3.5" />
-                  </button>
-                </div>
+                <button
+                  onClick={() => setOpenFullscreen(true)}
+                  className="p-1.5 sm:p-2 bg-[#14141d] hover:bg-[#dfb76c] hover:text-neutral-950 rounded-lg border border-neutral-800 hover:border-[#dfb76c] text-neutral-200 transition-all cursor-pointer shrink-0"
+                  title="Fullscreen Ultra Zoom"
+                >
+                  <Maximize2 size={12} className="sm:w-3.5 sm:h-3.5" />
+                </button>
               </div>
 
               {/* 3D Real-Room Stage Display */}
@@ -1046,153 +1452,11 @@ export default function ProductDetail({ onReplayEntrance }) {
                   </div>
                 </motion.div>
 
-                {/* Left / Right Carousel Controls */}
-                <motion.button
-                  whileHover={shouldReduceMotion ? {} : { scale: 1.1 }}
-                  whileTap={shouldReduceMotion ? {} : { scale: 0.9 }}
-                  onClick={(e) => { e.stopPropagation(); prevSlide() }}
-                  aria-label="Previous view"
-                  className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#121217]/85 hover:bg-[#dfb76c] hover:text-neutral-950 text-neutral-200 backdrop-blur-md border border-neutral-700 shadow-lg flex items-center justify-center transition-all cursor-pointer z-30"
-                >
-                  <ChevronLeft size={16} className="sm:w-[18px] sm:h-[18px]" />
-                </motion.button>
-                <motion.button
-                  whileHover={shouldReduceMotion ? {} : { scale: 1.1 }}
-                  whileTap={shouldReduceMotion ? {} : { scale: 0.9 }}
-                  onClick={(e) => { e.stopPropagation(); nextSlide() }}
-                  aria-label="Next view"
-                  className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-[#121217]/85 hover:bg-[#dfb76c] hover:text-neutral-950 text-neutral-200 backdrop-blur-md border border-neutral-700 shadow-lg flex items-center justify-center transition-all cursor-pointer z-30"
-                >
-                  <ChevronRight size={16} className="sm:w-[18px] sm:h-[18px]" />
-                </motion.button>
-
-                {/* Unified Non-Colliding Bottom Bar */}
-                <div className="absolute bottom-2.5 left-2.5 right-2.5 flex items-center justify-between gap-1.5 pointer-events-none z-30">
-                  <div className="bg-[#0c0c10]/90 backdrop-blur-md border border-neutral-700/80 text-neutral-300 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[8.5px] sm:text-[10px] flex items-center gap-1 shadow-lg">
-                    <Move size={10} className="text-[#dfb76c] animate-pulse" />
-                    <span className="hidden xs:inline">Drag to rotate 3D room</span>
-                    <span className="xs:hidden">Drag to orbit</span>
-                  </div>
-
-                  <div className="bg-[#0c0c10]/90 backdrop-blur-md border border-neutral-700/80 text-white px-2 sm:px-3 py-0.5 sm:py-1 rounded-full text-[8.5px] sm:text-xs font-light tracking-wide shadow-lg whitespace-nowrap flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#dfb76c] animate-pulse" />
-                    <span className="text-[#dfb76c] font-medium">Room {roomIndex + 1}/4</span>
-                    <span className="text-neutral-500">•</span>
-                    <span className="text-[#f7d794] font-medium">View {active + 1}/{galleryThumbs.length}</span>
-                  </div>
-                </div>
               </div>
             </motion.div>
 
-            {/* ── ROW 1: REAL ROOM ENVIRONMENT SELECTOR (6 IMAGES PER ROOM AUTO-TOUR) ── */}
-            <div 
-              onMouseEnter={() => setIsRoomHovered(true)}
-              onMouseLeave={() => setIsRoomHovered(false)}
-              className="space-y-1.5 w-full"
-            >
-              <div className="flex items-center justify-between text-[10px] sm:text-xs text-neutral-400 font-medium uppercase tracking-wider px-1">
-                <div className="flex items-center gap-1.5 min-w-0">
-                  <Home size={12} className="text-[#dfb76c] shrink-0" />
-                  <span className="truncate">1. Room Environment:</span>
-                  <span className="text-[#dfb76c] font-semibold truncate hidden xs:inline">{currentRoom.name}</span>
-                </div>
 
-                <div className="flex items-center gap-1.5 shrink-0">
-                  <span className="text-[9px] font-mono text-[#dfb76c] bg-[#dfb76c]/10 border border-[#dfb76c]/30 px-2 py-0.5 rounded-full flex items-center gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#dfb76c] animate-pulse" />
-                    {isAutoPlay && !isRoomHovered 
-                      ? `Tour Active` 
-                      : 'Paused'}
-                  </span>
-                  <button
-                    onClick={() => setIsAutoPlay(!isAutoPlay)}
-                    className="p-1 px-1.5 rounded bg-neutral-900 hover:bg-[#dfb76c]/20 hover:text-[#f7d794] border border-neutral-800 text-neutral-400 text-[9px] font-mono transition-all cursor-pointer flex items-center gap-1"
-                    title={isAutoPlay ? "Pause 6-Image Room Tour" : "Resume 6-Image Room Tour"}
-                  >
-                    {isAutoPlay && !isRoomHovered ? <Pause size={9} /> : <Play size={9} />}
-                  </button>
-                </div>
-              </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 sm:gap-2 w-full">
-                {ROOM_PRESETS.map((room, idx) => {
-                  const isRoomActive = roomIndex === idx
-                  return (
-                    <motion.button
-                      key={room.id}
-                      onClick={() => {
-                        setStepIndex(idx * totalArtworks + 0)
-                        setYOffset(0)
-                      }}
-                      animate={{
-                        scale: isRoomActive ? 1.02 : 1.0,
-                      }}
-                      transition={{ type: 'spring', stiffness: 350, damping: 24 }}
-                      className={`px-2 py-1.5 sm:px-2.5 sm:py-2 rounded-xl border text-left transition-all cursor-pointer flex items-center gap-1.5 sm:gap-2 relative overflow-hidden ${
-                        isRoomActive
-                          ? 'bg-[#dfb76c]/20 border-[#dfb76c] text-[#f7d794] shadow-[0_0_15px_rgba(223,183,108,0.3)] ring-1 ring-[#dfb76c]/50 z-10'
-                          : 'bg-[#121217] border-neutral-800 hover:border-neutral-700 text-neutral-400 hover:text-neutral-200'
-                      }`}
-                    >
-                      {isRoomActive && (
-                        <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#dfb76c] shadow-[0_0_8px_#dfb76c]" />
-                      )}
-                      <span className="text-xs sm:text-sm shrink-0">{room.icon}</span>
-                      <div className="min-w-0">
-                        <div className={`text-[9.5px] sm:text-[11px] font-semibold truncate ${isRoomActive ? 'text-white' : ''}`}>
-                          {room.name}
-                        </div>
-                        <div className="text-[7.5px] sm:text-[8px] text-neutral-400 truncate">{room.subtitle}</div>
-                      </div>
-                    </motion.button>
-                  )
-                })}
-              </div>
-            </div>
-
-            {/* ── ROW 2: FRAME STYLES BAR ── */}
-            <div className="bg-[#121217]/90 p-2 sm:p-2.5 rounded-xl border border-neutral-800/80 w-full">
-              <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto max-w-full pb-0.5" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
-                <span className="text-neutral-400 uppercase tracking-wider font-semibold text-[8.5px] sm:text-[10px] pr-1 flex items-center gap-1 shrink-0">
-                  <Box size={10} className="text-[#dfb76c]" /> Frame:
-                </span>
-                {FRAME_STYLES.map((frame) => (
-                  <button
-                    key={frame.id}
-                    onClick={() => setActiveFrameId(frame.id)}
-                    className={`px-2 py-0.5 sm:py-1 rounded-lg border transition-all text-[8.5px] sm:text-[10px] font-medium whitespace-nowrap cursor-pointer shrink-0 ${
-                      activeFrameId === frame.id
-                        ? 'bg-[#dfb76c]/20 border-[#dfb76c] text-[#f7d794] font-semibold'
-                        : 'bg-neutral-900 border-neutral-800 text-neutral-400 hover:text-white'
-                    }`}
-                  >
-                    {frame.name.split(' (')[0]}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* ── ROW 3: MASTER VIEWS PRESET RIBBON ── */}
-            <div className="product-preset-ribbon flex flex-row items-center gap-1 sm:gap-2 overflow-x-auto pb-1 text-xs flex-nowrap w-full" style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}>
-              <span className="text-neutral-400 font-medium uppercase tracking-wider text-[9px] sm:text-[11px] pr-1 flex items-center gap-1 shrink-0 flex-shrink-0">
-                <Layers size={11} className="text-[#dfb76c]" /> {galleryThumbs.length} Views:
-              </span>
-              {galleryThumbs.map((view, idx) => (
-                <button
-                  key={`${view.label}-${idx}`}
-                  onClick={() => setStepIndex(roomIndex * totalArtworks + idx)}
-                  className={`product-preset-pill px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl border transition-all whitespace-nowrap cursor-pointer text-[9px] sm:text-xs shrink-0 flex-shrink-0 flex items-center gap-1 sm:gap-1.5 ${
-                    active === idx
-                      ? 'bg-[#dfb76c]/20 border-[#dfb76c] text-[#f7d794] font-semibold shadow-[0_0_12px_rgba(223,183,108,0.3)]'
-                      : 'bg-[#121217] border-neutral-800 hover:border-neutral-700 text-neutral-400 hover:text-neutral-200'
-                  }`}
-                >
-                  <span className={`w-1.5 h-1.5 rounded-full ${active === idx ? 'bg-[#dfb76c] shadow-[0_0_6px_#dfb76c]' : 'bg-neutral-600'}`} />
-                  <span className="font-mono text-[8px] sm:text-[9px] text-[#dfb76c]">0{idx + 1}.</span>
-                  <span>{view.label}</span>
-                </button>
-              ))}
-            </div>
 
             {/* ── ROW 4: 8 GALLERY THUMBNAILS RAIL ── */}
             <div
@@ -1228,250 +1492,110 @@ export default function ProductDetail({ onReplayEntrance }) {
             </div>
           </div>
 
-          {/* RIGHT: ELEGANT PURCHASE DOSSIER (5 Columns) */}
+          {/* RIGHT: ELEGANT PURCHASE DOSSIER (5 Columns - Sticky within Main Product Section) */}
           <motion.div 
             initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-5 xl:col-span-5 space-y-4 sm:space-y-6 w-full min-w-0"
+            className="product-details-sticky-track order-2 lg:order-none lg:col-span-5 xl:col-span-5 lg:col-start-8 xl:col-start-8 lg:row-start-1 lg:row-end-3 space-y-4 sm:space-y-6 w-full min-w-0 lg:sticky lg:top-24 self-start"
           >
-            <div className="bg-[#121217]/95 backdrop-blur-2xl p-4 xs:p-5 sm:p-7 lg:p-8 xl:p-9 rounded-2xl sm:rounded-3xl border border-neutral-800 shadow-[0_16px_50px_rgba(0,0,0,0.5)] space-y-4 sm:space-y-6 w-full">
-              {/* Header: Title & Artist */}
-              <div className="space-y-1.5 sm:space-y-2 pb-4 sm:pb-6 border-b border-neutral-800/80">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[9px] sm:text-xs uppercase tracking-[0.22em] text-[#dfb76c] font-semibold block">
-                    Archival Masterpiece
-                  </span>
-                  <span className="font-mono text-[8px] sm:text-[9px] text-neutral-400 bg-neutral-900 px-2 py-0.5 rounded border border-neutral-800">
-                    0{active + 1} / 0{galleryThumbs.length}
-                  </span>
-                </div>
-                <h1 className="font-serif text-2xl xs:text-3xl sm:text-4xl lg:text-[40px] font-normal text-white tracking-tight leading-tight break-words">
-                  Divine Tunes-11
-                </h1>
-                <div className="flex items-center gap-2 pt-0.5 sm:pt-1">
-                  <span className="text-xs sm:text-sm text-neutral-400 font-light">By</span>
-                  <a
-                    href="#artist-section"
-                    className="text-xs sm:text-sm font-medium text-white hover:text-[#dfb76c] transition-colors underline underline-offset-4 decoration-[#dfb76c]/50"
-                  >
-                    Pradip Sarkar
-                  </a>
-                  <CheckCircle2 size={15} className="text-[#dfb76c]" />
-                </div>
-              </div>
+            {renderProductDossierBox('top')}
+          </motion.div>
 
-              {/* Price Section */}
-              <div className="pb-4 sm:pb-6 border-b border-neutral-800/80 space-y-1 sm:space-y-2">
-                <span className="text-[9.5px] sm:text-xs uppercase tracking-[0.18em] text-neutral-400 font-medium block">
-                  Acquisition Value
-                </span>
-                <div className="flex flex-wrap items-baseline gap-2 sm:gap-3">
-                  <span className="font-serif text-2xl xs:text-3xl sm:text-4xl font-normal text-white tracking-tight">
-                    ₹1,18,300
-                  </span>
-                  <span className="text-xs sm:text-sm text-neutral-400 font-light">
-                    ($1,577.33 USD)
-                  </span>
-                </div>
-                <p className="text-[10px] sm:text-xs text-neutral-400 font-light pt-0.5 sm:pt-1">
-                  Includes all taxes • Insured white-glove global air transit • Authenticity certificate
-                </p>
-              </div>
+          {/* LEFT: SUBSEQUENT SECTIONS (Act 3 to Act 8 - Spanning under Gallery in Row 2, 7 Columns) */}
+          <div className="order-3 lg:order-none lg:col-span-7 xl:col-span-7 lg:row-start-2 space-y-12 sm:space-y-16 lg:space-y-24 w-full min-w-0">
+            {/* Curved Reveal Divider */}
+            <div className="curved-section-divider -my-4 opacity-50">
+              <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+                <path d="M0,0 C150,90 350,-40 500,60 C650,160 900,10 1200,40 L1200,120 L0,120 Z" className="shape-fill" />
+              </svg>
+            </div>
 
-              {/* Dimensions & Unit Switcher */}
-              <div className="pb-4 sm:pb-6 border-b border-neutral-800/80 space-y-2.5 sm:space-y-3">
-                <div className="flex flex-row items-center justify-between gap-2">
-                  <span className="text-[9.5px] sm:text-xs uppercase tracking-[0.16em] sm:tracking-[0.18em] text-neutral-400 font-medium truncate">
-                    Dimensions & Medium
-                  </span>
-                  <div className="product-unit-toggle bg-neutral-900 p-0.5 rounded-lg border border-neutral-700/80 inline-flex flex-row items-center shrink-0 flex-nowrap">
-                    <button
-                      onClick={() => setUnit('inch')}
-                      className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-md text-[9.5px] sm:text-xs uppercase tracking-wider font-semibold transition-all cursor-pointer shrink-0 ${
-                        unit === 'inch' ? 'bg-[#dfb76c] text-neutral-950 shadow-sm' : 'text-neutral-400 hover:text-white'
-                      }`}
-                    >
-                      Inches
-                    </button>
-                    <button
-                      onClick={() => setUnit('cm')}
-                      className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-md text-[9.5px] sm:text-xs uppercase tracking-wider font-semibold transition-all cursor-pointer shrink-0 ${
-                        unit === 'cm' ? 'bg-[#dfb76c] text-neutral-950 shadow-sm' : 'text-neutral-400 hover:text-white'
-                      }`}
-                    >
-                      Centimeters
-                    </button>
+      {/* ========================================================= */}
+      {/* ACT 2B: DEDICATED ARTWORK DESCRIPTION & CURATORIAL ESSENCE */}
+      {/* ========================================================= */}
+      <motion.section 
+        data-showcase-section
+        data-showcase-title="Artwork Description"
+        initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-60px' }}
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full"
+      >
+        <div className="bg-[#121217]/90 backdrop-blur-xl p-5 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl border border-neutral-800 shadow-xl space-y-6 sm:space-y-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-5 border-b border-neutral-800/80">
+            <div>
+              <span className="text-[10px] sm:text-xs uppercase tracking-[0.22em] text-[#dfb76c] font-semibold block mb-1">
+                Zigguratss Maison d'Art • Curatorial Monograph
+              </span>
+              <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-normal text-white tracking-tight">
+                Artwork Description
+              </h2>
+            </div>
+            <div className="flex items-center gap-2 text-xs font-mono text-[#dfb76c] bg-[#dfb76c]/10 px-3 py-1.5 rounded-full border border-[#dfb76c]/30 self-start md:self-auto">
+              <Sparkles size={13} />
+              <span>Divine Tunes-11 by Pradip Sarkar</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+            {/* Left Narrative Pillar */}
+            <div className="lg:col-span-7 space-y-4 text-xs sm:text-sm text-neutral-300 font-light leading-relaxed">
+              <p className="first-letter:font-serif first-letter:text-3xl first-letter:text-[#dfb76c] first-letter:font-normal first-letter:mr-1 first-letter:float-left">
+                <strong className="text-white font-medium">Divine Tunes-11</strong> represents the pinnacle of contemporary master Pradip Sarkar's acclaimed spiritual abstraction series. Grounded in decades of classical draughtsmanship and modernist spatial geometry developed at the British Institute in Mumbai, this masterwork captures an evocative metaphysical dialogue between sound, stillness, and human consciousness.
+              </p>
+              <p>
+                The composition is anchored by a contemplative, serene muse adorned with delicate flutterings of vibrant butterflies—a timeless allegorical motif evoking spiritual transmutation, transient earthly beauty, and the elevation of the soul. Sarkar partitions the canvas into architectural rhythmic planes, using warm ochres, burnished golds, soft rose madder, and meditative earthen umbers to echo the visual architecture of classical Indian ragas.
+              </p>
+              <p>
+                Every brushstroke is rendered with master-grade archival heavy-body acrylics upon museum-grade primed Belgian canvas, sealed with invisible UV-absorptive protective isolation coats. The luminous surface dynamically interacts with shifting ambient light, revealing subtle chromatic undertones and geometric depth that reward intimate observation.
+              </p>
+            </div>
+
+            {/* Right Highlights & Registry Pillars */}
+            <div className="lg:col-span-5 space-y-3.5 bg-neutral-900/60 p-4 sm:p-5 rounded-2xl border border-neutral-800/80">
+              <span className="text-[10px] uppercase tracking-[0.2em] text-[#dfb76c] font-semibold block">
+                Archival Ledger Highlights
+              </span>
+              
+              <div className="space-y-2.5 text-xs">
+                <div className="p-2.5 rounded-xl bg-neutral-950/60 border border-neutral-800/60 flex items-start gap-2.5">
+                  <Palette size={15} className="text-[#dfb76c] shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-semibold text-white block">Curatorial Genre</span>
+                    <span className="text-neutral-400 text-[11px]">Meditative Figurative & Geometric Abstraction</span>
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 sm:gap-3 text-xs w-full">
-                  <motion.div 
-                    onClick={() => setActiveDimBoxIdx(0)}
-                    animate={{
-                      scale: activeDimBoxIdx === 0 ? 1.02 : 1.0,
-                    }}
-                    transition={{ type: 'spring', stiffness: 350, damping: 24 }}
-                    className={`p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl border transition-all duration-300 cursor-pointer relative overflow-hidden ${
-                      activeDimBoxIdx === 0
-                        ? 'bg-gradient-to-br from-[#202030] via-[#161622] to-[#101016] border-[#dfb76c] ring-1 ring-[#dfb76c]/40 shadow-[0_4px_20px_rgba(223,183,108,0.2)]'
-                        : 'bg-neutral-900/90 border-neutral-800 opacity-80'
-                    }`}
-                  >
-                    {activeDimBoxIdx === 0 && (
-                      <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#dfb76c]" />
-                    )}
-                    <span className={`text-[9.5px] sm:text-[11px] uppercase tracking-wider block mb-0.5 sm:mb-1 transition-colors ${
-                      activeDimBoxIdx === 0 ? 'text-[#f7d794] font-semibold' : 'text-neutral-400'
-                    }`}>Canvas Size</span>
-                    <span className={`font-medium text-[11px] xs:text-xs sm:text-sm break-words transition-colors ${
-                      activeDimBoxIdx === 0 ? 'text-white font-semibold' : 'text-neutral-200'
-                    }`}>
-                      {unit === 'inch' ? '32 × 30 in' : '81.28 × 76.2 cm'}
-                    </span>
-                  </motion.div>
-
-                  <motion.div 
-                    onClick={() => setActiveDimBoxIdx(1)}
-                    animate={{
-                      scale: activeDimBoxIdx === 1 ? 1.02 : 1.0,
-                    }}
-                    transition={{ type: 'spring', stiffness: 350, damping: 24 }}
-                    className={`p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl border transition-all duration-300 cursor-pointer relative overflow-hidden ${
-                      activeDimBoxIdx === 1
-                        ? 'bg-gradient-to-br from-[#202030] via-[#161622] to-[#101016] border-[#dfb76c] ring-1 ring-[#dfb76c]/40 shadow-[0_4px_20px_rgba(223,183,108,0.2)]'
-                        : 'bg-neutral-900/90 border-neutral-800 opacity-80'
-                    }`}
-                  >
-                    {activeDimBoxIdx === 1 && (
-                      <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#dfb76c]" />
-                    )}
-                    <span className={`text-[9.5px] sm:text-[11px] uppercase tracking-wider block mb-0.5 sm:mb-1 transition-colors ${
-                      activeDimBoxIdx === 1 ? 'text-[#f7d794] font-semibold' : 'text-neutral-400'
-                    }`}>Medium</span>
-                    <span className={`font-medium text-[11px] xs:text-xs sm:text-sm break-words transition-colors ${
-                      activeDimBoxIdx === 1 ? 'text-white font-semibold' : 'text-neutral-200'
-                    }`}>
-                      Acrylic on Canvas
-                    </span>
-                  </motion.div>
+                <div className="p-2.5 rounded-xl bg-neutral-950/60 border border-neutral-800/60 flex items-start gap-2.5">
+                  <CheckCircle2 size={15} className="text-[#dfb76c] shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-semibold text-white block">Provenance & Signature</span>
+                    <span className="text-neutral-400 text-[11px]">Signed recto and inscribed verso by Pradip Sarkar • ZG-ART-2024-DT11</span>
+                  </div>
                 </div>
-              </div>
 
-              {/* Primary Action Buttons */}
-              <div className="space-y-2 sm:space-y-2.5 pt-0.5 max-w-[300px] xs:max-w-[340px] sm:max-w-[360px] mx-auto w-full">
-                <motion.button
-                  whileHover={shouldReduceMotion ? {} : { scale: 1.01 }}
-                  whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
-                  onClick={handleAddToCart}
-                  className="w-full py-2 sm:py-2.5 px-3 sm:px-5 bg-gradient-to-r from-[#dfb76c] via-[#f7d794] to-[#dfb76c] hover:from-[#f7d794] hover:to-[#dfb76c] text-neutral-950 rounded-lg sm:rounded-xl text-[10px] sm:text-[11px] uppercase tracking-[0.12em] sm:tracking-[0.15em] font-bold transition-all duration-300 shadow-[0_4px_20px_rgba(223,183,108,0.25)] hover:shadow-[0_8px_30px_rgba(223,183,108,0.4)] flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <CreditCard size={13} className="shrink-0" />
-                  <span className="truncate">Acquire Artwork • ₹1,18,300</span>
-                </motion.button>
-
-                <div className="grid grid-cols-2 gap-2 sm:gap-2.5 w-full">
-                  <motion.button
-                    whileHover={shouldReduceMotion ? {} : { scale: 1.01 }}
-                    whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
-                    onClick={() => setShowOfferModal(true)}
-                    className="py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg sm:rounded-xl border border-[#dfb76c] text-[#dfb76c] hover:bg-[#dfb76c]/10 text-[9px] sm:text-[10px] uppercase tracking-wider font-semibold transition-all flex items-center justify-center gap-1 cursor-pointer bg-neutral-900/60"
-                  >
-                    <MessageCircle size={11} className="shrink-0" />
-                    <span>Make Offer</span>
-                  </motion.button>
-
-                  <motion.button
-                    whileHover={shouldReduceMotion ? {} : { scale: 1.01 }}
-                    whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
-                    onClick={handleAddToCart}
-                    className="py-1.5 sm:py-2 px-2 sm:px-3 rounded-lg sm:rounded-xl border border-neutral-700 hover:border-neutral-500 text-neutral-200 hover:bg-neutral-800 text-[9px] sm:text-[10px] uppercase tracking-wider font-semibold transition-all flex items-center justify-center gap-1 cursor-pointer bg-neutral-900/60"
-                  >
-                    <ShoppingCart size={11} className="shrink-0" />
-                    <span>Add to Cart</span>
-                  </motion.button>
+                <div className="p-2.5 rounded-xl bg-neutral-950/60 border border-neutral-800/60 flex items-start gap-2.5">
+                  <Shield size={15} className="text-[#dfb76c] shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-semibold text-white block">Preservation Protocol</span>
+                    <span className="text-neutral-400 text-[11px]">UV Isolation Glaze • Non-Yellowing • 100+ Years Archival Stability</span>
+                  </div>
                 </div>
-              </div>
 
-              {/* 4 Guarantees / Rules with Sequential Auto-Highlight Animation (Big -> Small Cycle) */}
-              <div 
-                onMouseEnter={() => setIsTrustHovered(true)}
-                onMouseLeave={() => setIsTrustHovered(false)}
-                className="pt-3 sm:pt-4 border-t border-neutral-800/80 space-y-1.5 sm:space-y-2 relative"
-              >
-                {TRUST_GUARANTEE_ITEMS.map((item, idx) => {
-                  const IconComp = item.icon
-                  const isActive = activeTrustIndex === idx
-
-                  return (
-                    <motion.div
-                      key={item.id}
-                      onClick={() => setActiveTrustIndex(idx)}
-                      animate={{
-                        scale: isActive ? 1.02 : 1.0,
-                        x: isActive ? 3 : 0,
-                      }}
-                      transition={{ 
-                        type: 'spring', 
-                        stiffness: 380, 
-                        damping: 24, 
-                        mass: 0.8 
-                      }}
-                      className={`group flex flex-row items-center justify-between p-2 sm:p-2.5 rounded-xl transition-all duration-300 cursor-pointer ${
-                        isActive
-                          ? 'bg-gradient-to-r from-[#dfb76c]/20 via-[#dfb76c]/8 to-neutral-900/40 border border-[#dfb76c]/45 shadow-[0_4px_20px_rgba(223,183,108,0.18)]'
-                          : 'hover:bg-neutral-900/50 border border-transparent opacity-65 hover:opacity-90'
-                      }`}
-                    >
-                      <div className="flex flex-row items-center gap-2.5 min-w-0 flex-1">
-                        <div 
-                          className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg transition-all duration-300 flex-shrink-0 flex items-center justify-center ${
-                            isActive
-                              ? 'bg-[#dfb76c] text-neutral-950 shadow-[0_0_12px_rgba(223,183,108,0.6)]'
-                              : 'bg-neutral-800/80 text-[#dfb76c]'
-                          }`}
-                        >
-                          <IconComp size={14} className="stroke-[2.2]" />
-                        </div>
-                        <span 
-                          className={`transition-all duration-300 text-left text-[11px] sm:text-xs leading-snug line-clamp-2 ${
-                            isActive
-                              ? 'font-semibold text-white tracking-wide drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]'
-                              : 'text-neutral-400 font-light'
-                          }`}
-                        >
-                          {item.text}
-                        </span>
-                      </div>
-
-                      {/* Active Indicator Pulse Pill */}
-                      {isActive && (
-                        <motion.span
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.8 }}
-                          transition={{ duration: 0.2 }}
-                          className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] uppercase tracking-wider font-bold bg-[#dfb76c]/20 text-[#dfb76c] border border-[#dfb76c]/40 flex-shrink-0 ml-2"
-                        >
-                          <span className="w-1.5 h-1.5 rounded-full bg-[#dfb76c] animate-pulse" />
-                          {item.tag}
-                        </motion.span>
-                      )}
-                    </motion.div>
-                  )
-                })}
+                <div className="p-2.5 rounded-xl bg-neutral-950/60 border border-neutral-800/60 flex items-start gap-2.5">
+                  <Home size={15} className="text-[#dfb76c] shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-semibold text-white block">Architectural Setting</span>
+                    <span className="text-neutral-400 text-[11px]">Focal placement for salon, penthouse, or executive residence</span>
+                  </div>
+                </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
-      </div>
-
-      {/* Curved Reveal Divider */}
-      <div className="curved-section-divider -my-4 opacity-50">
-        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
-          <path d="M0,0 C150,90 350,-40 500,60 C650,160 900,10 1200,40 L1200,120 L0,120 Z" className="shape-fill" />
-        </svg>
-      </div>
+      </motion.section>
 
       {/* ========================================================= */}
       {/* ACT 3: PRECISION TECHNICAL DOSSIER & SPECIFICATIONS */}
@@ -1485,7 +1609,7 @@ export default function ProductDetail({ onReplayEntrance }) {
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         className="w-full"
       >
-        <div className="bg-[#121217]/90 backdrop-blur-xl p-5 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl border border-neutral-800 shadow-xl space-y-5 sm:space-y-6">
+        <div className="bg-[#121217]/90 backdrop-blur-xl p-5 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl border border-neutral-800 shadow-xl space-y-6 sm:space-y-8">
           <div className="text-center max-w-xl mx-auto">
             <span className="text-[10px] sm:text-xs uppercase tracking-[0.22em] text-[#dfb76c] font-semibold block mb-1">
               Specifications
@@ -1493,34 +1617,31 @@ export default function ProductDetail({ onReplayEntrance }) {
             <h3 className="font-serif text-xl sm:text-2xl md:text-3xl font-normal text-white tracking-tight">
               Artwork Details & Technical Ledger
             </h3>
+            <p className="text-xs text-neutral-400 mt-1.5 font-light">
+              Select or hover any specification box below to inspect its verified archival parameters.
+            </p>
           </div>
 
+          {/* 8 Specification Boxes with Heading, Value & Relevant Descriptive Content */}
           <div 
             onMouseEnter={() => setIsSpecHovered(true)}
             onMouseLeave={() => setIsSpecHovered(false)}
-            className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 sm:gap-4 pt-2 sm:pt-4 text-xs"
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 pt-2 text-xs"
           >
-            {[
-              { label: 'Category', value: 'Portrait / Abstract' },
-              { label: 'Style', value: 'Geometric Abstraction' },
-              { label: 'Techniques', value: 'Layered Impasto' },
-              { label: 'Medium Used', value: 'Acrylic on Canvas' },
-              { label: 'Size (Inches)', value: unit === 'cm' ? '81.28 × 76.20 cm' : '32.00 × 30.00 in' },
-              { label: 'Valuation', value: '₹1,18,300 ($1,577)' },
-              { label: 'Year Created', value: '2023 (Archival)' },
-              { label: 'Delivery Format', value: 'Rolled in Archival Tube' }
-            ].map((spec, i) => {
+            {artworkSpecs.map((spec, i) => {
               const isActive = activeSpecIdx === i
+              const SpecIcon = spec.icon
               return (
                 <motion.div
-                  key={spec.label}
+                  key={spec.id}
                   onClick={() => setActiveSpecIdx(i)}
+                  onMouseEnter={() => setActiveSpecIdx(i)}
                   initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 12 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   animate={{
-                    scale: isActive ? 1.05 : 1.0,
-                    y: isActive ? -4 : 0,
+                    scale: isActive ? 1.03 : 1.0,
+                    y: isActive ? -3 : 0,
                   }}
                   transition={{ 
                     type: 'spring', 
@@ -1528,33 +1649,131 @@ export default function ProductDetail({ onReplayEntrance }) {
                     damping: 24, 
                     mass: 0.8 
                   }}
-                  className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl border transition-all duration-300 relative overflow-hidden group cursor-pointer ${
+                  className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border transition-all duration-300 relative overflow-hidden group cursor-pointer flex flex-col justify-between gap-2.5 ${
                     isActive
                       ? 'bg-gradient-to-b from-[#252538] via-[#1a1a27] to-[#12121b] border-[#dfb76c] ring-2 ring-[#dfb76c]/50 shadow-[0_8px_30px_rgba(223,183,108,0.32)] z-10'
-                      : 'bg-gradient-to-b from-[#1d1d2b] via-[#14141e] to-[#101017] border-neutral-800 hover:border-[#dfb76c]/40 opacity-75 hover:opacity-100'
+                      : 'bg-gradient-to-b from-[#1d1d2b] via-[#14141e] to-[#101017] border-neutral-800 hover:border-[#dfb76c]/40 opacity-80 hover:opacity-100 shadow-md'
                   }`}
                 >
                   <div className={`absolute top-0 left-0 right-0 h-[2px] transition-opacity duration-300 ${
-                    isActive ? 'bg-[#dfb76c] opacity-100 shadow-[0_0_10px_#dfb76c]' : 'bg-gradient-to-r from-transparent via-[#dfb76c] to-transparent opacity-40'
+                    isActive ? 'bg-[#dfb76c] opacity-100 shadow-[0_0_10px_#dfb76c]' : 'bg-gradient-to-r from-transparent via-[#dfb76c] to-transparent opacity-30 group-hover:opacity-70'
                   }`} />
-                  <div className="flex items-center justify-between">
-                    <span className={`uppercase tracking-wider text-[10px] sm:text-[11px] font-semibold block mb-0.5 sm:mb-1 transition-colors ${
-                      isActive ? 'text-[#f7d794]' : 'text-[#dfb76c]'
+
+                  {/* Header Row: Label & Active Ping Indicator */}
+                  <div>
+                    <div className="flex items-center justify-between gap-1.5 mb-1.5">
+                      <div className="flex items-center gap-1.5 min-w-0">
+                        <SpecIcon size={13} className={`shrink-0 transition-colors ${
+                          isActive ? 'text-[#f7d794]' : 'text-[#dfb76c]'
+                        }`} />
+                        <span className={`uppercase tracking-wider text-[10px] sm:text-[11px] font-semibold truncate transition-colors ${
+                          isActive ? 'text-[#f7d794]' : 'text-[#dfb76c]'
+                        }`}>
+                          {spec.label}
+                        </span>
+                      </div>
+                      {isActive ? (
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#dfb76c] animate-ping shrink-0" />
+                      ) : (
+                        <span className="w-1 h-1 rounded-full bg-neutral-600 shrink-0" />
+                      )}
+                    </div>
+
+                    {/* Value */}
+                    <span className={`font-serif text-xs sm:text-[13px] font-medium block transition-colors leading-snug ${
+                      isActive ? 'text-white font-semibold drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]' : 'text-neutral-200'
                     }`}>
-                      {spec.label}
+                      {spec.value}
                     </span>
-                    {isActive && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#dfb76c] animate-ping shrink-0" />
-                    )}
                   </div>
-                  <span className={`font-medium text-xs sm:text-sm block transition-colors ${
-                    isActive ? 'text-white font-semibold drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]' : 'text-neutral-200'
+
+                  {/* Relevant Descriptive Content inside each box */}
+                  <p className={`text-[10px] sm:text-[11px] font-light leading-relaxed transition-colors border-t border-neutral-800/80 pt-2 ${
+                    isActive ? 'text-neutral-200' : 'text-neutral-400'
                   }`}>
-                    {spec.value}
-                  </span>
+                    {spec.shortDesc}
+                  </p>
                 </motion.div>
               )
             })}
+          </div>
+
+          {/* Deep-Dive Specification Inspector Panel (Smooth Transition on Selection) */}
+          <div className="pt-2">
+            <AnimatePresence mode="wait">
+              {artworkSpecs[activeSpecIdx] && (
+                <motion.div
+                  key={artworkSpecs[activeSpecIdx].id}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                  className="p-4 sm:p-6 rounded-2xl bg-gradient-to-r from-[#171722] via-[#13131c] to-[#0f0f15] border border-[#dfb76c]/40 shadow-xl space-y-3.5 relative overflow-hidden"
+                >
+                  <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#dfb76c] to-transparent shadow-[0_0_12px_#dfb76c]" />
+
+                  {/* Inspector Header */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-3 border-b border-neutral-800/80">
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-lg bg-[#dfb76c]/20 border border-[#dfb76c]/40 flex items-center justify-center text-[#dfb76c]">
+                        {React.createElement(artworkSpecs[activeSpecIdx].icon, { size: 16 })}
+                      </div>
+                      <div>
+                        <span className="text-[9.5px] uppercase tracking-widest text-[#dfb76c] font-mono block">
+                          Archival Specification • {artworkSpecs[activeSpecIdx].label}
+                        </span>
+                        <h4 className="font-serif text-base sm:text-lg font-medium text-white">
+                          {artworkSpecs[activeSpecIdx].heading}
+                        </h4>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="px-3 py-1 rounded-full bg-neutral-900 border border-neutral-700 text-xs font-serif font-bold text-[#dfb76c]">
+                        {artworkSpecs[activeSpecIdx].value}
+                      </span>
+                      {artworkSpecs[activeSpecIdx].id === 'size' && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setUnit(unit === 'inch' ? 'cm' : 'inch')
+                          }}
+                          className="px-2.5 py-1 rounded-full bg-[#dfb76c]/20 hover:bg-[#dfb76c] text-[#f7d794] hover:text-neutral-950 border border-[#dfb76c]/40 text-[10px] font-mono uppercase tracking-wider transition-colors cursor-pointer"
+                        >
+                          Switch to {unit === 'inch' ? 'cm' : 'inches'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Inspector Detailed Description */}
+                  <div className="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-4 items-start">
+                    <div className="md:col-span-8 space-y-2">
+                      <p className="text-xs sm:text-sm text-neutral-300 font-light leading-relaxed">
+                        {artworkSpecs[activeSpecIdx].detail}
+                      </p>
+                      <div className="flex items-center gap-2 pt-1 text-[11px] text-neutral-400">
+                        <Sparkles size={12} className="text-[#dfb76c] shrink-0" />
+                        <span className="italic text-neutral-300">{artworkSpecs[activeSpecIdx].curatorialNote}</span>
+                      </div>
+                    </div>
+
+                    <div className="md:col-span-4 p-3 rounded-xl bg-neutral-900/80 border border-neutral-800 space-y-1.5">
+                      <div className="flex items-center gap-1.5 text-[10px] uppercase font-mono text-[#dfb76c]">
+                        <CheckCircle2 size={12} className="text-emerald-400" />
+                        <span>Verified Registry</span>
+                      </div>
+                      <span className="text-[11px] text-white font-medium block">
+                        {artworkSpecs[activeSpecIdx].highlight}
+                      </span>
+                      <span className="text-[10px] text-neutral-400 block font-light">
+                        Source: {artworkSpecs[activeSpecIdx].provenanceSource}
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </motion.section>
@@ -1590,20 +1809,18 @@ export default function ProductDetail({ onReplayEntrance }) {
             The Master Behind The Canvas
           </span>
           <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-normal text-white tracking-tight">
-            Artist Spotlight & Provenance
+            Artist Spotlight & Curatorial Provenance
           </h2>
+          <p className="text-xs sm:text-sm text-neutral-400 font-light mt-2 max-w-lg mx-auto leading-relaxed">
+            Discover the legacy, academic pedigree, and philosophical vision of Pradip Sarkar — Indian contemporary master of spiritual cubism.
+          </p>
         </motion.div>
 
-        {/* 2-Column Curated Artist Suite: Profile + Curatorial Provenance Dossier (Sequential Auto-Highlight) */}
-        <div 
-          onMouseEnter={() => setIsArtistSuiteHovered(true)}
-          onMouseLeave={() => setIsArtistSuiteHovered(false)}
-          className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch mb-10 sm:mb-14"
-        >
-          {/* Left: Artist Profile Card (7 cols on lg, 8 on xl) */}
+        <div className="flex flex-col gap-6 sm:gap-8 items-stretch mb-10 sm:mb-14">
+          {/* Top: Featured Artist Profile Card */}
           <div 
             onClick={() => setActiveArtistSuiteIdx(0)}
-            className="lg:col-span-7 xl:col-span-8 flex w-full"
+            className="w-full flex"
           >
             <ArtistCardMini 
               name="Pradip Sarkar" 
@@ -1612,23 +1829,174 @@ export default function ProductDetail({ onReplayEntrance }) {
             />
           </div>
 
-          {/* Right: Curatorial Provenance & Advisory Dossier (5 cols on lg, 4 on xl) */}
+          {/* 4 Artist-Information Boxes (Moved into Artist Section) */}
+          <div className="space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-1">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-[#dfb76c] animate-pulse" />
+                <span className="text-[10px] sm:text-xs uppercase tracking-[0.2em] font-mono text-[#dfb76c] font-semibold">
+                  Curatorial Pillars & Career Milestones
+                </span>
+              </div>
+              <span className="text-[11px] text-neutral-400 font-light">
+                Select or hover any box for verified curatorial dossier
+              </span>
+            </div>
+
+            {/* 4 Specification / Milestone Boxes Grid */}
+            <div 
+              onMouseEnter={() => setIsMilestoneHovered(true)}
+              onMouseLeave={() => setIsMilestoneHovered(false)}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4"
+            >
+              {artistMilestones.map((m, idx) => {
+                const MIcon = m.icon
+                const isActive = activeMilestoneIdx === idx
+                return (
+                  <motion.div
+                    key={m.id || m.title}
+                    id={`artist-milestone-${m.origin.toLowerCase()}`}
+                    onClick={() => setActiveMilestoneIdx(idx)}
+                    onMouseEnter={() => setActiveMilestoneIdx(idx)}
+                    initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 16 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, margin: '-20px' }}
+                    transition={{ duration: 0.45, delay: idx * 0.06, ease: [0.16, 1, 0.3, 1] }}
+                    animate={{
+                      scale: isActive ? 1.03 : 1.0,
+                      y: isActive ? -4 : 0,
+                    }}
+                    whileHover={shouldReduceMotion ? {} : { y: -3, transition: { duration: 0.2 } }}
+                    className={`p-4 sm:p-5 rounded-2xl border transition-all duration-300 cursor-pointer relative overflow-hidden flex flex-col justify-between gap-3 text-left group ${
+                      isActive
+                        ? 'bg-gradient-to-br from-[#222234] via-[#181824] to-[#101018] border-[#dfb76c] ring-2 ring-[#dfb76c]/50 shadow-[0_10px_32px_rgba(223,183,108,0.28)] z-10'
+                        : 'bg-[#121217]/90 border-neutral-800 hover:border-[#dfb76c]/40 hover:bg-[#16161f] shadow-md'
+                    }`}
+                  >
+                    {/* Active Top Highlight Bar */}
+                    <div className={`absolute top-0 left-0 right-0 h-[2.5px] transition-all duration-300 ${
+                      isActive 
+                        ? 'bg-[#dfb76c] opacity-100 shadow-[0_0_12px_#dfb76c]' 
+                        : 'bg-transparent opacity-0 group-hover:bg-[#dfb76c]/30 group-hover:opacity-100'
+                    }`} />
+
+                    {/* Header with Origin & Category Icon */}
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-1.5">
+                        <span className={`text-[10px] uppercase tracking-widest font-mono font-bold transition-colors ${
+                          isActive ? 'text-[#f7d794]' : 'text-[#dfb76c]'
+                        }`}>
+                          {m.origin}
+                        </span>
+                      </div>
+                      <div className={`p-1.5 rounded-lg transition-colors ${
+                        isActive ? 'bg-[#dfb76c]/20 text-[#f7d794]' : 'bg-neutral-800/60 text-neutral-400 group-hover:text-[#dfb76c]'
+                      }`}>
+                        <MIcon size={14} className="shrink-0" />
+                      </div>
+                    </div>
+
+                    {/* Milestone Title */}
+                    <div>
+                      <h4 className={`font-serif text-sm sm:text-base font-medium leading-snug transition-colors ${
+                        isActive ? 'text-white font-semibold drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]' : 'text-neutral-200'
+                      }`}>
+                        {m.title}
+                      </h4>
+                    </div>
+
+                    {/* Relevant Descriptive Content inside each box */}
+                    <p className={`text-[11px] font-light leading-relaxed transition-colors border-t border-neutral-800/80 pt-2.5 ${
+                      isActive ? 'text-neutral-200' : 'text-neutral-400'
+                    }`}>
+                      {m.desc}
+                    </p>
+                  </motion.div>
+                )
+              })}
+            </div>
+
+            {/* Interactive Milestone Deep-Dive Inspector Panel (Smooth Transition on Highlight/Selection) */}
+            <div className="pt-2">
+              <AnimatePresence mode="wait">
+                {artistMilestones[activeMilestoneIdx] && (
+                  <motion.div
+                    key={artistMilestones[activeMilestoneIdx].id || activeMilestoneIdx}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -12 }}
+                    transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                    className="p-5 sm:p-7 rounded-2xl bg-gradient-to-r from-[#171722] via-[#13131c] to-[#0f0f15] border border-[#dfb76c]/40 shadow-xl space-y-3.5 relative overflow-hidden"
+                  >
+                    <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#dfb76c] to-transparent shadow-[0_0_12px_#dfb76c]" />
+
+                    {/* Inspector Header */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-neutral-800/80">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-[#dfb76c]/20 border border-[#dfb76c]/40 flex items-center justify-center text-[#dfb76c]">
+                          {React.createElement(artistMilestones[activeMilestoneIdx].icon, { size: 18 })}
+                        </div>
+                        <div>
+                          <span className="text-[10px] uppercase tracking-widest text-[#dfb76c] font-mono block">
+                            Curatorial Dossier • {artistMilestones[activeMilestoneIdx].origin}
+                          </span>
+                          <h4 className="font-serif text-base sm:text-xl font-medium text-white">
+                            {artistMilestones[activeMilestoneIdx].title}
+                          </h4>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="px-3 py-1 rounded-full bg-neutral-900 border border-[#dfb76c]/30 text-xs font-mono font-medium text-[#dfb76c]">
+                          {artistMilestones[activeMilestoneIdx].badge}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Inspector Details */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
+                      <div className="md:col-span-8 space-y-2">
+                        <p className="text-xs sm:text-sm text-neutral-300 font-light leading-relaxed">
+                          {artistMilestones[activeMilestoneIdx].extended}
+                        </p>
+                        <div className="flex items-center gap-2 pt-1 text-[11px] text-neutral-400">
+                          <Sparkles size={12} className="text-[#dfb76c] shrink-0" />
+                          <span className="italic text-neutral-300">{artistMilestones[activeMilestoneIdx].desc}</span>
+                        </div>
+                      </div>
+
+                      <div className="md:col-span-4 p-3.5 rounded-xl bg-neutral-900/90 border border-neutral-800 space-y-1.5">
+                        <div className="flex items-center gap-1.5 text-[10px] uppercase font-mono text-[#dfb76c]">
+                          <CheckCircle2 size={12} className="text-emerald-400" />
+                          <span>Curatorial Registry</span>
+                        </div>
+                        <span className="text-xs text-white font-medium block">
+                          Verified Artist Milestone
+                        </span>
+                        <span className="text-[11px] text-neutral-400 block font-light">
+                          Archive: {artistMilestones[activeMilestoneIdx].source}
+                        </span>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </div>
+
+          {/* Curatorial Provenance, Studio Dossier & More Information */}
           <motion.div 
             onClick={() => setActiveArtistSuiteIdx(1)}
-            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: 20 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-40px" }}
             transition={{ duration: 0.65, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
-            animate={{
-              scale: activeArtistSuiteIdx === 1 ? 1.025 : 1.0,
-            }}
-            className={`lg:col-span-5 xl:col-span-4 flex flex-col justify-between gap-4 p-5 sm:p-7 rounded-2xl sm:rounded-3xl backdrop-blur-xl transition-all duration-500 w-full cursor-pointer relative overflow-hidden ${
+            className={`flex flex-col justify-between gap-5 p-5 sm:p-8 rounded-2xl sm:rounded-3xl backdrop-blur-xl transition-all duration-500 w-full relative overflow-hidden ${
               activeArtistSuiteIdx === 1
                 ? 'bg-gradient-to-br from-[#1b1b28] via-[#13131c] to-[#0e0e14] border-2 border-[#dfb76c] ring-2 ring-[#dfb76c]/40 shadow-[0_0_40px_rgba(223,183,108,0.28)]'
                 : 'bg-[#121217]/90 border border-neutral-800 hover:border-[#dfb76c]/40 shadow-xl'
             }`}
           >
-            {/* Active Top Highlight Bar */}
             {activeArtistSuiteIdx === 1 && (
               <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-transparent via-[#dfb76c] to-transparent shadow-[0_0_10px_#dfb76c]" />
             )}
@@ -1638,42 +2006,41 @@ export default function ProductDetail({ onReplayEntrance }) {
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-[#dfb76c] animate-pulse" />
                   <span className="text-[10px] sm:text-xs uppercase tracking-widest text-[#dfb76c] font-mono font-semibold">
-                    Curatorial Provenance
+                    Studio Provenance & Archival Catalog
                   </span>
                 </div>
-                {activeArtistSuiteIdx === 1 && (
-                  <span className="text-[9px] uppercase tracking-wider font-bold bg-[#dfb76c]/20 text-[#dfb76c] px-2 py-0.5 rounded-full border border-[#dfb76c]/30">
-                    Active Focus
-                  </span>
-                )}
+                <span className="text-[9px] uppercase tracking-wider font-bold bg-[#dfb76c]/20 text-[#dfb76c] px-2.5 py-0.5 rounded-full border border-[#dfb76c]/30">
+                  Direct Atelier Access
+                </span>
               </div>
 
-              <h4 className={`font-serif text-lg sm:text-xl font-medium mb-2 transition-colors ${
-                activeArtistSuiteIdx === 1 ? 'text-[#f7d794]' : 'text-white'
-              }`}>
-                Santiniketan Master Pedigree
+              <h4 className="font-serif text-lg sm:text-2xl font-medium text-white mb-2.5">
+                The Synthesis of Sound and Geometry
               </h4>
               <p className="text-xs sm:text-sm text-neutral-300 font-light leading-relaxed mb-4">
-                Pradip Sarkar’s artworks are curated by Zigguratss directly from the artist's studio. Each acquisition is certified with a serialized Certificate of Authenticity (COA) and verified provenance archive.
+                Pradip Sarkar’s artworks are cataloged and acquired by Zigguratss directly from the master's atelier in Mumbai. Each acquisition is certified with a physical serialized Certificate of Authenticity (COA) personally hand-signed by Pradip Sarkar and entered into the immutable gallery registry.
+              </p>
+              <p className="text-xs sm:text-sm text-neutral-300 font-light leading-relaxed mb-5">
+                In his acclaimed <em className="text-[#f7d794] not-italic font-normal">Divine Tunes</em> series, Sarkar explores the sublime relationship between music, consciousness, and architectural structure. Through meticulous square partitions, impasto acrylic textures, and fluttering butterfly motifs, his canvases embody meditative stillness—translating classical Indian ragas into vibrant chromatic symphonies.
               </p>
 
-              {/* 3 Key Curatorial Accreditations with Sequential Auto-Highlight */}
-              <div className="space-y-2 pt-3 border-t border-neutral-800/80">
+              {/* 3 Key Curatorial Accreditations */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-4 border-t border-neutral-800/80">
                 {[
                   {
-                    icon: CheckCircle2,
-                    title: 'Kala Bhavana Alumni',
-                    sub: 'Visva-Bharati University, Santiniketan'
+                    icon: Award,
+                    title: 'British Institute Mumbai Alumnus',
+                    sub: 'Diploma in Fine Art with honors in spatial geometry and color theory'
                   },
                   {
-                    icon: Award,
-                    title: 'National Scholar Fellowship',
-                    sub: 'Ministry of Culture Government Awardee'
+                    icon: CheckCircle2,
+                    title: '70+ Significant Curated Shows',
+                    sub: 'Exhibited across Mumbai, New Delhi, Kolkata, Dubai, London & Singapore since 1995'
                   },
                   {
                     icon: Shield,
-                    title: 'Museum-Grade Archival',
-                    sub: 'Lightfast pigments on heavy linen canvas'
+                    title: 'Museum-Grade Archival Standard',
+                    sub: 'Lightfast pigments on heavy linen canvas with serialized COA guarantee'
                   }
                 ].map((acc, idx) => {
                   const AccIcon = acc.icon
@@ -1683,14 +2050,13 @@ export default function ProductDetail({ onReplayEntrance }) {
                       key={acc.title}
                       onClick={() => setActiveAccreditationIdx(idx)}
                       animate={{
-                        scale: isActive ? 1.03 : 1.0,
-                        x: isActive ? 4 : 0
+                        scale: isActive ? 1.02 : 1.0,
                       }}
                       transition={{ type: 'spring', stiffness: 350, damping: 24 }}
-                      className={`flex items-start gap-2.5 p-2 rounded-xl transition-all duration-300 cursor-pointer ${
+                      className={`flex items-start gap-2.5 p-3 rounded-xl transition-all duration-300 cursor-pointer ${
                         isActive 
                           ? 'bg-[#dfb76c]/15 border border-[#dfb76c]/40 shadow-sm' 
-                          : 'hover:bg-white/[0.02] border border-transparent'
+                          : 'bg-neutral-900/60 hover:bg-neutral-900 border border-neutral-800/80 hover:border-[#dfb76c]/30'
                       }`}
                     >
                       <AccIcon size={16} className={`shrink-0 mt-0.5 transition-colors ${
@@ -1700,7 +2066,7 @@ export default function ProductDetail({ onReplayEntrance }) {
                         <strong className={`block font-medium text-xs sm:text-sm transition-colors ${
                           isActive ? 'text-white font-semibold' : 'text-neutral-200'
                         }`}>{acc.title}</strong>
-                        <span className={`text-[11px] transition-colors ${
+                        <span className={`text-[11px] transition-colors leading-relaxed block mt-0.5 ${
                           isActive ? 'text-[#f7d794]' : 'text-neutral-400'
                         }`}>{acc.sub}</span>
                       </div>
@@ -1711,20 +2077,34 @@ export default function ProductDetail({ onReplayEntrance }) {
             </div>
 
             {/* Direct Curator Access CTA */}
-            <div className="pt-4 border-t border-neutral-800/80 flex items-center justify-between gap-2">
-              <span className="text-[11px] font-mono text-neutral-400">Direct Curator Inquiry</span>
+            <div className="pt-4 border-t border-neutral-800/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div>
+                <span className="text-xs font-serif text-white font-medium block">Private Atelier Acquisition Inquiries</span>
+                <span className="text-[11px] text-neutral-400 font-light">Direct liaison with the artist's studio representatives</span>
+              </div>
               <button 
                 onClick={(e) => {
                   e.stopPropagation()
                   setShowOfferModal(true)
                 }}
-                className="px-3.5 sm:px-4 py-2 rounded-xl bg-[#dfb76c]/15 hover:bg-[#dfb76c] text-[#f7d794] hover:text-neutral-950 border border-[#dfb76c]/40 text-xs font-semibold uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-md shrink-0"
+                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#dfb76c] to-[#c9a96e] hover:from-[#f7d794] hover:to-[#dfb76c] text-neutral-950 font-bold text-xs uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2 shadow-md shrink-0"
               >
-                <MessageCircle size={13} />
-                <span>Private Viewing</span>
+                <MessageCircle size={14} />
+                <span>Private Viewing & Acquisition</span>
               </button>
             </div>
           </motion.div>
+
+          {/* Philosophical Artist Quote Block (Moved to Artist Section) */}
+          <blockquote className="p-5 sm:p-7 md:p-8 bg-gradient-to-r from-[#181824] via-[#14141e] to-[#101018] rounded-2xl border-l-4 border-[#dfb76c] text-[#f7d794] font-serif italic text-base sm:text-lg md:text-xl leading-relaxed flex items-center justify-between gap-4 shadow-xl">
+            <div>
+              "Art is the expression of my own life story... art is divine."
+              <span className="block text-xs font-sans text-neutral-400 not-italic mt-2.5 tracking-widest uppercase font-mono">
+                — Pradip Sarkar, Mumbai Atelier
+              </span>
+            </div>
+            <Sparkles size={24} className="text-[#dfb76c] flex-shrink-0 hidden sm:block opacity-80" />
+          </blockquote>
         </div>
       </motion.section>
 
@@ -1736,7 +2116,7 @@ export default function ProductDetail({ onReplayEntrance }) {
       </div>
 
       {/* ========================================================= */}
-      {/* ACT 5: MASTER ARTIST MONOGRAPH & STUDIO FILMSTRIP */}
+      {/* ACT 5: MASTER ARTIST RETROSPECTIVE (BALANCED 8-IMAGE GALLERY) */}
       {/* ========================================================= */}
       <motion.section 
         data-showcase-section
@@ -1747,154 +2127,210 @@ export default function ProductDetail({ onReplayEntrance }) {
         transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
         className="w-full"
       >
-        <div className="bg-[#121217]/90 backdrop-blur-xl p-5 sm:p-8 md:p-12 rounded-2xl sm:rounded-3xl border border-neutral-800 shadow-xl space-y-8 sm:space-y-10">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 border-b border-neutral-800/80 pb-4 sm:pb-6">
+        <div className="bg-[#121217]/90 backdrop-blur-xl p-5 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl border border-neutral-800 shadow-xl space-y-6 sm:space-y-8">
+          {/* Header */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 border-b border-neutral-800/80 pb-5">
             <div>
               <span className="text-[10px] sm:text-xs uppercase tracking-[0.22em] text-[#dfb76c] font-semibold block mb-1">
-                Artist Monograph & Archive
+                Artist Monograph & Archive • 1995 – 2024
               </span>
               <h3 className="font-serif text-2xl sm:text-3xl md:text-4xl font-normal text-white tracking-tight">
                 Pradip Sarkar — Master Retrospective
               </h3>
+              <p className="text-xs sm:text-sm text-neutral-400 font-light mt-1.5 max-w-xl leading-relaxed">
+                A balanced curatorial retrospective of 8 seminal works spanning three decades of cubic harmony, Vedic resonance, and spatial abstraction.
+              </p>
             </div>
-            <div className="inline-flex items-center gap-1.5 sm:gap-2 py-1.5 px-3 sm:px-3.5 bg-neutral-900 rounded-full border border-neutral-700 text-xs text-[#dfb76c] font-semibold w-fit">
+            <div className="inline-flex items-center gap-1.5 sm:gap-2 py-1.5 px-3.5 bg-neutral-900 rounded-full border border-neutral-700 text-xs text-[#dfb76c] font-semibold w-fit shrink-0">
               <Award size={13} />
-              <span>30+ Years of Artistic Mastery</span>
+              <span>30+ Years of Mastery</span>
             </div>
           </div>
 
-          {/* Continuous Animated Artist Filmstrip */}
-          <div className="space-y-3">
-            <div className="flex items-center justify-between text-xs text-neutral-400">
-              <span className="uppercase tracking-wider font-semibold text-[#dfb76c] text-[11px] sm:text-xs">
-                ✦ Oeuvre & Studio Filmstrip
-              </span>
-              <span className="text-[11px] sm:text-xs">Continuous Exhibition Reel</span>
-            </div>
-            <div className="overflow-x-auto py-2 px-1 snap-x flex gap-3 sm:gap-4" style={{ scrollbarWidth: 'none' }}>
-              {artistFilmstrip.map((item, idx) => {
-                const isActive = activeFilmstripIdx === idx
-                return (
-                  <motion.div
-                    key={`${item.title}-${idx}`}
-                    onClick={() => setActiveFilmstripIdx(idx)}
-                    animate={{
-                      scale: isActive ? 1.05 : 1.0,
-                      y: isActive ? -4 : 0
-                    }}
-                    transition={{ type: 'spring', stiffness: 350, damping: 24 }}
-                    className={`flex-shrink-0 w-36 xs:w-44 sm:w-52 rounded-xl sm:rounded-2xl overflow-hidden border transition-all duration-300 group cursor-pointer relative ${
-                      isActive
-                        ? 'bg-neutral-900 border-[#dfb76c] ring-1 ring-[#dfb76c]/50 shadow-[0_8px_25px_rgba(223,183,108,0.3)]'
-                        : 'bg-neutral-900/90 border-neutral-800 opacity-75 hover:opacity-100'
-                    }`}
-                  >
-                    {isActive && (
-                      <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#dfb76c] z-20 shadow-[0_0_8px_#dfb76c]" />
-                    )}
-                    <div className="h-28 xs:h-36 sm:h-40 w-full overflow-hidden relative">
-                      <img 
-                        src={item.image} 
-                        alt={item.title} 
-                        className={`w-full h-full object-cover transition-transform duration-500 ${
-                          isActive ? 'scale-108' : 'group-hover:scale-105'
-                        }`} 
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                      <span className="absolute bottom-2 left-2 text-[9px] sm:text-[10px] text-[#dfb76c] font-mono bg-black/60 px-1.5 py-0.5 rounded">
-                        {item.year}
-                      </span>
-                    </div>
-                    <div className="p-2.5 sm:p-3">
-                      <h6 className={`font-serif text-[11px] sm:text-xs font-medium truncate transition-colors ${
-                        isActive ? 'text-[#f7d794] font-semibold' : 'text-white group-hover:text-[#dfb76c]'
-                      }`}>
-                        {item.title}
-                      </h6>
-                      <span className="text-[10px] text-neutral-400">Pradip Sarkar</span>
-                    </div>
-                  </motion.div>
-                )
-              })}
-            </div>
-          </div>
-
-          {/* 4 Concise Milestone Cards with Sequential Auto-Highlight Animation */}
-          <div 
-            onMouseEnter={() => setIsMilestoneHovered(true)}
-            onMouseLeave={() => setIsMilestoneHovered(false)}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4"
-          >
-            {[
-              { origin: 'Origin', title: 'Dhanbad, Jharkhand', desc: 'Commerce Graduate, Ranchi University' },
-              { origin: 'Academic', title: 'Diploma in Fine Art', desc: 'British Institute, Mumbai' },
-              { origin: 'Exhibitions', title: '70+ Curated Shows', desc: 'Active Indian contemporary artist since 1995' },
-              { origin: 'Presence', title: 'Lalit Kala Akademi', desc: 'Featured across prestigious institutions' }
-            ].map((m, idx) => {
-              const isActive = activeMilestoneIdx === idx
+          {/* Master Retrospective Balanced 2-Column Grid of 8 Works */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6 w-full">
+            {artistFilmstrip.map((item, idx) => {
+              const isActive = activeFilmstripIdx === idx
               return (
                 <motion.div
-                  key={m.title}
-                  onClick={() => setActiveMilestoneIdx(idx)}
-                  initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 12 }}
+                  key={item.id || `${item.title}-${idx}`}
+                  id={`retrospective-artwork-${idx}`}
+                  onClick={() => {
+                    setActiveFilmstripIdx(idx)
+                    setSelectedRetrospectiveArt(item)
+                  }}
+                  initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 24 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  animate={{
-                    scale: isActive ? 1.05 : 1.0,
-                    y: isActive ? -4 : 0,
-                  }}
-                  transition={{ 
-                    type: 'spring', 
-                    stiffness: 350, 
-                    damping: 24, 
-                    mass: 0.8 
-                  }}
-                  className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border transition-all duration-300 cursor-pointer relative overflow-hidden ${
+                  viewport={{ once: true, margin: '-40px' }}
+                  transition={{ duration: 0.5, delay: idx * 0.06, ease: [0.16, 1, 0.3, 1] }}
+                  whileHover={shouldReduceMotion ? {} : { y: -6, transition: { duration: 0.25 } }}
+                  className={`group relative rounded-2xl overflow-hidden border transition-all duration-300 flex flex-col justify-between cursor-pointer ${
                     isActive
-                      ? 'bg-gradient-to-br from-[#222234] via-[#181824] to-[#101018] border-[#dfb76c] ring-1 ring-[#dfb76c]/50 shadow-[0_8px_30px_rgba(223,183,108,0.28)] z-10'
-                      : 'bg-neutral-900/90 border-neutral-800 hover:border-[#dfb76c]/40 opacity-75 hover:opacity-100'
+                      ? 'bg-[#181826] border-[#dfb76c] ring-2 ring-[#dfb76c]/40 shadow-[0_12px_36px_rgba(223,183,108,0.28)]'
+                      : 'bg-[#13131c] border-neutral-800 hover:border-[#dfb76c]/60 hover:bg-[#161622] shadow-lg'
                   }`}
                 >
-                  <div className={`absolute top-0 left-0 right-0 h-[2px] transition-opacity duration-300 ${
-                    isActive ? 'bg-[#dfb76c] opacity-100 shadow-[0_0_10px_#dfb76c]' : 'bg-transparent opacity-0'
+                  {/* Glowing gold top line on active or hover */}
+                  <div className={`absolute top-0 left-0 right-0 h-[2.5px] transition-all duration-300 z-20 ${
+                    isActive 
+                      ? 'bg-[#dfb76c] opacity-100 shadow-[0_0_10px_#dfb76c]' 
+                      : 'bg-transparent opacity-0 group-hover:bg-[#dfb76c] group-hover:opacity-100'
                   }`} />
-                  <div className="flex items-center justify-between mb-1">
-                    <span className={`text-[10px] uppercase tracking-widest font-bold block transition-colors ${
-                      isActive ? 'text-[#f7d794]' : 'text-[#dfb76c]'
-                    }`}>
-                      {m.origin}
+
+                  {/* Corner accents */}
+                  <div className="absolute top-2.5 left-2.5 text-[#dfb76c]/30 text-xs font-mono pointer-events-none z-20 opacity-0 group-hover:opacity-100 transition-opacity">⌜</div>
+                  <div className="absolute top-2.5 right-2.5 text-[#dfb76c]/30 text-xs font-mono pointer-events-none z-20 opacity-0 group-hover:opacity-100 transition-opacity">⌝</div>
+
+                  {/* Clear Image Frame with Balanced Aspect Ratio (No overlapping or underlaying) */}
+                  <div className="aspect-[4/3] w-full overflow-hidden relative bg-neutral-950">
+                    <img 
+                      src={item.image} 
+                      alt={item.title} 
+                      className="w-full h-full object-cover transition-transform duration-600 ease-out group-hover:scale-106 select-none"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none" />
+
+                    {/* Plate Index Badge */}
+                    <span className="absolute top-3 left-3 bg-black/80 backdrop-blur-md px-2.5 py-1 rounded-md text-[9.5px] font-mono text-[#dfb76c] border border-white/10 shadow-md">
+                      PLATE 0{idx + 1}
                     </span>
-                    {isActive && (
-                      <span className="w-1.5 h-1.5 rounded-full bg-[#dfb76c] animate-pulse" />
-                    )}
+
+                    {/* Year Badge */}
+                    <span className="absolute bottom-3 left-3 bg-neutral-950/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-mono text-[#f7d794] border border-[#dfb76c]/30 flex items-center gap-1 shadow-md">
+                      <Sparkles size={10} className="text-[#dfb76c]" />
+                      <span>{item.year}</span>
+                    </span>
+
+                    {/* Dimensions Badge */}
+                    <span className="absolute bottom-3 right-3 bg-black/80 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-mono text-neutral-300 border border-white/10">
+                      {item.dimensions?.split(' ')[0]} {item.dimensions?.split(' ')[1]} {item.dimensions?.split(' ')[2]}
+                    </span>
                   </div>
-                  <h5 className={`font-serif text-xs sm:text-sm font-medium transition-colors ${
-                    isActive ? 'text-white font-semibold drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]' : 'text-neutral-200'
-                  }`}>
-                    {m.title}
-                  </h5>
-                  <p className={`text-[10px] sm:text-[11px] font-light mt-1 transition-colors ${
-                    isActive ? 'text-neutral-200' : 'text-neutral-400'
-                  }`}>
-                    {m.desc}
-                  </p>
+
+                  {/* Artwork Meta & Curatorial Information */}
+                  <div className="p-4 sm:p-5 flex flex-col justify-between gap-3 flex-1">
+                    <div>
+                      <span className="text-[9.5px] uppercase font-mono tracking-wider text-[#dfb76c] block mb-1">
+                        {item.subtitle}
+                      </span>
+                      <h4 className="font-serif text-base sm:text-lg font-medium text-white group-hover:text-[#f7d794] transition-colors leading-snug">
+                        {item.title}
+                      </h4>
+                      <p className="text-xs text-neutral-300 font-light leading-relaxed mt-1.5 line-clamp-2">
+                        {item.description}
+                      </p>
+                    </div>
+
+                    <div className="pt-3 border-t border-neutral-800/80 flex items-center justify-between gap-2">
+                      <div className="text-[11px] text-neutral-400 font-light truncate">
+                        <span>{item.medium}</span>
+                      </div>
+                      <span className="inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-[#dfb76c] group-hover:underline shrink-0">
+                        <span>Inspect Canvas</span>
+                        <ArrowUpRight size={12} />
+                      </span>
+                    </div>
+                  </div>
                 </motion.div>
               )
             })}
           </div>
-
-          {/* Philosophical Quote Block */}
-          <blockquote className="p-4 sm:p-6 md:p-8 bg-[#161622] rounded-xl sm:rounded-2xl border-l-4 border-[#dfb76c] text-[#f7d794] font-serif italic text-base sm:text-lg md:text-xl leading-relaxed flex items-center justify-between gap-4">
-            <div>
-              "Art is the expression of my own life story... art is divine."
-              <span className="block text-xs font-sans text-neutral-400 not-italic mt-2 tracking-widest uppercase">
-                — Pradip Sarkar, Mumbai
-              </span>
-            </div>
-            <Sparkles size={24} className="text-[#dfb76c] flex-shrink-0 hidden sm:block opacity-70" />
-          </blockquote>
         </div>
+
+        {/* Retrospective Masterwork High-Res Lightbox Modal */}
+        <AnimatePresence>
+          {selectedRetrospectiveArt && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedRetrospectiveArt(null)}
+              className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 sm:p-6"
+            >
+              <motion.div
+                initial={{ scale: 0.95, opacity: 0, y: 16 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.95, opacity: 0, y: 16 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                onClick={(e) => e.stopPropagation()}
+                className="bg-[#14141e] border border-[#dfb76c]/40 rounded-2xl sm:rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl relative"
+              >
+                {/* Close Button */}
+                <button
+                  onClick={() => setSelectedRetrospectiveArt(null)}
+                  className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-black/70 hover:bg-black text-neutral-300 hover:text-white flex items-center justify-center border border-white/10 transition-colors cursor-pointer"
+                  aria-label="Close modal"
+                >
+                  <X size={16} />
+                </button>
+
+                {/* Modal Image */}
+                <div className="w-full max-h-[380px] sm:max-h-[420px] overflow-hidden bg-neutral-950 flex items-center justify-center relative">
+                  <img
+                    src={selectedRetrospectiveArt.image}
+                    alt={selectedRetrospectiveArt.title}
+                    className="max-h-[380px] sm:max-h-[420px] w-full object-contain"
+                  />
+                  <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded text-[10px] font-mono text-[#dfb76c] border border-[#dfb76c]/30">
+                    Archival Monograph • {selectedRetrospectiveArt.year}
+                  </div>
+                </div>
+
+                {/* Modal Content */}
+                <div className="p-5 sm:p-7 space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-neutral-800">
+                    <div>
+                      <span className="text-[10px] uppercase font-mono tracking-wider text-[#dfb76c] block">
+                        {selectedRetrospectiveArt.subtitle}
+                      </span>
+                      <h3 className="font-serif text-xl sm:text-2xl text-white font-medium">
+                        {selectedRetrospectiveArt.title}
+                      </h3>
+                    </div>
+                    <span className="text-xs font-mono text-neutral-400">
+                      Pradip Sarkar
+                    </span>
+                  </div>
+
+                  <p className="text-xs sm:text-sm text-neutral-300 font-light leading-relaxed">
+                    {selectedRetrospectiveArt.description}
+                  </p>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3 bg-neutral-900/80 rounded-xl border border-neutral-800 text-xs">
+                    <div>
+                      <span className="text-[10px] text-neutral-400 block font-mono">MEDIUM</span>
+                      <strong className="text-white font-medium">{selectedRetrospectiveArt.medium}</strong>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-neutral-400 block font-mono">DIMENSIONS</span>
+                      <strong className="text-white font-medium">{selectedRetrospectiveArt.dimensions}</strong>
+                    </div>
+                    <div className="col-span-2 sm:col-span-1">
+                      <span className="text-[10px] text-neutral-400 block font-mono">ORIGIN</span>
+                      <strong className="text-white font-medium">Mumbai Studio Vault</strong>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 flex items-center justify-end gap-3">
+                    <button
+                      onClick={() => {
+                        setSelectedRetrospectiveArt(null)
+                        setShowOfferModal(true)
+                      }}
+                      className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#dfb76c] to-[#c9a96e] hover:from-[#f7d794] hover:to-[#dfb76c] text-neutral-950 font-bold text-xs uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-md"
+                    >
+                      <MessageCircle size={14} />
+                      <span>Inquire About Acquisition</span>
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.section>
+          </div>
+        </div>
 
       {/* Curved Reveal Divider */}
       <div className="curved-section-divider -my-4 opacity-50">
@@ -1904,10 +2340,68 @@ export default function ProductDetail({ onReplayEntrance }) {
       </div>
 
       {/* ========================================================= */}
-      {/* ACT 6: RELATED MASTERWORKS MARQUEE STREAMS */}
+      {/* ACT 6: RELATED MASTERWORKS MARQUEE STREAMS & COMPACT PRODUCT BAR */}
+      {/* (FULL-WIDTH PANORAMIC STREAM - NO RIGHT-SIDE PRODUCT BOX) */}
       {/* ========================================================= */}
-      <ArtistMarqueesSection />
+      <div className="w-full relative space-y-6 sm:space-y-8">
+        <ArtistMarqueesSection />
 
+        {/* Compact Bottom Product Bar (Referencing Singulart Luxury Spec) */}
+        <div className="sticky bottom-4 z-40 w-full max-w-5xl mx-auto px-2 sm:px-4 pointer-events-auto">
+          <div className="bg-[#121218]/95 backdrop-blur-2xl border border-[#dfb76c]/50 rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 md:p-5 shadow-[0_20px_60px_rgba(0,0,0,0.9)] ring-1 ring-[#dfb76c]/30">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-6">
+              {/* Artwork Info & Valuation */}
+              <div className="flex items-center justify-between sm:justify-start gap-4 sm:gap-6">
+                <div>
+                  <span className="text-[9.5px] sm:text-[11px] uppercase tracking-[0.2em] text-[#dfb76c] font-mono font-medium block">
+                    Pradip Sarkar
+                  </span>
+                  <h4 className="font-serif text-base sm:text-xl font-normal text-white tracking-tight">
+                    Divine Tunes-11
+                  </h4>
+                </div>
+
+                {/* Pricing with Strikethrough & -20% badge */}
+                <div className="text-right sm:text-left">
+                  <div className="flex items-center gap-1.5 justify-end sm:justify-start">
+                    <span className="text-[10px] sm:text-xs text-neutral-500 line-through font-serif">₹1,47,800</span>
+                    <span className="px-1.5 py-0.5 rounded bg-[#8a1c14] text-white text-[9px] font-bold font-mono tracking-wider">-20%</span>
+                  </div>
+                  <span className="font-serif text-base sm:text-xl font-bold text-[#dfb76c]">
+                    ₹1,18,300
+                  </span>
+                </div>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+                <button
+                  onClick={handleAddToCart}
+                  className="flex-1 sm:flex-none px-5 sm:px-7 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl bg-gradient-to-r from-[#dfb76c] via-[#f7d794] to-[#dfb76c] hover:from-[#f7d794] hover:to-[#dfb76c] text-neutral-950 font-bold text-xs uppercase tracking-wider transition-all duration-300 shadow-[0_4px_20px_rgba(223,183,108,0.3)] hover:shadow-[0_8px_30px_rgba(223,183,108,0.5)] flex items-center justify-center gap-2 cursor-pointer"
+                >
+                  <span>Acquire Artwork</span>
+                  <ArrowRight size={14} />
+                </button>
+
+                <button
+                  onClick={() => setShowOfferModal(true)}
+                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl border border-[#dfb76c]/40 hover:border-[#dfb76c] bg-neutral-900/90 hover:bg-[#dfb76c]/15 text-[#dfb76c] flex items-center justify-center transition-all cursor-pointer shadow-sm shrink-0"
+                  title="Make an Offer or Inquire"
+                >
+                  <MessageCircle size={17} />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ========================================================= */}
+      {/* GRID 2: SHIPPING & REVIEWS WITH STICKY PRODUCT DOSSIER */}
+      {/* ========================================================= */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-10 xl:gap-12 items-start w-full">
+        {/* LEFT: 7 Columns for Act 7 (Logistics) & Act 8 (Reviews) */}
+        <div className="lg:col-span-7 xl:col-span-7 space-y-12 sm:space-y-16 lg:space-y-24 w-full min-w-0">
       {/* Curved Reveal Divider */}
       <div className="curved-section-divider -my-4 opacity-50 transform rotate-180">
         <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
@@ -2004,10 +2498,10 @@ export default function ProductDetail({ onReplayEntrance }) {
                 animate={{ opacity: 1, x: 0 }}
                 exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, x: -20 }}
                 transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-                className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center"
+                className="relative z-10 flex flex-col gap-6 sm:gap-8 items-stretch"
               >
                 {/* Visual Graphic */}
-                <div className={`lg:col-span-7 w-full rounded-xl sm:rounded-2xl overflow-hidden relative flex items-center justify-center ${
+                <div className={`w-full rounded-xl sm:rounded-2xl overflow-hidden relative flex items-center justify-center ${
                   shippingStep === 1 || shippingStep === 2 || shippingStep === 3
                     ? 'p-0 bg-transparent border-0 shadow-2xl' 
                     : 'h-56 xs:h-64 sm:h-72 bg-black/60 border border-neutral-800 p-3 sm:p-6'
@@ -2127,61 +2621,64 @@ export default function ProductDetail({ onReplayEntrance }) {
                         isReducedMotion={shouldReduceMotion} 
                         artworkSrc={currentPackagedArt.src}
                         artworkTitle={currentPackagedArt.title || currentPackagedArt.label || 'Divine Tunes-11'}
+                        onUserInteraction={() => setIsShippingAutoPlay(false)}
                       />
                     </div>
                   )}
                 </div>
 
-                {/* Right Details */}
-                <div className="lg:col-span-5 space-y-3 sm:space-y-4">
-                  <span className="text-[10px] sm:text-xs uppercase tracking-[0.2em] text-[#dfb76c] font-semibold block">
-                    {shippingStages[shippingStep].subtitle}
-                  </span>
-                  <h4 className="font-serif text-xl sm:text-2xl md:text-3xl font-normal text-white leading-tight">
-                    {shippingStages[shippingStep].title}
-                  </h4>
-                  <p className="text-xs sm:text-sm text-neutral-300 font-light leading-relaxed">
-                    {shippingStages[shippingStep].description}
-                  </p>
+                {/* Details & Controls (Hidden for Stage 04 per user requirement: "no neede of all these words in the house and down also") */}
+                {shippingStep !== 3 && (
+                  <div className="w-full space-y-3 sm:space-y-4">
+                    <span className="text-[10px] sm:text-xs uppercase tracking-[0.2em] text-[#dfb76c] font-semibold block">
+                      {shippingStages[shippingStep].subtitle}
+                    </span>
+                    <h4 className="font-serif text-xl sm:text-2xl md:text-3xl font-normal text-white leading-tight">
+                      {shippingStages[shippingStep].title}
+                    </h4>
+                    <p className="text-xs sm:text-sm text-neutral-300 font-light leading-relaxed">
+                      {shippingStages[shippingStep].description}
+                    </p>
 
-                  <div className="space-y-1.5 sm:space-y-2 pt-1 sm:pt-2">
-                    {shippingStages[shippingStep].highlights.map((h) => (
-                      <div key={h} className="flex items-center gap-2 text-[11px] sm:text-xs text-neutral-300">
-                        <Check size={13} className="text-[#dfb76c] flex-shrink-0" />
-                        <span>{h}</span>
-                      </div>
-                    ))}
-                  </div>
+                    <div className="space-y-1.5 sm:space-y-2 pt-1 sm:pt-2">
+                      {shippingStages[shippingStep].highlights.map((h) => (
+                        <div key={h} className="flex items-center gap-2 text-[11px] sm:text-xs text-neutral-300">
+                          <Check size={13} className="text-[#dfb76c] flex-shrink-0" />
+                          <span>{h}</span>
+                        </div>
+                      ))}
+                    </div>
 
-                  <div className="flex items-center gap-2.5 sm:gap-3 pt-2 sm:pt-3">
-                    <button
-                      onClick={() => {
-                        setShippingStep((prev) => (prev - 1 + shippingStages.length) % shippingStages.length)
-                        setIsShippingAutoPlay(false)
-                      }}
-                      className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-[11px] sm:text-xs font-medium text-neutral-300 transition-all cursor-pointer flex items-center gap-1"
-                    >
-                      <ChevronLeft size={13} />
-                      <span>Prev Step</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        setShippingStep((prev) => (prev + 1) % shippingStages.length)
-                        setIsShippingAutoPlay(false)
-                      }}
-                      className="px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-[#dfb76c] hover:bg-[#f7d794] text-neutral-950 text-[11px] sm:text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shadow-md"
-                    >
-                      <span>Next Step</span>
-                      <ChevronRight size={13} />
-                    </button>
+                    <div className="flex items-center gap-2.5 sm:gap-3 pt-2 sm:pt-3">
+                      <button
+                        onClick={() => {
+                          setShippingStep((prev) => (prev - 1 + shippingStages.length) % shippingStages.length)
+                          setIsShippingAutoPlay(false)
+                        }}
+                        className="px-3 sm:px-3.5 py-1.5 sm:py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-[11px] sm:text-xs font-medium text-neutral-300 transition-all cursor-pointer flex items-center gap-1"
+                      >
+                        <ChevronLeft size={13} />
+                        <span>Prev Step</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          setShippingStep((prev) => (prev + 1) % shippingStages.length)
+                          setIsShippingAutoPlay(false)
+                        }}
+                        className="px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-[#dfb76c] hover:bg-[#f7d794] text-neutral-950 text-[11px] sm:text-xs font-bold transition-all cursor-pointer flex items-center gap-1 shadow-md"
+                      >
+                        <span>Next Step</span>
+                        <ChevronRight size={13} />
+                      </button>
+                    </div>
                   </div>
-                </div>
+                )}
               </motion.div>
             </AnimatePresence>
           </div>
 
           {/* 4 Guarantees Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             {[
               { icon: Clock, title: '5–7 Days Domestic', desc: 'Direct express delivery across India with priority freight routing.' },
               { icon: Globe, title: '10–20 Days Global', desc: 'Worldwide insured air courier delivery with customs handling.' },
@@ -2215,9 +2712,17 @@ export default function ProductDetail({ onReplayEntrance }) {
       </div>
 
       {/* ========================================================= */}
-      {/* ACT 8: VERIFIED COLLECTOR LETTERHEAD REVIEWS (KEPT DOWN) */}
+      {/* ACT 8: VERIFIED COLLECTOR LETTERHEAD REVIEWS */}
       {/* ========================================================= */}
       <CollectorReviewsSection />
+        </div>
+
+        {/* RIGHT: 5 Columns with Sticky Product Dossier Box on Desktop */}
+        <div className="hidden lg:block lg:col-span-5 xl:col-span-5 lg:sticky lg:top-24 space-y-4 sm:space-y-6 w-full min-w-0 self-start">
+          {renderProductDossierBox('bottom', true)}
+        </div>
+      </div>
+      </div>
       </div>
 
       {/* ========================================================= */}

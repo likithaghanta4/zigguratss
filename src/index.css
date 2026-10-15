@@ -25,9 +25,10 @@ html.lenis body {
   overscroll-behavior: contain;
 }
 
-/* Prevent horizontal overflow globally */
+/* Prevent horizontal overflow globally without breaking position: sticky */
 body {
-  @apply overflow-x-hidden w-full antialiased;
+  overflow-x: clip;
+  @apply w-full antialiased;
 }
 
 @media (hover: hover) and (pointer: fine) {

@@ -134,6 +134,7 @@ export default function EarthGlobeReviewsSection() {
 
   return (
     <section 
+      id="collector-reviews"
       data-showcase-section
       data-showcase-title="Resonant Collector Reviews • 3D Earth"
       className="relative w-full py-16 sm:py-24 bg-[#070a14] overflow-hidden border-t border-b border-neutral-800 text-white font-sans select-none"
@@ -178,11 +179,11 @@ export default function EarthGlobeReviewsSection() {
           {/* ========================================================= */}
           <div className="lg:col-span-6 relative flex flex-col items-center justify-center">
             
-            {/* Freely Floating Globe Canvas Container (No Box Frame, Pure Screen Presence) */}
-            <div className="relative w-full max-w-[480px] aspect-square flex items-center justify-center">
+            {/* Freely Floating Globe Canvas Container (Refined Compact Size) */}
+            <div className="relative w-full max-w-[280px] sm:max-w-[310px] aspect-square flex items-center justify-center">
               
               {/* ── 3D VECTOR EARTH GLOBE WITH RADIATING WAVES ── */}
-              <svg viewBox="0 0 460 460" className="w-full h-full object-contain overflow-visible filter drop-shadow-[0_0_35px_rgba(223,183,108,0.25)]">
+              <svg viewBox="0 0 460 460" className="w-full h-full object-contain overflow-visible filter drop-shadow-[0_0_24px_rgba(223,183,108,0.22)]">
                 <defs>
                   {/* Earth Sphere Radial Depth Gradient (Luxury Gold & Navy) */}
                   <radialGradient id="freeGlobeGrad" cx="45%" cy="38%" r="62%">
@@ -324,87 +325,87 @@ export default function EarthGlobeReviewsSection() {
           {/* ========================================================= */}
           {/* RIGHT SIDE: THROWN REVIEWS CARD DISPLAY (RECEIVING WAVE) */}
           {/* ========================================================= */}
-          <div className="lg:col-span-6 relative">
+          <div className="lg:col-span-6 relative flex justify-center lg:justify-start">
             
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentReview.id + '-' + waveKey}
-                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: 40, scale: 0.95, filter: 'blur(8px)' }}
+                initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: 30, scale: 0.96, filter: 'blur(6px)' }}
                 animate={{ opacity: 1, x: 0, scale: 1, filter: 'blur(0px)' }}
-                exit={{ opacity: 0, x: -30, scale: 0.96, filter: 'blur(6px)' }}
-                transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
-                className="relative rounded-3xl bg-gradient-to-br from-[#121626] via-[#0d1220] to-[#0a0e1a] border-2 border-[#dfb76c]/60 p-6 sm:p-8 md:p-10 shadow-[0_25px_70px_rgba(0,0,0,0.85)] overflow-hidden"
+                exit={{ opacity: 0, x: -24, scale: 0.96, filter: 'blur(4px)' }}
+                transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                className="relative w-full max-w-[420px] rounded-2xl bg-gradient-to-br from-[#121626] via-[#0d1220] to-[#0a0e1a] border border-[#dfb76c]/60 p-3.5 sm:p-4.5 md:p-5 shadow-[0_16px_50px_rgba(0,0,0,0.85)] overflow-hidden"
               >
                 {/* Incoming Wave Radiance Top Border */}
-                <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-[#38bdf8] via-[#dfb76c] to-[#f7d794] animate-pulse" />
+                <div className="absolute top-0 left-0 right-0 h-[2.5px] bg-gradient-to-r from-[#38bdf8] via-[#dfb76c] to-[#f7d794] animate-pulse" />
 
                 {/* Top Badge Strip */}
-                <div className="flex flex-wrap items-center justify-between gap-2.5 pb-5 border-b border-neutral-800/80">
-                  <div className="flex items-center gap-2">
-                    <span className="px-2.5 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-400 text-[10px] font-mono font-bold flex items-center gap-1.5">
-                      <CheckCircle2 size={12} />
+                <div className="flex flex-wrap items-center justify-between gap-2 pb-2.5 sm:pb-3 border-b border-neutral-800/80">
+                  <div className="flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-400 text-[9px] font-mono font-bold flex items-center gap-1">
+                      <CheckCircle2 size={11} />
                       <span>{currentReview.seal}</span>
                     </span>
-                    <span className="text-[10px] font-mono text-[#dfb76c] bg-[#dfb76c]/10 px-2 py-0.5 rounded border border-[#dfb76c]/30">
+                    <span className="text-[9px] font-mono text-[#dfb76c] bg-[#dfb76c]/10 px-1.5 py-0.5 rounded border border-[#dfb76c]/30">
                       {currentReview.tag}
                     </span>
                   </div>
 
                   {/* 5-Star Rating */}
-                  <div className="flex items-center gap-1 text-[#dfb76c]">
+                  <div className="flex items-center gap-0.5 text-[#dfb76c]">
                     {[...Array(currentReview.rating)].map((_, i) => (
-                      <Star key={i} size={15} className="fill-[#dfb76c] text-[#dfb76c] filter drop-shadow-[0_0_4px_#dfb76c]" />
+                      <Star key={i} size={13} className="fill-[#dfb76c] text-[#dfb76c] filter drop-shadow-[0_0_3px_#dfb76c]" />
                     ))}
                   </div>
                 </div>
 
                 {/* Main Serif Quote Content */}
-                <div className="my-6 sm:my-8 relative">
-                  <Quote size={48} className="absolute -top-5 -left-3 text-[#dfb76c]/15 pointer-events-none" />
-                  <p className="font-serif italic text-base sm:text-lg md:text-xl text-neutral-100 leading-relaxed sm:leading-loose relative z-10">
+                <div className="my-3 sm:my-3.5 relative">
+                  <Quote size={28} className="absolute -top-2.5 -left-1.5 text-[#dfb76c]/15 pointer-events-none" />
+                  <p className="font-serif italic text-xs sm:text-[13px] text-neutral-100 leading-relaxed relative z-10">
                     "{currentReview.quote}"
                   </p>
                 </div>
 
                 {/* Collector Credential Footer */}
-                <div className="pt-5 border-t border-neutral-800/80 flex flex-wrap items-center justify-between gap-4">
-                  <div>
-                    <h4 className="font-serif text-lg sm:text-xl font-normal text-white flex items-center gap-2">
-                      <span>{currentReview.collector}</span>
-                      <Award size={16} className="text-[#dfb76c]" />
+                <div className="pt-2.5 sm:pt-3 border-t border-neutral-800/80 flex items-center justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <h4 className="font-serif text-sm sm:text-[15px] font-normal text-white flex items-center gap-1.5 truncate">
+                      <span className="truncate">{currentReview.collector}</span>
+                      <Award size={14} className="text-[#dfb76c] shrink-0" />
                     </h4>
-                    <p className="text-xs sm:text-sm text-neutral-400 font-light mt-0.5">
+                    <p className="text-[10.5px] sm:text-xs text-neutral-400 font-light truncate mt-0.5">
                       {currentReview.title}
                     </p>
-                    <p className="text-[11px] font-mono text-[#f7d794] mt-1 flex items-center gap-1">
-                      <MapPin size={11} className="text-[#dfb76c]" />
-                      <span>{currentReview.location}</span>
+                    <p className="text-[10px] font-mono text-[#f7d794] mt-0.5 flex items-center gap-1 truncate">
+                      <MapPin size={10} className="text-[#dfb76c] shrink-0" />
+                      <span className="truncate">{currentReview.location}</span>
                       <span className="text-neutral-600">•</span>
-                      <span className="text-neutral-300">{currentReview.artwork}</span>
+                      <span className="text-neutral-300 truncate">{currentReview.artwork}</span>
                     </p>
                   </div>
 
                   {/* Navigation Arrows */}
-                  <div className="flex items-center gap-2 shrink-0">
+                  <div className="flex items-center gap-1.5 shrink-0">
                     <button
                       onClick={handlePrev}
-                      className="p-2.5 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-neutral-300 hover:text-white transition-all cursor-pointer shadow-md"
+                      className="p-1.5 sm:p-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-neutral-300 hover:text-white transition-all cursor-pointer shadow-md"
                       aria-label="Previous review"
                     >
-                      <ArrowLeft size={16} />
+                      <ArrowLeft size={13} />
                     </button>
                     <button
                       onClick={handleNext}
-                      className="p-2.5 rounded-xl bg-[#dfb76c] hover:bg-[#f7d794] text-neutral-950 font-bold transition-all cursor-pointer shadow-[0_0_15px_rgba(223,183,108,0.5)]"
+                      className="p-1.5 sm:p-2 rounded-lg bg-[#dfb76c] hover:bg-[#f7d794] text-neutral-950 font-bold transition-all cursor-pointer shadow-[0_0_12px_rgba(223,183,108,0.5)]"
                       aria-label="Next review"
                     >
-                      <ArrowRight size={16} />
+                      <ArrowRight size={13} />
                     </button>
                   </div>
                 </div>
 
                 {/* Auto-play Timer Progress Bar */}
-                <div className="mt-5 w-full bg-neutral-800/80 h-1 rounded-full overflow-hidden">
+                <div className="mt-3 w-full bg-neutral-800/80 h-1 rounded-full overflow-hidden">
                   <motion.div
                     key={waveKey}
                     initial={{ width: '0%' }}

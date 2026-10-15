@@ -17,7 +17,7 @@ export default function ProductPage() {
 
   return (
     <div 
-      className="product-page-root min-h-screen w-full bg-[#0a0a0d] text-neutral-100 selection:bg-[#dfb76c]/30 selection:text-[#f3e3ba] relative overflow-x-hidden"
+      className="product-page-root min-h-screen w-full bg-[#0a0a0d] text-neutral-100 selection:bg-[#dfb76c]/30 selection:text-[#f3e3ba] relative overflow-x-clip"
       style={{ touchAction: 'pan-y', WebkitOverflowScrolling: 'touch' }}
     >
       {/* 3D Cinematic Entrance Intro Hero */}
@@ -41,7 +41,7 @@ export default function ProductPage() {
 
       {/* Main Content Container */}
       <div 
-        className="product-detail-container relative z-10 w-full max-w-[1440px] mx-auto px-2.5 xs:px-4 sm:px-6 lg:px-10 xl:px-12 pt-16 xs:pt-20 sm:pt-24 lg:pt-28 pb-16 sm:pb-28 lg:pb-36"
+        className="product-detail-container relative z-10 w-full max-w-[1720px] mx-auto px-3 xs:px-4 sm:px-6 lg:px-8 xl:px-10 2xl:px-12 pt-16 xs:pt-20 sm:pt-24 lg:pt-28 pb-16 sm:pb-28 lg:pb-36"
         style={{ touchAction: 'pan-y' }}
       >
         <ProductDetail onReplayEntrance={() => setShowEntrance(true)} />
