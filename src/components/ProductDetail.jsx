@@ -1099,26 +1099,26 @@ export default function ProductDetail({ onReplayEntrance }) {
                 </div>
               </div>
 
-              {/* Primary Action Buttons (Acquire Artwork & Make Offer - Identical Dimensions) */}
-              <div className="grid grid-cols-2 gap-2.5 pt-0.5 w-full">
+              {/* Primary Action Buttons (Acquire Artwork & Make Offer - Compact & Refined) */}
+              <div className="grid grid-cols-2 gap-2 sm:gap-2.5 pt-0.5 w-full max-w-[340px] sm:max-w-[360px]">
                 <motion.button
                   whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
                   whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
                   onClick={handleAddToCart}
-                  className="w-full h-11 sm:h-12 bg-gradient-to-r from-[#dfb76c] via-[#f7d794] to-[#dfb76c] hover:from-[#f7d794] hover:to-[#dfb76c] text-neutral-950 rounded-xl text-[10px] sm:text-[11px] uppercase tracking-[0.14em] font-bold transition-all duration-300 shadow-[0_4px_20px_rgba(223,183,108,0.25)] hover:shadow-[0_8px_30px_rgba(223,183,108,0.4)] flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer"
+                  className="w-full h-9 sm:h-10 px-3 bg-gradient-to-r from-[#dfb76c] via-[#f7d794] to-[#dfb76c] hover:from-[#f7d794] hover:to-[#dfb76c] text-neutral-950 rounded-lg sm:rounded-xl text-[9.5px] sm:text-[10px] uppercase tracking-wider font-bold transition-all duration-300 shadow-[0_2px_12px_rgba(223,183,108,0.2)] hover:shadow-[0_4px_18px_rgba(223,183,108,0.35)] flex items-center justify-center gap-1.5 cursor-pointer"
                 >
-                  <CreditCard size={14} className="shrink-0" />
-                  <span className="truncate">Acquire Artwork</span>
+                  <CreditCard size={13} className="shrink-0" />
+                  <span className="whitespace-nowrap">Acquire Artwork</span>
                 </motion.button>
 
                 <motion.button
                   whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
                   whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
                   onClick={() => setShowOfferModal(true)}
-                  className="w-full h-11 sm:h-12 rounded-xl border border-[#dfb76c] text-[#dfb76c] hover:bg-[#dfb76c]/15 text-[10px] sm:text-[11px] uppercase tracking-wider font-semibold transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer bg-neutral-900/80 hover:border-[#f7d794]"
+                  className="w-full h-9 sm:h-10 px-3 rounded-lg sm:rounded-xl border border-[#dfb76c]/80 text-[#dfb76c] hover:bg-[#dfb76c]/15 text-[9.5px] sm:text-[10px] uppercase tracking-wider font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer bg-neutral-900/80 hover:border-[#f7d794]"
                 >
-                  <MessageCircle size={14} className="shrink-0" />
-                  <span className="truncate">Make Offer</span>
+                  <MessageCircle size={13} className="shrink-0" />
+                  <span className="whitespace-nowrap">Make Offer</span>
                 </motion.button>
               </div>
 
