@@ -246,7 +246,7 @@ export default function ArtworkEntranceHero({ onComplete, onSkip, isInline = fal
       exit={{ opacity: 0, scale: 1.05, transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] } }}
       className={
         isInline
-          ? "relative w-full min-h-[640px] sm:min-h-[720px] bg-gradient-to-b from-[#0a0a0f] via-[#0d0d17] to-[#07070b] border border-[#dfb76c]/40 rounded-2xl sm:rounded-3xl shadow-[0_24px_75px_rgba(0,0,0,0.95)] text-neutral-100 flex flex-col justify-between items-center select-none overflow-hidden p-4 sm:p-6 md:p-8 ring-1 ring-[#dfb76c]/20"
+          ? "relative w-full min-h-[580px] sm:min-h-[720px] bg-gradient-to-b from-[#0a0a0f] via-[#0d0d17] to-[#07070b] border border-[#dfb76c]/40 rounded-2xl sm:rounded-3xl shadow-[0_24px_75px_rgba(0,0,0,0.95)] text-neutral-100 flex flex-col justify-between items-center select-none overflow-hidden p-3 xs:p-4 sm:p-6 md:p-8 ring-1 ring-[#dfb76c]/20"
           : "fixed inset-0 z-[100] bg-[#060609] text-neutral-100 flex flex-col justify-between items-center select-none overflow-hidden"
       }
     >
@@ -282,16 +282,16 @@ export default function ArtworkEntranceHero({ onComplete, onSkip, isInline = fal
         ))}
       </div>
 
-      {/* ── TOP BAR: CURATORIAL BADGE & SKIP BUTTON ── */}
-      <div className="w-full max-w-6xl mx-auto px-4 sm:px-8 pt-4 sm:pt-6 flex flex-row items-center justify-between z-30">
+      {/* ── TOP BAR: CURATORIAL BADGE & REPLAY REVEAL BUTTON ── */}
+      <div className="w-full max-w-6xl mx-auto px-1 xs:px-2 sm:px-6 pt-1 xs:pt-2 sm:pt-4 flex flex-row items-center justify-between gap-2 z-30">
         <motion.div
           initial={{ opacity: 0, y: -15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="flex items-center gap-2 shrink-0"
+          className="flex items-center gap-1.5 xs:gap-2 shrink min-w-0"
         >
-          <div className="w-2 h-2 rounded-full bg-[#dfb76c] animate-pulse" />
-          <span className="font-sans text-[10px] sm:text-xs uppercase tracking-[0.25em] text-[#dfb76c] font-semibold">
+          <div className="w-2 h-2 rounded-full bg-[#dfb76c] animate-pulse shrink-0" />
+          <span className="font-sans text-[9px] xs:text-[10.5px] sm:text-xs uppercase tracking-wider sm:tracking-[0.25em] text-[#dfb76c] font-semibold truncate">
             Zigguratss Private Vault
           </span>
         </motion.div>
@@ -301,14 +301,14 @@ export default function ArtworkEntranceHero({ onComplete, onSkip, isInline = fal
             initial={{ opacity: 0, y: -15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 shrink-0"
           >
             <button
               onClick={handleReplay}
-              className="px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full bg-gradient-to-r from-[#dfb76c] via-[#f7d794] to-[#dfb76c] hover:from-[#f7d794] hover:to-[#dfb76c] text-neutral-950 text-[10px] sm:text-xs uppercase tracking-wider font-bold transition-all flex items-center gap-1.5 shadow-md hover:shadow-[0_4px_20px_rgba(223,183,108,0.4)] cursor-pointer shrink-0"
+              className="px-2.5 xs:px-3.5 sm:px-5 py-1 xs:py-1.5 sm:py-2 rounded-full bg-gradient-to-r from-[#dfb76c] via-[#f7d794] to-[#dfb76c] hover:from-[#f7d794] hover:to-[#dfb76c] text-neutral-950 text-[9px] xs:text-[10px] sm:text-xs uppercase tracking-wide font-bold transition-all flex items-center gap-1 sm:gap-1.5 shadow-md hover:shadow-[0_4px_20px_rgba(223,183,108,0.4)] cursor-pointer whitespace-nowrap shrink-0"
               title="Replay 3D Masterpiece Reveal Sequence"
             >
-              <RotateCcw size={12} className="text-neutral-950 stroke-[2.5]" />
+              <RotateCcw size={11} className="text-neutral-950 stroke-[2.5]" />
               <span>Replay Reveal</span>
             </button>
           </motion.div>
@@ -318,10 +318,10 @@ export default function ArtworkEntranceHero({ onComplete, onSkip, isInline = fal
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
             onClick={onSkip || onComplete}
-            className="px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full bg-neutral-900/90 hover:bg-[#dfb76c] text-neutral-300 hover:text-neutral-950 border border-neutral-700 hover:border-[#dfb76c] text-[10px] sm:text-xs uppercase tracking-wider font-bold transition-all flex items-center gap-1.5 shadow-lg cursor-pointer shrink-0"
+            className="px-2.5 xs:px-3.5 sm:px-5 py-1 xs:py-1.5 sm:py-2 rounded-full bg-neutral-900/90 hover:bg-[#dfb76c] text-neutral-300 hover:text-neutral-950 border border-neutral-700 hover:border-[#dfb76c] text-[9px] xs:text-[10px] sm:text-xs uppercase tracking-wide font-bold transition-all flex items-center gap-1 sm:gap-1.5 shadow-lg cursor-pointer whitespace-nowrap shrink-0"
           >
             <span>Enter Gallery</span>
-            <ArrowRight size={12} />
+            <ArrowRight size={11} />
           </motion.button>
         )}
       </div>
@@ -439,7 +439,7 @@ export default function ArtworkEntranceHero({ onComplete, onSkip, isInline = fal
             </div>
 
             {/* Master Painting Canvas */}
-            <div className="w-52 xs:w-60 sm:w-72 md:w-80 h-52 xs:h-60 sm:h-72 md:h-80 rounded-xl overflow-hidden bg-black relative flex items-center justify-center border border-neutral-700 shadow-2xl">
+            <div className="w-44 xs:w-56 sm:w-72 md:w-80 h-44 xs:h-56 sm:h-72 md:h-80 rounded-xl overflow-hidden bg-black relative flex items-center justify-center border border-neutral-700 shadow-2xl">
               {/* Subtle Floating Pulse on Main Artwork */}
               <motion.img
                 src={screenshotImage}
@@ -460,11 +460,11 @@ export default function ArtworkEntranceHero({ onComplete, onSkip, isInline = fal
             </div>
 
             {/* Title & Artist Signature */}
-            <div className="mt-3 text-center">
-              <h2 className="font-serif text-base sm:text-xl font-normal text-white tracking-tight">
+            <div className="mt-2.5 sm:mt-3 text-center">
+              <h2 className="font-serif text-sm sm:text-xl font-normal text-white tracking-tight">
                 Divine Tunes-11
               </h2>
-              <div className="flex items-center justify-center gap-1.5 text-[11px] sm:text-xs text-neutral-400 font-light mt-0.5">
+              <div className="flex items-center justify-center gap-1.5 text-[10px] sm:text-xs text-neutral-400 font-light mt-0.5">
                 <span>By</span>
                 <span className="text-[#dfb76c] font-medium">Pradip Sarkar</span>
                 <span className="text-neutral-600">•</span>
@@ -476,31 +476,31 @@ export default function ArtworkEntranceHero({ onComplete, onSkip, isInline = fal
       </div>
 
       {/* ── MOBILE RESPONSIVE COMPANION ARTWORKS (REVEALED DIRECTLY WITHOUT CLICKING) ── */}
-      <div className="w-full md:hidden z-30 pt-3 pb-2 px-2">
-        <div className="flex items-center justify-between mb-2 px-1">
-          <span className="text-[10px] uppercase tracking-wider text-[#dfb76c] font-semibold flex items-center gap-1.5">
+      <div className="w-full md:hidden z-30 pt-2 pb-1 px-1">
+        <div className="flex items-center justify-between mb-1.5 px-1">
+          <span className="text-[9px] xs:text-[10px] uppercase tracking-wider text-[#dfb76c] font-semibold flex items-center gap-1.5">
             <Layers size={11} /> Revealed Satellite Archival Cards ({floatingArtworkCards.length})
           </span>
-          <span className="text-[8.5px] text-neutral-400 font-mono">Swipe horizontally</span>
+          <span className="text-[8px] text-neutral-400 font-mono">Swipe horizontally</span>
         </div>
         <div 
-          className="flex flex-row items-center gap-2.5 overflow-x-auto pb-2 px-0.5 snap-x snap-mandatory flex-nowrap w-full"
+          className="flex flex-row items-center gap-2 overflow-x-auto pb-1.5 px-0.5 snap-x snap-mandatory flex-nowrap w-full"
           style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
         >
           {floatingArtworkCards.map((card) => (
             <div
               key={`mob-card-${card.id}`}
-              className="shrink-0 flex-shrink-0 w-32 rounded-xl overflow-hidden bg-[#13131c] border border-neutral-700/80 shadow-md snap-center"
+              className="shrink-0 flex-shrink-0 w-28 xs:w-32 rounded-xl overflow-hidden bg-[#13131c] border border-neutral-700/80 shadow-md snap-center"
             >
-              <div className="h-20 w-full overflow-hidden bg-black relative">
+              <div className="h-18 xs:h-20 w-full overflow-hidden bg-black relative">
                 <img src={card.img} alt={card.title} className="w-full h-full object-cover pointer-events-none" />
-                <div className="absolute top-1 left-1 px-1 py-0.5 rounded bg-black/80 text-[#dfb76c] text-[7px] font-mono uppercase tracking-wider border border-neutral-700">
+                <div className="absolute top-1 left-1 px-1 py-0.5 rounded bg-black/80 text-[#dfb76c] text-[6.5px] xs:text-[7px] font-mono uppercase tracking-wider border border-neutral-700">
                   {card.tag}
                 </div>
               </div>
-              <div className="p-1.5 bg-[#0e0e16] border-t border-neutral-800">
-                <h6 className="font-serif text-[9.5px] text-white truncate">{card.title}</h6>
-                <span className="text-[7.5px] text-neutral-400">Archival View</span>
+              <div className="p-1 xs:p-1.5 bg-[#0e0e16] border-t border-neutral-800">
+                <h6 className="font-serif text-[9px] text-white truncate">{card.title}</h6>
+                <span className="text-[7px] text-neutral-400">Archival View</span>
               </div>
             </div>
           ))}
@@ -508,22 +508,22 @@ export default function ArtworkEntranceHero({ onComplete, onSkip, isInline = fal
       </div>
 
       {/* ── BOTTOM TRAY: LIVE TELEMETRY & PROGRESS BAR ── */}
-      <div className="w-full max-w-3xl mx-auto px-4 sm:px-8 pb-4 sm:pb-6 z-30 space-y-2">
+      <div className="w-full max-w-3xl mx-auto px-1 xs:px-2 sm:px-8 pb-2 sm:pb-6 z-30 space-y-1.5 sm:space-y-2 mt-2 sm:mt-0">
         {/* Ticker Status */}
         <div className="flex flex-row items-center justify-between gap-1 text-xs">
-          <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#dfb76c] animate-pulse" />
-            <span className="font-mono text-[9px] sm:text-xs text-[#dfb76c] font-semibold tracking-wider truncate">
+          <div className="flex items-center gap-1.5 xs:gap-2 min-w-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#dfb76c] animate-pulse shrink-0" />
+            <span className="font-mono text-[8px] xs:text-[9.5px] sm:text-xs text-[#dfb76c] font-semibold tracking-wider truncate">
               {getStatusText()}
             </span>
           </div>
-          <span className="font-mono text-[9px] sm:text-xs text-neutral-400 shrink-0">
+          <span className="font-mono text-[8px] xs:text-[9.5px] sm:text-xs text-neutral-400 shrink-0">
             {Math.round(progress)}% LOADED
           </span>
         </div>
 
         {/* Golden Reading Progress Line */}
-        <div className="w-full h-1.5 bg-neutral-900 rounded-full overflow-hidden border border-neutral-800 relative">
+        <div className="w-full h-1 xs:h-1.5 bg-neutral-900 rounded-full overflow-hidden border border-neutral-800 relative">
           <motion.div
             className="h-full bg-gradient-to-r from-[#c9a96e] via-[#f7d794] to-[#c9a96e]"
             style={{ width: `${progress}%` }}
@@ -533,10 +533,10 @@ export default function ArtworkEntranceHero({ onComplete, onSkip, isInline = fal
         {/* Quick Entrance Cue / Inline Status Cue */}
         <div className="flex items-center justify-center pt-0.5">
           {isInline ? (
-            <span className="text-[9.5px] sm:text-xs uppercase tracking-widest text-neutral-400 font-mono text-center px-2">
+            <span className="text-[8px] xs:text-[9.5px] sm:text-xs uppercase tracking-wider sm:tracking-widest text-neutral-400 font-mono text-center px-1 leading-tight">
               {progress >= 100 
-                ? "Revealed Masterpiece & 12 Archival Satellite Perspectives • Divine Tunes-11 • Pradip Sarkar Studio" 
-                : "Interactive 3D Convergence in progress • Move cursor to tilt perspective"}
+                ? "Revealed Masterpiece & 12 Archival Perspectives • Divine Tunes-11" 
+                : "Interactive 3D Convergence in progress • Move cursor or tilt"}
             </span>
           ) : (
             <button

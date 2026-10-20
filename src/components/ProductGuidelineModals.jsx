@@ -332,7 +332,7 @@ export function PaymentEscrowModal({ onClose }) {
   return (
     <div className="space-y-4 sm:space-y-5 text-neutral-200">
       {/* Header */}
-      <div className="flex items-start justify-between gap-3 border-b border-[#dfb76c]/30 pb-3">
+      <div className="border-b border-[#dfb76c]/30 pb-3 pr-10 sm:pr-14">
         <div>
           <span className="text-[9px] sm:text-[10px] uppercase font-mono tracking-[0.2em] text-[#dfb76c] font-bold block mb-1">
             Collector Protection // Protocol 02
@@ -345,15 +345,16 @@ export function PaymentEscrowModal({ onClose }) {
           </p>
         </div>
 
-        {/* Play / Pause Toggle */}
-        <div className="flex items-center gap-1.5 shrink-0">
+        {/* Step Controls Strip - Below Title, ZERO overlap with close button */}
+        <div className="flex items-center justify-between gap-2 mt-2.5 pt-2 border-t border-neutral-800/80">
+          <span className="text-[9px] font-mono text-neutral-400 uppercase tracking-wider">3D Escrow Lifecycle:</span>
           <button
             onClick={() => setIsPlaying(!isPlaying)}
-            className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-[#dfb76c]/40 bg-[#dfb76c]/10 hover:bg-[#dfb76c]/20 text-[#dfb76c] text-[10px] sm:text-xs font-mono font-medium flex items-center gap-1.5 transition-all cursor-pointer"
+            className="px-2.5 py-1 rounded-lg border border-[#dfb76c]/40 bg-[#dfb76c]/10 hover:bg-[#dfb76c]/20 text-[#dfb76c] text-[10px] sm:text-xs font-mono font-medium flex items-center gap-1.5 transition-all cursor-pointer"
             title={isPlaying ? "Pause Step Animation" : "Resume Auto Steps"}
           >
             {isPlaying ? <Pause size={12} /> : <Play size={12} />}
-            <span className="hidden xs:inline">{isPlaying ? 'Pause' : 'Auto Play'}</span>
+            <span>{isPlaying ? 'Pause' : 'Auto Play'}</span>
           </button>
         </div>
       </div>
@@ -626,7 +627,7 @@ export function GuaranteeModal({ onClose }) {
   return (
     <div className="space-y-4 sm:space-y-5 text-neutral-200">
       {/* Header */}
-      <div className="flex items-start justify-between gap-3 border-b border-[#dfb76c]/30 pb-3">
+      <div className="border-b border-[#dfb76c]/30 pb-3 pr-10 sm:pr-14">
         <div>
           <span className="text-[9px] sm:text-[10px] uppercase font-mono tracking-[0.2em] text-[#dfb76c] font-bold block mb-1">
             Collector Confidence // Protocol 03
@@ -639,15 +640,16 @@ export function GuaranteeModal({ onClose }) {
           </p>
         </div>
 
-        {/* Play / Pause Toggle */}
-        <div className="flex items-center gap-1.5 shrink-0">
+        {/* Stage Controls Strip - Below Title, ZERO overlap with close button */}
+        <div className="flex items-center justify-between gap-2 mt-2.5 pt-2 border-t border-neutral-800/80">
+          <span className="text-[9px] font-mono text-neutral-400 uppercase tracking-wider">Guarantee Stages:</span>
           <button
             onClick={() => setIsPlaying(!isPlaying)}
-            className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-[#dfb76c]/40 bg-[#dfb76c]/10 hover:bg-[#dfb76c]/20 text-[#dfb76c] text-[10px] sm:text-xs font-mono font-medium flex items-center gap-1.5 transition-all cursor-pointer"
+            className="px-2.5 py-1 rounded-lg border border-[#dfb76c]/40 bg-[#dfb76c]/10 hover:bg-[#dfb76c]/20 text-[#dfb76c] text-[10px] sm:text-xs font-mono font-medium flex items-center gap-1.5 transition-all cursor-pointer"
             title={isPlaying ? "Pause Stage Cycle" : "Resume Stage Cycle"}
           >
             {isPlaying ? <Pause size={12} /> : <Play size={12} />}
-            <span className="hidden xs:inline">{isPlaying ? 'Pause' : 'Auto Play'}</span>
+            <span>{isPlaying ? 'Pause' : 'Auto Play'}</span>
           </button>
         </div>
       </div>
@@ -839,7 +841,7 @@ export function GlobalShippingJourneyScene({ onClose }) {
   return (
     <div className="space-y-3 sm:space-y-4 text-neutral-200">
       {/* Header */}
-      <div className="flex items-start justify-between gap-3 border-b border-[#dfb76c]/30 pb-2.5">
+      <div className="border-b border-[#dfb76c]/30 pb-3 pr-10 sm:pr-14">
         <div>
           <span className="text-[9px] sm:text-[10px] uppercase font-mono tracking-[0.2em] text-[#dfb76c] font-bold block mb-0.5">
             White-Glove Road Transit // Protocol 04
@@ -852,42 +854,47 @@ export function GlobalShippingJourneyScene({ onClose }) {
           </p>
         </div>
 
-        {/* Controls */}
-        <div className="flex items-center gap-1.5 shrink-0">
-          <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-0.5 flex items-center mr-1">
-            <button
-              onClick={() => { setTransitMode('expressway'); setProgress(0) }}
-              className={`px-2 py-1 rounded text-[9.5px] font-mono font-medium transition-all cursor-pointer ${
-                transitMode === 'expressway' ? 'bg-[#dfb76c] text-neutral-950 font-bold' : 'text-neutral-400 hover:text-white'
-              }`}
-            >
-              Expressway
-            </button>
-            <button
-              onClick={() => { setTransitMode('doorstep'); setProgress(0) }}
-              className={`px-2 py-1 rounded text-[9.5px] font-mono font-medium transition-all cursor-pointer ${
-                transitMode === 'doorstep' ? 'bg-[#dfb76c] text-neutral-950 font-bold' : 'text-neutral-400 hover:text-white'
-              }`}
-            >
-              Doorstep
-            </button>
+        {/* Dedicated Transit Controls Strip - Positioned below title, ZERO overlap with close button */}
+        <div className="flex flex-wrap items-center justify-between gap-2 mt-3 pt-2.5 border-t border-neutral-800/80">
+          <div className="flex items-center gap-2">
+            <span className="text-[9px] font-mono uppercase tracking-wider text-neutral-400">Route:</span>
+            <div className="bg-neutral-900 border border-neutral-700 rounded-lg p-0.5 flex items-center">
+              <button
+                onClick={() => { setTransitMode('expressway'); setProgress(0) }}
+                className={`px-2.5 py-1 rounded text-[9.5px] font-mono font-medium transition-all cursor-pointer ${
+                  transitMode === 'expressway' ? 'bg-[#dfb76c] text-neutral-950 font-bold shadow' : 'text-neutral-400 hover:text-white'
+                }`}
+              >
+                Expressway
+              </button>
+              <button
+                onClick={() => { setTransitMode('doorstep'); setProgress(0) }}
+                className={`px-2.5 py-1 rounded text-[9.5px] font-mono font-medium transition-all cursor-pointer ${
+                  transitMode === 'doorstep' ? 'bg-[#dfb76c] text-neutral-950 font-bold shadow' : 'text-neutral-400 hover:text-white'
+                }`}
+              >
+                Doorstep
+              </button>
+            </div>
           </div>
 
-          <button
-            onClick={() => setIsPlaying(!isPlaying)}
-            className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-lg border border-[#dfb76c]/40 bg-[#dfb76c]/10 hover:bg-[#dfb76c]/20 text-[#dfb76c] text-[10px] sm:text-xs font-mono font-medium flex items-center gap-1 transition-all cursor-pointer"
-            title={isPlaying ? "Pause Transit" : "Resume Transit"}
-          >
-            {isPlaying ? <Pause size={12} /> : <Play size={12} />}
-            <span className="hidden xs:inline">{isPlaying ? 'Pause' : 'Play'}</span>
-          </button>
-          <button
-            onClick={() => setProgress(0)}
-            className="p-1.5 sm:p-2 rounded-lg border border-neutral-800 bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-white transition-all cursor-pointer"
-            title="Restart Transit"
-          >
-            <RotateCcw size={12} />
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              onClick={() => setIsPlaying(!isPlaying)}
+              className="px-2.5 py-1 rounded-lg border border-[#dfb76c]/40 bg-[#dfb76c]/10 hover:bg-[#dfb76c]/20 text-[#dfb76c] text-[10px] sm:text-xs font-mono font-medium flex items-center gap-1.5 transition-all cursor-pointer"
+              title={isPlaying ? "Pause Transit" : "Resume Transit"}
+            >
+              {isPlaying ? <Pause size={12} /> : <Play size={12} />}
+              <span>{isPlaying ? 'Pause' : 'Play'}</span>
+            </button>
+            <button
+              onClick={() => setProgress(0)}
+              className="p-1 sm:p-1.5 rounded-lg border border-neutral-800 bg-neutral-900 hover:bg-neutral-800 text-neutral-300 hover:text-white transition-all cursor-pointer"
+              title="Restart Transit"
+            >
+              <RotateCcw size={12} />
+            </button>
+          </div>
         </div>
       </div>
 
