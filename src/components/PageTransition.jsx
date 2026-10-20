@@ -30,7 +30,8 @@ const PageTransition = ({ children }) => {
         const tl = gsap.timeline({
             defaults: { ease: 'power2.inOut' },
             onStart: () => {
-                document.body.style.overflow = 'hidden'
+                // Ensure body overflow is never locked on mobile or desktop
+                document.body.style.overflow = ''
                 gsap.set(overlay, { display: 'flex' })
             },
             onComplete: () => {

@@ -12,6 +12,10 @@
   font-family: var(--font-lato);
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 html.lenis,
 html.lenis body {
   height: auto;
@@ -25,10 +29,23 @@ html.lenis body {
   overscroll-behavior: contain;
 }
 
-/* Prevent horizontal overflow globally without breaking position: sticky */
+/* Desktop: clip horizontal overflow while preserving position: sticky */
 body {
+  width: 100%;
   overflow-x: clip;
-  @apply w-full antialiased;
+  @apply antialiased;
+}
+
+/* Mobile & Touch: ensure completely unrestricted, native momentum vertical scrolling */
+@media (max-width: 1024px) {
+  html, body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    touch-action: auto;
+  }
 }
 
 @media (hover: hover) and (pointer: fine) {

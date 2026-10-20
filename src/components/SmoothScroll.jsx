@@ -10,7 +10,22 @@ export const SmoothScroll = ({ children }) => {
   const lenisRef = useRef(null);
 
   useEffect(() => {
-    // Initialize the physics-based scroll
+    // Only enable Lenis physics scrolling on desktop/non-touch devices.
+    // On mobile touch devices, native momentum scrolling is 120Hz smooth and prevents touch lockups.
+    const isTouchOrMobile = () => {
+      if (typeof window === 'undefined') return false;
+      return (
+        'ontouchstart' in window ||
+        navigator.maxTouchPoints > 0 ||
+        window.innerWidth < 1024
+      );
+    };
+
+    if (isTouchOrMobile()) {
+      return;
+    }
+
+    // Initialize the physics-based scroll for desktop wheel
     const lenis = new Lenis({
       duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),

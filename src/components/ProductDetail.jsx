@@ -118,7 +118,6 @@ export default function ProductDetail({ onReplayEntrance }) {
     if (hoverGuidelineTimeoutRef.current) {
       clearTimeout(hoverGuidelineTimeoutRef.current)
     }
-    // Clear any previous hover intent timer
     if (hoverIntentTimeoutRef.current) {
       clearTimeout(hoverIntentTimeoutRef.current)
     }
@@ -127,24 +126,18 @@ export default function ProductDetail({ onReplayEntrance }) {
       return
     }
 
-    // Hover Intent Delay: wait ~250ms so accidental swipes do not trigger
-    hoverIntentTimeoutRef.current = setTimeout(() => {
-      setActiveGuideline(id)
-      setIsGuidelinePinned(false)
+    // Immediately open the guideline modal on hover as requested
+    setActiveGuideline(id)
+    setIsGuidelinePinned(false)
 
-      // Auto-dismiss preview timer: exactly 7 seconds for all guidelines on hover
-      hoverGuidelineTimeoutRef.current = setTimeout(() => {
-        setActiveGuideline(null)
-      }, 7000)
-    }, 250)
+    // Keep preview active for 8 seconds unless pinned or dismissed
+    hoverGuidelineTimeoutRef.current = setTimeout(() => {
+      setActiveGuideline(null)
+    }, 8000)
   }
 
   const handleGuidelineMouseLeave = () => {
-    // Cancel opening if cursor leaves before intent delay
-    if (hoverIntentTimeoutRef.current) {
-      clearTimeout(hoverIntentTimeoutRef.current)
-    }
-    // If not pinned, the 7-second timer continues to its scheduled close
+    // Keep guideline open on mouse leave so user can comfortably inspect
   }
 
   const handleGuidelineClick = (id) => {
@@ -272,9 +265,8 @@ export default function ProductDetail({ onReplayEntrance }) {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
   
-  // Mobile Touch Swipe States
-  const [touchStartX, setTouchStartX] = useState(null)
-  const [touchEndX, setTouchEndX] = useState(null)
+  // Mobile Touch Swipe Coordinates (using ref to avoid state re-renders on touchmove)
+  const touchCoordsRef = useRef({ startX: 0, startY: 0, endX: 0, endY: 0 })
 
   // Delivery Destinations Dataset (Air Freight Destinations across India and Global)
   const DELIVERY_DESTINATIONS = [
@@ -400,20 +392,119 @@ export default function ProductDetail({ onReplayEntrance }) {
   const [previewImage, setPreviewImage] = useState(null)
   const [uploadedImages, setUploadedImages] = useState([])
 
-  // Authentic Zigguratss Gallery Dataset (Single Master Artwork Divine Tunes-11)
+  // Authentic Zigguratss Master Gallery Dataset (Multiple Artworks in Distinct Room Settings)
   const [galleryThumbs, setGalleryThumbs] = useState([
     {
       id: 'divine-tunes',
       title: 'Divine Tunes-11',
       src: screenshotImage,
       label: 'Master Canvas',
-      alt: 'Divine Tunes-11 - primary artwork',
+      roomName: 'Living Room',
+      alt: 'Divine Tunes-11 in Luxury Living Room',
       defaultRoom: 'living-room',
       aspectRatio: 281 / 313, // 0.898 (Portrait)
       orientation: 'portrait',
       dimensions: '32 × 30 in (81.3 × 76.2 cm)',
       wallWidthPct: 18.0,
       maxHeightPct: 33.0
+    },
+    {
+      id: 'butterfly-sonata',
+      title: 'The Butterfly Sonata',
+      src: flowersImage,
+      label: 'Butterfly Sonata',
+      roomName: 'Master Suite',
+      alt: 'The Butterfly Sonata in Master Suite Retreat',
+      defaultRoom: 'master-bedroom',
+      aspectRatio: 549 / 710, // 0.773 (Portrait)
+      orientation: 'portrait',
+      dimensions: '30 × 38 in (76.2 × 96.5 cm)',
+      wallWidthPct: 17.5,
+      maxHeightPct: 34.0
+    },
+    {
+      id: 'geometric-symmetry',
+      title: 'Geometric Symmetry',
+      src: image9,
+      label: 'Geometric Symmetry',
+      roomName: 'Gallery Salon',
+      alt: 'Geometric Symmetry in Curated Gallery Salon',
+      defaultRoom: 'gallery-salon',
+      aspectRatio: 735 / 913, // 0.805 (Portrait)
+      orientation: 'portrait',
+      dimensions: '32 × 40 in (81.3 × 101.6 cm)',
+      wallWidthPct: 17.5,
+      maxHeightPct: 34.0
+    },
+    {
+      id: 'wall-mount-1',
+      title: 'Curatorial Wall Mount',
+      src: testImage,
+      label: 'Curatorial Mount',
+      roomName: 'Penthouse Lounge',
+      alt: 'Curatorial Wall Mount in Penthouse Lounge',
+      defaultRoom: 'executive-lounge',
+      aspectRatio: 1200 / 1022, // 1.174 (Square)
+      orientation: 'square',
+      dimensions: '36 × 31 in (91.4 × 78.7 cm)',
+      wallWidthPct: 21.0,
+      maxHeightPct: 31.0
+    },
+    {
+      id: 'framed-canvas',
+      title: 'Studio Framed Canvas',
+      src: testImage2,
+      label: 'Framed Canvas',
+      roomName: 'Living Room',
+      alt: 'Studio Framed Canvas in Luxury Living Room',
+      defaultRoom: 'living-room',
+      aspectRatio: 1080 / 1350, // 0.800 (Portrait)
+      orientation: 'portrait',
+      dimensions: '30 × 37.5 in (76.2 × 95.3 cm)',
+      wallWidthPct: 17.5,
+      maxHeightPct: 34.0
+    },
+    {
+      id: 'museum-setting',
+      title: 'Archival Museum Setting',
+      src: hansImage,
+      label: 'Museum Setting',
+      roomName: 'Gallery Salon',
+      alt: 'Archival Museum Setting in Curated Gallery Salon',
+      defaultRoom: 'gallery-salon',
+      aspectRatio: 736 / 736, // 1.000 (Square)
+      orientation: 'square',
+      dimensions: '34 × 34 in (86.4 × 86.4 cm)',
+      wallWidthPct: 20.0,
+      maxHeightPct: 32.0
+    },
+    {
+      id: 'birds-flight',
+      title: 'Birds in Flight',
+      src: birdsImage,
+      label: 'Birds in Flight',
+      roomName: 'Master Suite',
+      alt: 'Birds in Flight in Master Suite Retreat',
+      defaultRoom: 'master-bedroom',
+      aspectRatio: 800 / 1000, // 0.800 (Portrait)
+      orientation: 'portrait',
+      dimensions: '28 × 36 in (71.1 × 91.4 cm)',
+      wallWidthPct: 17.0,
+      maxHeightPct: 33.0
+    },
+    {
+      id: 'heritage-chronology',
+      title: 'Heritage Chronology',
+      src: historyImage,
+      label: 'Heritage Chronology',
+      roomName: 'Penthouse Lounge',
+      alt: 'Heritage Chronology in Penthouse Lounge',
+      defaultRoom: 'executive-lounge',
+      aspectRatio: 900 / 900, // 1.000 (Square)
+      orientation: 'square',
+      dimensions: '36 × 36 in (91.4 × 91.4 cm)',
+      wallWidthPct: 20.0,
+      maxHeightPct: 32.0
     }
   ])
 
@@ -758,12 +849,13 @@ export default function ProductDetail({ onReplayEntrance }) {
     return () => clearInterval(interval)
   }, [shippingStep, galleryThumbs.length])
 
-  // Room Auto-Tour: smoothly cycle across all 4 rooms to showcase artwork mounted in all interior environments
+  // Room Auto-Tour: smoothly cycle across artworks and room interior environments
+  // Room Auto-Tour: smoothly cycle across room interior environments
   useEffect(() => {
     if (!isAutoPlay || isRoomHovered) return
 
     const timer = setInterval(() => {
-      setCurrentRoomIndex((prev) => (prev + 1) % totalRooms)
+      setCurrentRoomIndex((rPrev) => (rPrev + 1) % totalRooms)
     }, 4800)
 
     return () => clearInterval(timer)
@@ -802,7 +894,7 @@ export default function ProductDetail({ onReplayEntrance }) {
   // Current 3D Room & Frame Configurations
   const currentFrame = FRAME_STYLES.find(f => f.id === activeFrameId) || FRAME_STYLES[0]
   const currentAnglePreset = CAMERA_ANGLES.find(a => a.id === cameraAngleId) || CAMERA_ANGLES[0]
-  const activeArtwork = galleryThumbs[active] || galleryThumbs[0]
+  const activeArtwork = galleryThumbs[0]
   const currentInspectedArt = galleryThumbs[inspectedArtworkIdx] || galleryThumbs[0]
   const currentPackagedArt = galleryThumbs[packagedArtworkIdx] || galleryThumbs[0]
 
@@ -830,6 +922,9 @@ export default function ProductDetail({ onReplayEntrance }) {
 
   // Touch & Drag 3D Orbit Controls
   const handleStageMouseDown = (e) => {
+    // Only drag with primary mouse button on desktop/pointer devices
+    if (e.button !== 0) return
+    if (typeof window !== 'undefined' && 'ontouchstart' in window && window.innerWidth < 1024) return
     setIsDragging(true)
     setDragStart({ x: e.clientX, y: e.clientY })
   }
@@ -858,33 +953,62 @@ export default function ProductDetail({ onReplayEntrance }) {
     setMousePosition({ x, y })
   }
 
-  // Gallery Navigation (Moves forward / backward through the 24-step room & artwork tour)
+  // Gallery Navigation (Moves forward / backward through the artwork & room tour)
   const nextSlide = () => {
-    setStepIndex((prev) => (prev + 1) % totalSteps)
+    setStepIndex((prev) => {
+      const nextStep = (prev + 1) % totalSteps
+      const nextArt = galleryThumbs[nextStep]
+      if (nextArt && nextArt.defaultRoom) {
+        const rIdx = ROOM_PRESETS.findIndex((r) => r.id === nextArt.defaultRoom)
+        if (rIdx >= 0) setCurrentRoomIndex(rIdx)
+      }
+      return nextStep
+    })
   }
 
   const prevSlide = () => {
-    setStepIndex((prev) => (prev - 1 + totalSteps) % totalSteps)
+    setStepIndex((prev) => {
+      const prevStep = (prev - 1 + totalSteps) % totalSteps
+      const prevArt = galleryThumbs[prevStep]
+      if (prevArt && prevArt.defaultRoom) {
+        const rIdx = ROOM_PRESETS.findIndex((r) => r.id === prevArt.defaultRoom)
+        if (rIdx >= 0) setCurrentRoomIndex(rIdx)
+      }
+      return prevStep
+    })
   }
 
-  // Touch Swipe Handlers for Mobile Gallery
+  // Touch Swipe Handlers for Mobile Gallery (zero re-render, allows free vertical scrolling)
   const handleTouchStart = (e) => {
-    setTouchEndX(null)
-    setTouchStartX(e.targetTouches[0].clientX)
+    if (!e.touches || !e.touches[0]) return
+    touchCoordsRef.current = {
+      startX: e.touches[0].clientX,
+      startY: e.touches[0].clientY,
+      endX: e.touches[0].clientX,
+      endY: e.touches[0].clientY
+    }
   }
 
   const handleTouchMove = (e) => {
-    setTouchEndX(e.targetTouches[0].clientX)
+    if (!e.touches || !e.touches[0]) return
+    touchCoordsRef.current.endX = e.touches[0].clientX
+    touchCoordsRef.current.endY = e.touches[0].clientY
   }
 
   const handleTouchEnd = () => {
-    if (!touchStartX || !touchEndX) return
-    const distance = touchStartX - touchEndX
-    const minSwipeDistance = 45
-    if (distance > minSwipeDistance) {
-      nextSlide()
-    } else if (distance < -minSwipeDistance) {
-      prevSlide()
+    setIsDragging(false)
+    const { startX, startY, endX, endY } = touchCoordsRef.current
+    const diffX = startX - endX
+    const diffY = startY - endY
+    
+    // Only trigger horizontal artwork slide change if it is a deliberate horizontal swipe
+    // (horizontal distance must be at least 2.2x greater than vertical movement and over 75px)
+    if (Math.abs(diffX) > Math.abs(diffY) * 2.2 && Math.abs(diffX) > 75) {
+      if (diffX > 0) {
+        nextSlide()
+      } else {
+        prevSlide()
+      }
     }
   }
 
@@ -1002,7 +1126,7 @@ export default function ProductDetail({ onReplayEntrance }) {
                     Archival Masterpiece
                   </span>
                   <span className="font-mono text-[8px] sm:text-[9px] text-neutral-400 bg-neutral-900 px-2 py-0.5 rounded border border-neutral-800">
-                    0{active + 1} / 0{galleryThumbs.length}
+                    0{roomIndex + 1} / 0{ROOM_PRESETS.length}
                   </span>
                 </div>
                 <h1 className="font-serif text-2xl xs:text-3xl sm:text-4xl lg:text-[40px] font-normal text-white tracking-tight leading-tight break-words">
@@ -1202,16 +1326,6 @@ export default function ProductDetail({ onReplayEntrance }) {
                   )
                 })}
               </div>
-
-              {/* Four Interactive Guideline Modals Overlay */}
-              <ProductGuidelineOverlayManager 
-                activeGuideline={activeGuideline} 
-                isPinned={isGuidelinePinned}
-                onClose={handleCloseGuideline} 
-                onPin={handlePinGuideline}
-                onMouseEnter={handleMouseEnterModal}
-                onMouseLeave={handleMouseLeaveModal}
-              />
             </div>
   )
 
@@ -1221,68 +1335,57 @@ export default function ProductDetail({ onReplayEntrance }) {
       {/* ========================================================= */}
       {/* ACT 1: MASTER CANVAS HERO & DIRECT ACQUISITION PANEL */}
       {/* ========================================================= */}
-      <div className="space-y-16 sm:space-y-24 lg:space-y-32 w-full">
-        <div 
-          id="product-acquisition-stage" 
-          data-showcase-section
-          data-showcase-title="Masterpiece Gallery & Room Visualizer"
-          className="scroll-mt-24"
-        >
-        {/* Breadcrumb Navigation & Top Actions */}
-        <motion.div 
-          initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-5 sm:mb-6 pb-4 border-b border-neutral-800/80 w-full"
-        >
-          {/* Breadcrumb Trail */}
-          <nav className="flex flex-wrap items-center gap-1.5 text-xs uppercase tracking-wider text-neutral-400 font-medium">
-            <a href="/" className="hover:text-[#dfb76c] transition-colors shrink-0">Collections</a>
-            <span className="text-neutral-600 shrink-0">/</span>
-            <a href="#artist-section" className="hover:text-[#dfb76c] transition-colors shrink-0">Pradip Sarkar</a>
-            <span className="text-neutral-600 shrink-0">/</span>
-            <span className="text-[#dfb76c] font-semibold shrink-0">Divine Tunes-11</span>
-          </nav>
+      {/* Breadcrumb Navigation & Top Actions */}
+      <motion.div 
+        initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 mb-5 sm:mb-6 pb-4 border-b border-neutral-800/80 w-full"
+      >
+        {/* Breadcrumb Trail */}
+        <nav className="flex flex-wrap items-center gap-1.5 text-xs uppercase tracking-wider text-neutral-400 font-medium">
+          <a href="/" className="hover:text-[#dfb76c] transition-colors shrink-0">Collections</a>
+          <span className="text-neutral-600 shrink-0">/</span>
+          <a href="#artist-section" className="hover:text-[#dfb76c] transition-colors shrink-0">Pradip Sarkar</a>
+          <span className="text-neutral-600 shrink-0">/</span>
+          <span className="text-[#dfb76c] font-semibold shrink-0">Divine Tunes-11</span>
+        </nav>
 
-          {/* Action Buttons */}
-          <div className="flex items-center gap-2 shrink-0">
-            {onReplayEntrance && (
-              <button
-                onClick={onReplayEntrance}
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-[#dfb76c]/40 hover:border-[#dfb76c] bg-[#dfb76c]/10 hover:bg-[#dfb76c]/20 text-[#f7d794] text-xs font-semibold transition-all cursor-pointer shrink-0 shadow-sm"
-                title="Replay Cinematic 3D Entrance Reveal"
-              >
-                <Sparkles size={12} className="text-[#dfb76c]" />
-                <span>Replay Reveal</span>
-              </button>
-            )}
+        {/* Action Buttons */}
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            onClick={() => setWishlistActive(!wishlistActive)}
+            className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all text-xs font-medium cursor-pointer shrink-0 shadow-sm ${
+              wishlistActive 
+                ? 'border-red-500/60 bg-red-500/10 text-red-400' 
+                : 'border-neutral-800 hover:border-[#dfb76c]/60 bg-[#121217] text-neutral-300 hover:text-white'
+            }`}
+          >
+            <Heart size={12} className={wishlistActive ? 'fill-red-400 text-red-400' : ''} />
+            <span>{wishlistActive ? 'Saved' : 'Wishlist'}</span>
+          </button>
 
-            <button
-              onClick={() => setWishlistActive(!wishlistActive)}
-              className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border transition-all text-xs font-medium cursor-pointer shrink-0 shadow-sm ${
-                wishlistActive 
-                  ? 'border-red-500/60 bg-red-500/10 text-red-400' 
-                  : 'border-neutral-800 hover:border-[#dfb76c]/60 bg-[#121217] text-neutral-300 hover:text-white'
-              }`}
-            >
-              <Heart size={12} className={wishlistActive ? 'fill-red-400 text-red-400' : ''} />
-              <span>{wishlistActive ? 'Saved' : 'Wishlist'}</span>
-            </button>
+          <button
+            onClick={handleShare}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-neutral-800 hover:border-[#dfb76c]/60 bg-[#121217] text-neutral-300 hover:text-[#dfb76c] text-xs font-medium transition-all cursor-pointer shrink-0 shadow-sm"
+          >
+            <Share2 size={12} />
+            <span>Share</span>
+          </button>
+        </div>
+      </motion.div>
 
-            <button
-              onClick={handleShare}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-neutral-800 hover:border-[#dfb76c]/60 bg-[#121217] text-neutral-300 hover:text-[#dfb76c] text-xs font-medium transition-all cursor-pointer shrink-0 shadow-sm"
-            >
-              <Share2 size={12} />
-              <span>Share</span>
-            </button>
-          </div>
-        </motion.div>
-
-        {/* Hero Grid: Clean Two-Column Gallery & Acquisition Dossier */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-10 xl:gap-12 items-start w-full">
-          {/* LEFT: MASTER ARTWORK GALLERY (7 Columns, Row 1) */}
-          <div className="order-1 lg:order-none lg:col-span-7 xl:col-span-7 lg:row-start-1 space-y-3.5 sm:space-y-5 w-full min-w-0">
+      {/* Master Two-Column Responsive Layout: Left 7 Columns for All Acts, Right 5 Columns Sticky for Product Details Box */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-10 xl:gap-12 items-start w-full">
+        {/* LEFT COLUMN: 7 Columns Containing All Content Sections */}
+        <div className="order-1 lg:order-none lg:col-span-7 xl:col-span-7 space-y-12 sm:space-y-16 lg:space-y-24 w-full min-w-0">
+          {/* ACT 1: MASTER CANVAS HERO & GALLERY STAGE */}
+          <div 
+            id="product-acquisition-stage" 
+            data-showcase-section
+            data-showcase-title="Masterpiece Gallery"
+            className="scroll-mt-24 space-y-3.5 sm:space-y-5 w-full min-w-0"
+          >
             {/* Main Cinematic Real-Room 3D Artwork Stage */}
             <motion.div
               initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, scale: 0.98, y: 12 }}
@@ -1293,40 +1396,18 @@ export default function ProductDetail({ onReplayEntrance }) {
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
+              onTouchCancel={() => setIsDragging(false)}
               ref={imageFrameRef}
             >
               {/* Dynamic Auto-Advance Live Progress Line */}
               <div className="w-full h-1 bg-neutral-800/80 overflow-hidden relative z-30">
                 <motion.div
-                  key={`gallery-prog-step-${stepIndex}`}
+                  key={`gallery-prog-room-${roomIndex}`}
                   initial={{ width: '0%' }}
                   animate={{ width: '100%' }}
-                  transition={{ duration: 2.8, ease: 'linear' }}
+                  transition={{ duration: 4.8, ease: 'linear' }}
                   className="h-full bg-gradient-to-r from-[#c9a96e] via-[#f7d794] to-[#dfb76c] shadow-[0_0_8px_#dfb76c]"
                 />
-              </div>
-
-              {/* Dedicated Real-Room Stage Control Bar */}
-              <div className="relative z-30 flex items-center justify-end gap-1.5 sm:gap-2 px-2.5 py-1.5 sm:px-4 sm:py-2 bg-[#0c0c12]/95 backdrop-blur-md border-b border-neutral-800/80 w-full">
-                <button
-                  onClick={() => setIsSpotlightOn(!isSpotlightOn)}
-                  className={`p-1.5 sm:p-2 rounded-lg border transition-all cursor-pointer shrink-0 ${
-                    isSpotlightOn
-                      ? 'bg-[#dfb76c]/20 border-[#dfb76c]/60 text-[#dfb76c]'
-                      : 'bg-[#14141d] border-neutral-800 text-neutral-400 hover:text-white'
-                  }`}
-                  title="Toggle Ambient Gallery Spotlight"
-                >
-                  <Sun size={12} className="sm:w-3.5 sm:h-3.5" />
-                </button>
-
-                <button
-                  onClick={() => setOpenFullscreen(true)}
-                  className="p-1.5 sm:p-2 bg-[#14141d] hover:bg-[#dfb76c] hover:text-neutral-950 rounded-lg border border-neutral-800 hover:border-[#dfb76c] text-neutral-200 transition-all cursor-pointer shrink-0"
-                  title="Fullscreen Ultra Zoom"
-                >
-                  <Maximize2 size={12} className="sm:w-3.5 sm:h-3.5" />
-                </button>
               </div>
 
               {/* 3D Real-Room Stage Display */}
@@ -1339,6 +1420,28 @@ export default function ProductDetail({ onReplayEntrance }) {
                 onMouseMoveCapture={handleStageMouseMoveDrag}
                 onMouseUp={handleStageMouseUp}
               >
+                {/* Floating Action Controls (Spotlight & Fullscreen) */}
+                <div className="absolute top-3 right-3 z-20 flex items-center gap-1.5 sm:gap-2">
+                  <button
+                    onClick={() => setIsSpotlightOn(!isSpotlightOn)}
+                    className={`p-1.5 sm:p-2 rounded-lg border backdrop-blur-md transition-all cursor-pointer shadow-md ${
+                      isSpotlightOn
+                        ? 'bg-[#dfb76c]/25 border-[#dfb76c]/70 text-[#dfb76c]'
+                        : 'bg-black/70 border-neutral-700 text-neutral-300 hover:text-white'
+                    }`}
+                    title="Toggle Ambient Gallery Spotlight"
+                  >
+                    <Sun size={12} className="sm:w-3.5 sm:h-3.5" />
+                  </button>
+
+                  <button
+                    onClick={() => setOpenFullscreen(true)}
+                    className="p-1.5 sm:p-2 bg-black/70 hover:bg-[#dfb76c] hover:text-neutral-950 rounded-lg border border-neutral-700 hover:border-[#dfb76c] text-neutral-200 transition-all cursor-pointer shadow-md backdrop-blur-md"
+                    title="Fullscreen Ultra Zoom"
+                  >
+                    <Maximize2 size={12} className="sm:w-3.5 sm:h-3.5" />
+                  </button>
+                </div>
                 {/* 3D Rotational Room Plane */}
                 <motion.div
                   animate={
@@ -1458,155 +1561,65 @@ export default function ProductDetail({ onReplayEntrance }) {
 
 
 
-            {/* ── ROW 4: 8 GALLERY THUMBNAILS RAIL ── */}
+            {/* ── ROOM INTERIORS RAIL: PURE ROOM IMAGES WITHOUT TEXT OR SPELLINGS ── */}
             <div
               ref={thumbnailContainerRef}
-              className="product-thumbnail-rail flex flex-row items-center gap-1.5 sm:gap-3 overflow-x-auto py-1.5 px-0.5 snap-x snap-mandatory flex-nowrap w-full"
+              className="product-thumbnail-rail flex flex-row items-center gap-2 sm:gap-3 overflow-x-auto py-2 px-1 snap-x snap-mandatory flex-nowrap w-full"
               style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
             >
-              {galleryThumbs.map((t, i) => (
-                <button
-                  key={`${t.label}-${i}`}
-                  onClick={() => setStepIndex(roomIndex * totalArtworks + i)}
-                  className={`group relative shrink-0 flex-shrink-0 w-14 h-14 xs:w-16 xs:h-16 sm:w-20 sm:h-20 md:w-22 md:h-22 rounded-xl sm:rounded-2xl cursor-pointer overflow-hidden snap-center bg-[#14141a] transition-all duration-300 ${
-                    i === active
-                      ? 'border-2 border-[#dfb76c] shadow-[0_4px_20px_rgba(223,183,108,0.35)] ring-2 sm:ring-4 ring-[#dfb76c]/20 opacity-100 scale-100'
-                      : 'border border-neutral-800 hover:border-[#dfb76c]/50 opacity-60 hover:opacity-100'
-                  }`}
-                  aria-label={`Thumbnail ${i + 1}: ${t.label}`}
-                >
-                  <img
-                    src={t.src}
-                    alt={t.alt}
-                    className="w-full h-full object-contain p-0.5 sm:p-1 pointer-events-none select-none"
-                    loading="eager"
-                  />
-                  <div className="absolute bottom-0 inset-x-0 bg-black/85 py-0.5 text-center text-[6.5px] sm:text-[8px] text-[#f7d794] font-medium truncate px-0.5">
-                    0{i + 1}. {t.label}
-                  </div>
-                  {i === active && (
-                    <div className="absolute top-0 left-0 right-0 h-0.5 sm:h-1 bg-[#dfb76c]" />
-                  )}
-                </button>
-              ))}
+              {ROOM_PRESETS.map((room, i) => {
+                const isCurrent = i === roomIndex
+                return (
+                  <button
+                    key={room.id}
+                    onClick={() => {
+                      setCurrentRoomIndex(i)
+                      setIsAutoPlay(false)
+                    }}
+                    className={`group relative shrink-0 flex-shrink-0 w-24 h-16 xs:w-28 xs:h-18 sm:w-32 sm:h-20 md:w-36 md:h-22 rounded-xl sm:rounded-2xl cursor-pointer overflow-hidden snap-center bg-[#14141a] transition-all duration-300 ${
+                      isCurrent
+                        ? 'border-2 border-[#dfb76c] shadow-[0_4px_22px_rgba(223,183,108,0.4)] ring-2 sm:ring-4 ring-[#dfb76c]/30 opacity-100 scale-100'
+                        : 'border border-neutral-800 hover:border-[#dfb76c]/60 opacity-60 hover:opacity-100'
+                    }`}
+                    aria-label={`Room setting ${i + 1}`}
+                  >
+                    <img
+                      src={room.bg}
+                      alt=""
+                      className="w-full h-full object-cover pointer-events-none select-none transition-transform duration-500 group-hover:scale-105"
+                      loading="eager"
+                    />
+                    {isCurrent && (
+                      <div className="absolute top-0 left-0 right-0 h-0.5 sm:h-1 bg-[#dfb76c] shadow-[0_0_8px_#dfb76c]" />
+                    )}
+                  </button>
+                )
+              })}
             </div>
           </div>
 
-          {/* RIGHT: ELEGANT PURCHASE DOSSIER (5 Columns - Sticky within Main Product Section) */}
-          <motion.div 
-            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
-            className="product-details-sticky-track order-2 lg:order-none lg:col-span-5 xl:col-span-5 lg:col-start-8 xl:col-start-8 lg:row-start-1 lg:row-end-3 space-y-4 sm:space-y-6 w-full min-w-0 lg:sticky lg:top-24 self-start"
-          >
-            {renderProductDossierBox('top')}
-          </motion.div>
-
-          {/* LEFT: SUBSEQUENT SECTIONS (Act 3 to Act 8 - Spanning under Gallery in Row 2, 7 Columns) */}
-          <div className="order-3 lg:order-none lg:col-span-7 xl:col-span-7 lg:row-start-2 space-y-12 sm:space-y-16 lg:space-y-24 w-full min-w-0">
-            {/* Curved Reveal Divider */}
-            <div className="curved-section-divider -my-4 opacity-50">
-              <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
-                <path d="M0,0 C150,90 350,-40 500,60 C650,160 900,10 1200,40 L1200,120 L0,120 Z" className="shape-fill" />
-              </svg>
-            </div>
-
-      {/* ========================================================= */}
-      {/* ACT 2B: DEDICATED ARTWORK DESCRIPTION & CURATORIAL ESSENCE */}
-      {/* ========================================================= */}
-      <motion.section 
-        data-showcase-section
-        data-showcase-title="Artwork Description"
-        initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full"
-      >
-        <div className="bg-[#121217]/90 backdrop-blur-xl p-5 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl border border-neutral-800 shadow-xl space-y-6 sm:space-y-8">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-5 border-b border-neutral-800/80">
-            <div>
-              <span className="text-[10px] sm:text-xs uppercase tracking-[0.22em] text-[#dfb76c] font-semibold block mb-1">
-                Zigguratss Maison d'Art • Curatorial Monograph
-              </span>
-              <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-normal text-white tracking-tight">
-                Artwork Description
-              </h2>
-            </div>
-            <div className="flex items-center gap-2 text-xs font-mono text-[#dfb76c] bg-[#dfb76c]/10 px-3 py-1.5 rounded-full border border-[#dfb76c]/30 self-start md:self-auto">
-              <Sparkles size={13} />
-              <span>Divine Tunes-11 by Pradip Sarkar</span>
-            </div>
+          {/* Mobile Only: Product Details Box Rendered Directly Below Gallery */}
+          <div className="lg:hidden w-full pt-2">
+            {renderProductDossierBox('mobile')}
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-            {/* Left Narrative Pillar */}
-            <div className="lg:col-span-7 space-y-4 text-xs sm:text-sm text-neutral-300 font-light leading-relaxed">
-              <p className="first-letter:font-serif first-letter:text-3xl first-letter:text-[#dfb76c] first-letter:font-normal first-letter:mr-1 first-letter:float-left">
-                <strong className="text-white font-medium">Divine Tunes-11</strong> represents the pinnacle of contemporary master Pradip Sarkar's acclaimed spiritual abstraction series. Grounded in decades of classical draughtsmanship and modernist spatial geometry developed at the British Institute in Mumbai, this masterwork captures an evocative metaphysical dialogue between sound, stillness, and human consciousness.
-              </p>
-              <p>
-                The composition is anchored by a contemplative, serene muse adorned with delicate flutterings of vibrant butterflies—a timeless allegorical motif evoking spiritual transmutation, transient earthly beauty, and the elevation of the soul. Sarkar partitions the canvas into architectural rhythmic planes, using warm ochres, burnished golds, soft rose madder, and meditative earthen umbers to echo the visual architecture of classical Indian ragas.
-              </p>
-              <p>
-                Every brushstroke is rendered with master-grade archival heavy-body acrylics upon museum-grade primed Belgian canvas, sealed with invisible UV-absorptive protective isolation coats. The luminous surface dynamically interacts with shifting ambient light, revealing subtle chromatic undertones and geometric depth that reward intimate observation.
-              </p>
-            </div>
-
-            {/* Right Highlights & Registry Pillars */}
-            <div className="lg:col-span-5 space-y-3.5 bg-neutral-900/60 p-4 sm:p-5 rounded-2xl border border-neutral-800/80">
-              <span className="text-[10px] uppercase tracking-[0.2em] text-[#dfb76c] font-semibold block">
-                Archival Ledger Highlights
-              </span>
-              
-              <div className="space-y-2.5 text-xs">
-                <div className="p-2.5 rounded-xl bg-neutral-950/60 border border-neutral-800/60 flex items-start gap-2.5">
-                  <Palette size={15} className="text-[#dfb76c] shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-semibold text-white block">Curatorial Genre</span>
-                    <span className="text-neutral-400 text-[11px]">Meditative Figurative & Geometric Abstraction</span>
-                  </div>
-                </div>
-
-                <div className="p-2.5 rounded-xl bg-neutral-950/60 border border-neutral-800/60 flex items-start gap-2.5">
-                  <CheckCircle2 size={15} className="text-[#dfb76c] shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-semibold text-white block">Provenance & Signature</span>
-                    <span className="text-neutral-400 text-[11px]">Signed recto and inscribed verso by Pradip Sarkar • ZG-ART-2024-DT11</span>
-                  </div>
-                </div>
-
-                <div className="p-2.5 rounded-xl bg-neutral-950/60 border border-neutral-800/60 flex items-start gap-2.5">
-                  <Shield size={15} className="text-[#dfb76c] shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-semibold text-white block">Preservation Protocol</span>
-                    <span className="text-neutral-400 text-[11px]">UV Isolation Glaze • Non-Yellowing • 100+ Years Archival Stability</span>
-                  </div>
-                </div>
-
-                <div className="p-2.5 rounded-xl bg-neutral-950/60 border border-neutral-800/60 flex items-start gap-2.5">
-                  <Home size={15} className="text-[#dfb76c] shrink-0 mt-0.5" />
-                  <div>
-                    <span className="font-semibold text-white block">Architectural Setting</span>
-                    <span className="text-neutral-400 text-[11px]">Focal placement for salon, penthouse, or executive residence</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+          {/* Curved Reveal Divider */}
+          <div className="curved-section-divider -my-4 opacity-50">
+            <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+              <path d="M0,0 C150,90 350,-40 500,60 C650,160 900,10 1200,40 L1200,120 L0,120 Z" className="shape-fill" />
+            </svg>
           </div>
-        </div>
-      </motion.section>
 
       {/* ========================================================= */}
-      {/* ACT 3: PRECISION TECHNICAL DOSSIER & SPECIFICATIONS */}
+      {/* ACT 2B: PRECISION TECHNICAL DOSSIER & SPECIFICATIONS (ARTWORK DETAILS) */}
       {/* ========================================================= */}
       <motion.section 
         data-showcase-section
         data-showcase-title="Technical Ledger & Specs"
-        initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 40, filter: 'blur(10px)' }}
-        whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.05 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         className="w-full"
       >
         <div className="bg-[#121217]/90 backdrop-blur-xl p-5 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl border border-neutral-800 shadow-xl space-y-6 sm:space-y-8">
@@ -1781,6 +1794,99 @@ export default function ProductDetail({ onReplayEntrance }) {
       {/* Curved Reveal Divider */}
       <div className="curved-section-divider -my-4 opacity-50">
         <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+          <path d="M0,0 C150,90 350,-40 500,60 C650,160 900,10 1200,40 L1200,120 Z" className="shape-fill" />
+        </svg>
+      </div>
+
+      {/* ========================================================= */}
+      {/* ACT 3: DEDICATED ARTWORK DESCRIPTION & CURATORIAL ESSENCE */}
+      {/* ========================================================= */}
+      <motion.section 
+        data-showcase-section
+        data-showcase-title="Artwork Description"
+        initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.05 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full"
+      >
+        <div className="bg-[#121217]/90 backdrop-blur-xl p-5 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl border border-neutral-800 shadow-xl space-y-6 sm:space-y-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-5 border-b border-neutral-800/80">
+            <div>
+              <span className="text-[10px] sm:text-xs uppercase tracking-[0.22em] text-[#dfb76c] font-semibold block mb-1">
+                Zigguratss Maison d'Art • Curatorial Monograph
+              </span>
+              <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-normal text-white tracking-tight">
+                Artwork Description
+              </h2>
+            </div>
+            <div className="flex items-center gap-2 text-xs font-mono text-[#dfb76c] bg-[#dfb76c]/10 px-3 py-1.5 rounded-full border border-[#dfb76c]/30 self-start md:self-auto">
+              <Sparkles size={13} />
+              <span>Divine Tunes-11 by Pradip Sarkar</span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+            {/* Left Narrative Pillar */}
+            <div className="lg:col-span-7 space-y-4 text-xs sm:text-sm text-neutral-300 font-light leading-relaxed">
+              <p className="first-letter:font-serif first-letter:text-3xl first-letter:text-[#dfb76c] first-letter:font-normal first-letter:mr-1 first-letter:float-left">
+                <strong className="text-white font-medium">Divine Tunes-11</strong> represents the pinnacle of contemporary master Pradip Sarkar's acclaimed spiritual abstraction series. Grounded in decades of classical draughtsmanship and modernist spatial geometry developed at the British Institute in Mumbai, this masterwork captures an evocative metaphysical dialogue between sound, stillness, and human consciousness.
+              </p>
+              <p>
+                The composition is anchored by a contemplative, serene muse adorned with delicate flutterings of vibrant butterflies—a timeless allegorical motif evoking spiritual transmutation, transient earthly beauty, and the elevation of the soul. Sarkar partitions the canvas into architectural rhythmic planes, using warm ochres, burnished golds, soft rose madder, and meditative earthen umbers to echo the visual architecture of classical Indian ragas.
+              </p>
+              <p>
+                Every brushstroke is rendered with master-grade archival heavy-body acrylics upon museum-grade primed Belgian canvas, sealed with invisible UV-absorptive protective isolation coats. The luminous surface dynamically interacts with shifting ambient light, revealing subtle chromatic undertones and geometric depth that reward intimate observation.
+              </p>
+            </div>
+
+            {/* Right Highlights & Registry Pillars */}
+            <div className="lg:col-span-5 space-y-3.5 bg-neutral-900/60 p-4 sm:p-5 rounded-2xl border border-neutral-800/80">
+              <span className="text-[10px] uppercase tracking-[0.2em] text-[#dfb76c] font-semibold block">
+                Archival Ledger Highlights
+              </span>
+              
+              <div className="space-y-2.5 text-xs">
+                <div className="p-2.5 rounded-xl bg-neutral-950/60 border border-neutral-800/60 flex items-start gap-2.5">
+                  <Palette size={15} className="text-[#dfb76c] shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-semibold text-white block">Curatorial Genre</span>
+                    <span className="text-neutral-400 text-[11px]">Meditative Figurative & Geometric Abstraction</span>
+                  </div>
+                </div>
+
+                <div className="p-2.5 rounded-xl bg-neutral-950/60 border border-neutral-800/60 flex items-start gap-2.5">
+                  <CheckCircle2 size={15} className="text-[#dfb76c] shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-semibold text-white block">Provenance & Signature</span>
+                    <span className="text-neutral-400 text-[11px]">Signed recto and inscribed verso by Pradip Sarkar • ZG-ART-2024-DT11</span>
+                  </div>
+                </div>
+
+                <div className="p-2.5 rounded-xl bg-neutral-950/60 border border-neutral-800/60 flex items-start gap-2.5">
+                  <Shield size={15} className="text-[#dfb76c] shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-semibold text-white block">Preservation Protocol</span>
+                    <span className="text-neutral-400 text-[11px]">UV Isolation Glaze • Non-Yellowing • 100+ Years Archival Stability</span>
+                  </div>
+                </div>
+
+                <div className="p-2.5 rounded-xl bg-neutral-950/60 border border-neutral-800/60 flex items-start gap-2.5">
+                  <Home size={15} className="text-[#dfb76c] shrink-0 mt-0.5" />
+                  <div>
+                    <span className="font-semibold text-white block">Architectural Setting</span>
+                    <span className="text-neutral-400 text-[11px]">Focal placement for salon, penthouse, or executive residence</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* Curved Reveal Divider */}
+      <div className="curved-section-divider -my-4 opacity-50">
+        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
           <path d="M0,0 C150,90 350,-40 500,60 C650,160 900,10 1200,40 L1200,120 L0,120 Z" className="shape-fill" />
         </svg>
       </div>
@@ -1792,11 +1898,11 @@ export default function ProductDetail({ onReplayEntrance }) {
         id="artist-section" 
         data-showcase-section
         data-showcase-title="Artist Spotlight & Provenance"
-        initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 40, filter: 'blur(10px)' }}
-        whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full pt-4 sm:pt-6"
+        initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.05 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full pt-4 sm:pt-6 scroll-mt-24"
       >
         <motion.div 
           initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
@@ -2121,10 +2227,10 @@ export default function ProductDetail({ onReplayEntrance }) {
       <motion.section 
         data-showcase-section
         data-showcase-title="Pradip Sarkar Retrospective"
-        initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 40, filter: 'blur(10px)' }}
-        whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.05 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         className="w-full"
       >
         <div className="bg-[#121217]/90 backdrop-blur-xl p-5 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl border border-neutral-800 shadow-xl space-y-6 sm:space-y-8">
@@ -2329,8 +2435,13 @@ export default function ProductDetail({ onReplayEntrance }) {
           )}
         </AnimatePresence>
       </motion.section>
-          </div>
         </div>
+
+        {/* RIGHT: 5 Columns with Sticky Product Details Box on Desktop for Acts 1-5 */}
+        <div className="hidden lg:block lg:col-span-5 xl:col-span-5 lg:sticky lg:top-24 space-y-4 sm:space-y-6 w-full min-w-0 self-start">
+          {renderProductDossierBox('desktop-top')}
+        </div>
+      </div>
 
       {/* Curved Reveal Divider */}
       <div className="curved-section-divider -my-4 opacity-50">
@@ -2397,11 +2508,8 @@ export default function ProductDetail({ onReplayEntrance }) {
       </div>
 
       {/* ========================================================= */}
-      {/* GRID 2: SHIPPING & REVIEWS WITH STICKY PRODUCT DOSSIER */}
+      {/* ACT 7: WHITE-GLOVE LOGISTICS & ACT 8: REVIEWS */}
       {/* ========================================================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-10 xl:gap-12 items-start w-full">
-        {/* LEFT: 7 Columns for Act 7 (Logistics) & Act 8 (Reviews) */}
-        <div className="lg:col-span-7 xl:col-span-7 space-y-12 sm:space-y-16 lg:space-y-24 w-full min-w-0">
       {/* Curved Reveal Divider */}
       <div className="curved-section-divider -my-4 opacity-50 transform rotate-180">
         <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
@@ -2410,15 +2518,20 @@ export default function ProductDetail({ onReplayEntrance }) {
       </div>
 
       {/* ========================================================= */}
-      {/* ACT 7: INTERACTIVE 4-STAGE WHITE-GLOVE LOGISTICS PIPELINE (KEPT DOWN) */}
+      {/* REMAINING SECTIONS: ACT 7 (LOGISTICS) & ACT 8 (REVIEWS) */}
+      {/* (WITH RIGHT-SIDE STICKY PRODUCT DETAILS BOX) */}
       {/* ========================================================= */}
-      <motion.section 
-        data-showcase-section
-        data-showcase-title="White-Glove Logistics Journey"
-        initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 40, filter: 'blur(10px)' }}
-        whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-        viewport={{ once: true, margin: '-60px' }}
-        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-10 xl:gap-12 items-start w-full">
+        {/* LEFT COLUMN: 7 Columns for Remaining Acts */}
+        <div className="order-1 lg:order-none lg:col-span-7 xl:col-span-7 space-y-12 sm:space-y-16 lg:space-y-24 w-full min-w-0">
+          {/* ACT 7: INTERACTIVE 4-STAGE WHITE-GLOVE LOGISTICS PIPELINE (KEPT DOWN) */}
+          <motion.section 
+            data-showcase-section
+            data-showcase-title="White-Glove Logistics Journey"
+        initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, amount: 0.05 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         className="w-full"
       >
         <div className="bg-[#121217]/90 backdrop-blur-xl p-5 sm:p-8 md:p-12 rounded-2xl sm:rounded-3xl border border-neutral-800 shadow-xl space-y-8 sm:space-y-10">
@@ -2717,12 +2830,10 @@ export default function ProductDetail({ onReplayEntrance }) {
       <CollectorReviewsSection />
         </div>
 
-        {/* RIGHT: 5 Columns with Sticky Product Dossier Box on Desktop */}
+        {/* RIGHT: 5 Columns with Sticky Product Details Box on Desktop for Remaining Acts */}
         <div className="hidden lg:block lg:col-span-5 xl:col-span-5 lg:sticky lg:top-24 space-y-4 sm:space-y-6 w-full min-w-0 self-start">
-          {renderProductDossierBox('bottom', true)}
+          {renderProductDossierBox('desktop-bottom')}
         </div>
-      </div>
-      </div>
       </div>
 
       {/* ========================================================= */}
@@ -2988,6 +3099,16 @@ export default function ProductDetail({ onReplayEntrance }) {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Interactive Product Guidelines Overlay Manager (Global Single Portal) */}
+      <ProductGuidelineOverlayManager 
+        activeGuideline={activeGuideline} 
+        isPinned={isGuidelinePinned}
+        onClose={handleCloseGuideline} 
+        onPin={handlePinGuideline}
+        onMouseEnter={handleMouseEnterModal}
+        onMouseLeave={handleMouseLeaveModal}
+      />
     </div>
   )
 }

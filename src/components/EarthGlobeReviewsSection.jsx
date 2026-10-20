@@ -5,6 +5,7 @@ import {
   Sparkles, Radio, ArrowRight, ArrowLeft, Send,
   Waves, MapPin, Award
 } from 'lucide-react'
+import realisticEarthGlobe from '../assets/User-images/realistic-earth-globe.jpg'
 
 // ── 100% AUTHENTIC ORIGINAL ZIGGURATSS COLLECTOR REVIEWS ──
 export const AUTHENTIC_REVIEWS = [
@@ -13,7 +14,7 @@ export const AUTHENTIC_REVIEWS = [
     collector: 'Vipin Nautiyal',
     title: 'Business Analyst — Accenture',
     location: 'New Delhi, India',
-    coordinates: { x: 280, y: 190 },
+    coordinates: { x: 310, y: 175 },
     quote: "I have bought artwork from Zigguratss when they were not available online, the artwork they have supplied to me was great and at a cost which I didn't found anywhere else. I too create painting as a passion and I love the collection Zigguratss offers. Best of luck to the team of the Zigguratss.",
     artwork: 'Custom Canvas Acquisition',
     rating: 5,
@@ -25,7 +26,7 @@ export const AUTHENTIC_REVIEWS = [
     collector: 'Nishi Nair',
     title: 'Architect',
     location: 'Kerala & New Delhi, India',
-    coordinates: { x: 275, y: 265 },
+    coordinates: { x: 305, y: 220 },
     quote: "I was looking for a painting for my newly constructed home at Kerala. I contacted one of my friends who suggested me the name of Vijay Bhatt, owner of Zigguratss Artwork LLP — we finally met at Delhi and he suggested me artwork for my home. I suggest and recommend Zigguratss for all your artwork related needs. Thanks for your prompt service and best of luck for your future business as you are online now.",
     artwork: 'Bespoke Residence Artwork',
     rating: 5,
@@ -37,7 +38,7 @@ export const AUTHENTIC_REVIEWS = [
     collector: 'Vasudha',
     title: 'Entrepreneur',
     location: 'Gurugram, India',
-    coordinates: { x: 278, y: 194 },
+    coordinates: { x: 312, y: 178 },
     quote: "I recently purchased a piece of artwork by Somnath Bothe through the Zigguratss online gallery, and I couldn't be more pleased with my decision. The entire process was smooth — from browsing the collection to receiving the artwork at my home in Gurugram. Somnath's work is truly exceptional; his creativity and attention to detail are evident in every brushstroke. I highly recommend both Somnath Bothe's art and Zigguratss.",
     artwork: 'Original Somnath Bothe Painting',
     rating: 5,
@@ -49,7 +50,7 @@ export const AUTHENTIC_REVIEWS = [
     collector: 'Dr. Ananya Sen',
     title: 'Senior Art Historian & Private Collector',
     location: 'Kolkata, India',
-    coordinates: { x: 310, y: 210 },
+    coordinates: { x: 325, y: 185 },
     quote: "The geometric harmony and delicate butterfly motif in 'Divine Tunes-11' create a breathtaking stillness in our gallery salon. Pradip Sarkar's impasto technique catches natural morning light in a way photographs simply cannot capture.",
     artwork: 'Divine Tunes-11 • Master Canvas',
     rating: 5,
@@ -61,7 +62,7 @@ export const AUTHENTIC_REVIEWS = [
     collector: 'Vikramaditya Singhania',
     title: 'Heritage Collection Patron',
     location: 'Mumbai, India',
-    coordinates: { x: 260, y: 225 },
+    coordinates: { x: 300, y: 195 },
     quote: "Zigguratss delivered this masterwork in flawless museum-grade packaging. The certificate of provenance personally signed by Pradip Sarkar and the tamper-evident serial seal provide absolute assurance.",
     artwork: 'Divine Tunes-11 • Archival Canvas',
     rating: 5,
@@ -73,7 +74,7 @@ export const AUTHENTIC_REVIEWS = [
     collector: 'Elena Rostova',
     title: 'Contemporary Fine Art Collector',
     location: 'London, United Kingdom',
-    coordinates: { x: 195, y: 130 },
+    coordinates: { x: 265, y: 120 },
     quote: "Acquiring 'Divine Tunes-11' was a transcendent experience. The Vedic meditative rhythm of the squares and the serene feminine aura harmonize our London residence effortlessly.",
     artwork: 'Divine Tunes-11 • Global Vault Shipment',
     rating: 5,
@@ -85,7 +86,7 @@ export const AUTHENTIC_REVIEWS = [
     collector: 'Rohan & Priya Mehra',
     title: 'Principal Architects & Curators',
     location: 'New Delhi, India',
-    coordinates: { x: 280, y: 190 },
+    coordinates: { x: 310, y: 172 },
     quote: "The interplay of architectural symmetry and delicate nature symbolism represents modern Indian abstraction at its pinnacle. A timeless centerpiece in our architectural studio.",
     artwork: 'Divine Tunes-11 • Atelier Original',
     rating: 5,
@@ -175,24 +176,42 @@ export default function EarthGlobeReviewsSection() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
           {/* ========================================================= */}
-          {/* LEFT SIDE: FREELY FLOATING 3D EARTH GLOBE (NO SEPARATE BOX) */}
+          {/* LEFT SIDE: FREELY FLOATING 3D EARTH GLOBE (PHOTOREALISTIC SPHERE) */}
           {/* ========================================================= */}
           <div className="lg:col-span-6 relative flex flex-col items-center justify-center">
             
-            {/* Freely Floating Globe Canvas Container (Refined Compact Size) */}
-            <div className="relative w-full max-w-[280px] sm:max-w-[310px] aspect-square flex items-center justify-center">
-              
-              {/* ── 3D VECTOR EARTH GLOBE WITH RADIATING WAVES ── */}
-              <svg viewBox="0 0 460 460" className="w-full h-full object-contain overflow-visible filter drop-shadow-[0_0_24px_rgba(223,183,108,0.22)]">
-                <defs>
-                  {/* Earth Sphere Radial Depth Gradient (Luxury Gold & Navy) */}
-                  <radialGradient id="freeGlobeGrad" cx="45%" cy="38%" r="62%">
-                    <stop offset="0%" stopColor="#1e325c" />
-                    <stop offset="45%" stopColor="#121f3a" />
-                    <stop offset="80%" stopColor="#0a1224" />
-                    <stop offset="100%" stopColor="#040812" />
-                  </radialGradient>
+            {/* Freely Floating Globe Canvas Container */}
+            <motion.div 
+              animate={{
+                y: [-6, 6, -6],
+              }}
+              transition={{
+                duration: 5.5,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="relative w-full max-w-[320px] sm:max-w-[360px] md:max-w-[400px] aspect-square flex items-center justify-center"
+            >
+              {/* Atmospheric Background Glow */}
+              <div className="absolute inset-4 rounded-full bg-[radial-gradient(circle_at_45%_35%,rgba(56,189,248,0.35),rgba(223,183,108,0.2)_50%,transparent_75%)] blur-2xl pointer-events-none" />
 
+              {/* ── REALISTIC 3D EARTH GLOBE (MATCHING USER REFERENCE IMAGE) ── */}
+              <div className="relative w-[280px] h-[280px] sm:w-[320px] sm:h-[320px] md:w-[350px] md:h-[350px] rounded-full overflow-hidden shadow-[0_0_60px_rgba(56,189,248,0.5),0_0_110px_rgba(223,183,108,0.25)] border border-cyan-400/40 select-none">
+                <img 
+                  src={realisticEarthGlobe} 
+                  alt="3D Photorealistic Planet Earth Globe" 
+                  className="w-full h-full object-cover filter contrast-[1.08] brightness-[1.02] pointer-events-none"
+                />
+                
+                {/* 3D Atmospheric Rim Aura & Spherical Glare */}
+                <div className="absolute inset-0 rounded-full pointer-events-none bg-[radial-gradient(circle_at_35%_25%,rgba(255,255,255,0.28),transparent_55%)]" />
+                <div className="absolute inset-0 rounded-full pointer-events-none shadow-[inset_0_0_40px_rgba(0,0,0,0.85),inset_-14px_-14px_32px_rgba(0,0,0,0.95)]" />
+                <div className="absolute inset-0 rounded-full pointer-events-none ring-1 ring-cyan-400/50" />
+              </div>
+
+              {/* ── OVERLAID INTERACTIVE BEACONS, RADIATING WAVES & THROW RAY ── */}
+              <svg viewBox="0 0 400 400" className="absolute inset-0 w-full h-full object-contain overflow-visible pointer-events-none z-20">
+                <defs>
                   {/* Golden Beam Throw Gradient */}
                   <linearGradient id="waveThrowBeamGrad" x1="0%" y1="0%" x2="100%" y2="0%">
                     <stop offset="0%" stopColor="#dfb76c" stopOpacity="1" />
@@ -208,44 +227,11 @@ export default function EarthGlobeReviewsSection() {
                       <feMergeNode in="SourceGraphic" />
                     </feMerge>
                   </filter>
-
-                  <filter id="cyanArcFilter" x="-30%" y="-30%" width="160%" height="160%">
-                    <feGaussianBlur stdDeviation="3.5" result="blur" />
-                    <feMerge>
-                      <feMergeNode in="blur" />
-                      <feMergeNode in="SourceGraphic" />
-                    </feMerge>
-                  </filter>
                 </defs>
 
-                {/* ── FREELY FLOATING ATMOSPHERE & ORBIT RINGS ── */}
-                <circle cx="230" cy="230" r="195" fill="none" stroke="#38bdf8" strokeWidth="0.8" strokeDasharray="4 6" opacity="0.25" />
-                <circle cx="230" cy="230" r="215" fill="none" stroke="#dfb76c" strokeWidth="0.9" strokeDasharray="8 10" opacity="0.3" />
-
-                {/* ── MAIN 3D EARTH SPHERE BODY ── */}
-                <circle cx="230" cy="230" r="165" fill="url(#freeGlobeGrad)" stroke="#38bdf8" strokeWidth="2.5" filter="drop-shadow(0 0 25px rgba(56,189,248,0.35))" />
-
-                {/* Latitude / Longitude Elliptical Grid Lines */}
-                <g stroke="#2a426e" strokeWidth="1" opacity="0.65" fill="none">
-                  <ellipse cx="230" cy="230" rx="165" ry="165" />
-                  <ellipse cx="230" cy="230" rx="165" ry="110" />
-                  <ellipse cx="230" cy="230" rx="165" ry="55" />
-                  <line x1="65" y1="230" x2="395" y2="230" stroke="#38bdf8" strokeWidth="1.2" opacity="0.5" />
-                  <ellipse cx="230" cy="230" rx="110" ry="165" />
-                  <ellipse cx="230" cy="230" rx="55" ry="165" />
-                </g>
-
-                {/* Stylized Continents on Earth Sphere */}
-                <g fill="#1f3660" stroke="#38bdf8" strokeWidth="1.4" opacity="0.9">
-                  {/* Eurasia & India */}
-                  <path d="M 260 160 Q 320 150 350 190 Q 340 240 310 270 Q 290 300 275 260 Q 260 210 260 160 Z" />
-                  {/* Africa */}
-                  <path d="M 200 210 Q 250 210 260 260 Q 240 310 220 320 Q 190 270 200 210 Z" />
-                  {/* Americas */}
-                  <path d="M 120 150 Q 170 160 160 210 Q 135 260 110 245 Q 100 190 120 150 Z" />
-                  {/* South America */}
-                  <path d="M 140 260 Q 180 270 175 320 Q 155 360 135 330 Q 130 280 140 260 Z" />
-                </g>
+                {/* Outer Celestial Orbit Rings */}
+                <circle cx="200" cy="200" r="180" fill="none" stroke="#38bdf8" strokeWidth="0.8" strokeDasharray="4 6" opacity="0.3" />
+                <circle cx="200" cy="200" r="195" fill="none" stroke="#dfb76c" strokeWidth="0.9" strokeDasharray="8 10" opacity="0.35" />
 
                 {/* ── ALL COLLECTOR LOCATION NODES ON GLOBE ── */}
                 {AUTHENTIC_REVIEWS.map((rev, idx) => {
@@ -254,21 +240,21 @@ export default function EarthGlobeReviewsSection() {
                     <g 
                       key={rev.id} 
                       transform={`translate(${rev.coordinates.x}, ${rev.coordinates.y})`}
-                      className="cursor-pointer"
+                      className="cursor-pointer pointer-events-auto"
                       onClick={() => triggerReview(idx)}
                     >
                       {isSelected ? (
                         /* Active Pin Beacon & Radar Rings */
                         <g>
-                          <circle cx="0" cy="0" r="18" fill="#dfb76c" fillOpacity="0.3">
-                            <animate attributeName="r" values="8;26;8" dur="2.2s" repeatCount="indefinite" />
-                            <animate attributeName="opacity" values="0.9;0;0.9" dur="2.2s" repeatCount="indefinite" />
+                          <circle cx="0" cy="0" r="16" fill="#dfb76c" fillOpacity="0.35">
+                            <animate attributeName="r" values="8;24;8" dur="2.2s" repeatCount="indefinite" />
+                            <animate attributeName="opacity" values="0.95;0;0.95" dur="2.2s" repeatCount="indefinite" />
                           </circle>
-                          <circle cx="0" cy="0" r="7" fill="#dfb76c" stroke="#ffffff" strokeWidth="2.5" filter="url(#goldArcFilter)" />
+                          <circle cx="0" cy="0" r="6" fill="#dfb76c" stroke="#ffffff" strokeWidth="2.2" filter="url(#goldArcFilter)" />
                         </g>
                       ) : (
                         /* Inactive Pin Node */
-                        <circle cx="0" cy="0" r="4" fill="#38bdf8" stroke="#0a1224" strokeWidth="1.2" opacity="0.8" />
+                        <circle cx="0" cy="0" r="3.5" fill="#38bdf8" stroke="#0a1224" strokeWidth="1.2" opacity="0.85" />
                       )}
                     </g>
                   )
@@ -276,35 +262,35 @@ export default function EarthGlobeReviewsSection() {
 
                 {/* ── DYNAMIC RADIATING WAVES (Throwing Waves from Active Pin) ── */}
                 <g key={`waves-${waveKey}`} transform={`translate(${currentReview.coordinates.x}, ${currentReview.coordinates.y})`}>
-                  <circle cx="0" cy="0" r="12" fill="none" stroke="#dfb76c" strokeWidth="2.8" opacity="0.95">
-                    <animate attributeName="r" from="12" to="100" dur="2.0s" repeatCount="indefinite" />
+                  <circle cx="0" cy="0" r="10" fill="none" stroke="#dfb76c" strokeWidth="2.5" opacity="0.95">
+                    <animate attributeName="r" from="10" to="90" dur="2.0s" repeatCount="indefinite" />
                     <animate attributeName="opacity" from="1" to="0" dur="2.0s" repeatCount="indefinite" />
                   </circle>
-                  <circle cx="0" cy="0" r="24" fill="none" stroke="#f7d794" strokeWidth="2.2" opacity="0.85">
-                    <animate attributeName="r" from="24" to="140" dur="2.0s" begin="0.4s" repeatCount="indefinite" />
+                  <circle cx="0" cy="0" r="20" fill="none" stroke="#f7d794" strokeWidth="2.0" opacity="0.85">
+                    <animate attributeName="r" from="20" to="125" dur="2.0s" begin="0.4s" repeatCount="indefinite" />
                     <animate attributeName="opacity" from="0.9" to="0" dur="2.0s" begin="0.4s" repeatCount="indefinite" />
                   </circle>
-                  <circle cx="0" cy="0" r="36" fill="none" stroke="#38bdf8" strokeWidth="1.8" opacity="0.75">
-                    <animate attributeName="r" from="36" to="180" dur="2.0s" begin="0.8s" repeatCount="indefinite" />
+                  <circle cx="0" cy="0" r="30" fill="none" stroke="#38bdf8" strokeWidth="1.6" opacity="0.75">
+                    <animate attributeName="r" from="30" to="160" dur="2.0s" begin="0.8s" repeatCount="indefinite" />
                     <animate attributeName="opacity" from="0.8" to="0" dur="2.0s" begin="0.8s" repeatCount="indefinite" />
                   </circle>
                 </g>
 
                 {/* ── SHOOTING ENERGY WAVE THROW RAY (Connecting Open Globe -> Right Reviews) ── */}
                 <path
-                  d={`M ${currentReview.coordinates.x} ${currentReview.coordinates.y} Q 420 ${currentReview.coordinates.y - 40} 470 230`}
+                  d={`M ${currentReview.coordinates.x} ${currentReview.coordinates.y} Q 360 ${currentReview.coordinates.y - 30} 420 200`}
                   fill="none"
                   stroke="url(#waveThrowBeamGrad)"
-                  strokeWidth="4.5"
+                  strokeWidth="4"
                   strokeLinecap="round"
                   filter="url(#goldArcFilter)"
                 />
                 
                 {/* Animated Wave Particle Traveling across the Ray */}
-                <circle r="5" fill="#ffffff" filter="url(#goldArcFilter)">
+                <circle r="4.5" fill="#ffffff" filter="url(#goldArcFilter)">
                   <animateMotion
                     key={`particle-${waveKey}`}
-                    path={`M ${currentReview.coordinates.x} ${currentReview.coordinates.y} Q 420 ${currentReview.coordinates.y - 40} 470 230`}
+                    path={`M ${currentReview.coordinates.x} ${currentReview.coordinates.y} Q 360 ${currentReview.coordinates.y - 30} 420 200`}
                     dur="1.4s"
                     repeatCount="indefinite"
                   />
@@ -312,14 +298,16 @@ export default function EarthGlobeReviewsSection() {
               </svg>
 
               {/* Floating Active Collector City Label on Screen */}
-              <div className="absolute bottom-2 left-2 sm:left-4 z-20 flex items-center gap-2 bg-[#080e1c]/90 backdrop-blur-md border border-[#dfb76c]/40 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-xl shadow-xl pointer-events-none max-w-[calc(100%-1rem)] sm:max-w-none">
+              <div className="absolute -bottom-2 left-2 sm:left-4 z-30 flex items-center gap-2 bg-[#080e1c]/95 backdrop-blur-md border border-[#dfb76c]/40 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-xl shadow-xl pointer-events-none max-w-[calc(100%-1rem)] sm:max-w-none">
                 <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#dfb76c] animate-ping shrink-0" />
                 <span className="font-mono text-[10px] sm:text-xs text-neutral-200 truncate">
                   Origin: <strong className="text-[#f7d794]">{currentReview.location}</strong>
                 </span>
               </div>
+            </motion.div>
 
-            </div>
+            {/* Realistic Soft Contact Drop Shadow Under the Globe (Matching User Reference Image) */}
+            <div className="w-48 sm:w-56 md:w-64 h-5 sm:h-7 -mt-2 rounded-[100%] bg-black/85 blur-md pointer-events-none" />
           </div>
 
           {/* ========================================================= */}
