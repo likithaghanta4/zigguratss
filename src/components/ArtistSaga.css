@@ -2,7 +2,18 @@
 /* MAISON DES ÉLITES LUXURY STYLING FOR ZIGGURATSS SAGA     */
 /* ========================================================= */
 
-/* Marquee Slider Styles for Artist Saga */
+/* Marquee Slider & Touch-Friendly Manual Carousel Styles for Artist Saga */
+.artwork-manual-carousel-track {
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-behavior: smooth;
+}
+
+.artwork-manual-carousel-track::-webkit-scrollbar {
+  display: none;
+}
+
 .marquee-container {
   width: 100%;
   overflow-x: hidden;

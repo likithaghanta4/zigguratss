@@ -124,7 +124,7 @@ export default function ProductSlider() {
 
             // Price
             gsap.to(price, {
-                scale: 1, opacity: 1, y: 0, delay: 1.0, duration: 0.5, ease: "back.out(2)"
+                scale: 1, opacity: 1, y: 0, delay: 0.25, duration: 0.5, ease: "back.out(2)"
             });
 
             // Button

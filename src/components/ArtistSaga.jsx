@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import { useNavigate } from 'react-router-dom'
 import { motion, useReducedMotion, AnimatePresence } from 'framer-motion'
 import { 
   Sparkles, X, CheckCircle2, Shield, Eye, ArrowUpRight, Palette, Layers, 
-  ArrowRight, ArrowLeft, Star, Quote, Award, Heart, Check, Compass, Feather, BookOpen
+  ArrowRight, ArrowLeft, ChevronLeft, ChevronRight, Star, Quote, Award, Heart, Check, Compass, Feather, BookOpen
 } from 'lucide-react'
 
 // Authentic Zigguratss Artworks from repository
@@ -105,166 +106,371 @@ export const collectorReviews = [
   }
 ]
 
-// Luxury Gallery Artwork Card for Marquees
-export function LuxuryGalleryCard({ artwork, verified = false }) {
-  const [openModal, setOpenModal] = useState(false)
+// Comprehensive authentic artwork registry for Zigguratss curated works
+export const ALL_CURATED_ARTWORKS = [
+  {
+    id: 'dt-11',
+    title: 'Divine Tunes-11',
+    artist: 'Pradip Sarkar',
+    image: screenshotImage,
+    price: '₹1,18,300',
+    originalPrice: '₹1,47,800',
+    medium: 'Acrylic on Canvas',
+    sizeInch: '32 × 30 in',
+    sizeCm: '81.28 × 76.2 cm',
+    year: '2024',
+    category: 'Portrait / Abstract',
+    style: 'Geometric Abstraction',
+    shortDesc: 'Contemporary figurative portraiture fused with meditative geometric abstraction and nature symbolism.',
+    verified: true
+  },
+  {
+    id: 'dt-09',
+    title: 'Divine Tunes-09',
+    artist: 'Pradip Sarkar',
+    image: flowersImage,
+    price: '₹98,000',
+    originalPrice: '₹1,22,500',
+    medium: 'Acrylic on Canvas',
+    sizeInch: '30 × 30 in',
+    sizeCm: '76.2 × 76.2 cm',
+    year: '2023',
+    category: 'Contemporary Portrait',
+    style: 'Color Field Geometry',
+    shortDesc: 'Exploration of meditative consciousness through deep ultramarine blues and vibrant gold highlights.',
+    verified: true
+  },
+  {
+    id: 'dt-05',
+    title: 'Divine Tunes-05',
+    artist: 'Pradip Sarkar',
+    image: image9,
+    price: '₹75,000',
+    originalPrice: '₹93,750',
+    medium: 'Acrylic on Canvas',
+    sizeInch: '28 × 24 in',
+    sizeCm: '71.1 × 60.9 cm',
+    year: '2023',
+    category: 'Figurative Flora',
+    style: 'Atmospheric Symbolism',
+    shortDesc: 'A delicate dialogue between nature, golden flora, and avian symbols celebrating the sanctity of living beauty.',
+    verified: true
+  },
+  {
+    id: 'dt-02',
+    title: 'Divine Tunes-02',
+    artist: 'Pradip Sarkar',
+    image: image12,
+    price: '₹62,500',
+    originalPrice: '₹78,000',
+    medium: 'Oil & Acrylic on Canvas',
+    sizeInch: '26 × 22 in',
+    sizeCm: '66.0 × 55.8 cm',
+    year: '2022',
+    category: 'Solitude Silhouette',
+    style: 'Dusk Luminism',
+    shortDesc: 'A lone figure bathed in amber forest sunset, invoking the peace of wandering in the heart of nature.',
+    verified: true
+  },
+  {
+    id: 'dt-07',
+    title: 'Divine Tunes-07',
+    artist: 'Pradip Sarkar',
+    image: diff3,
+    price: '₹84,000',
+    originalPrice: '₹1,05,000',
+    medium: 'Acrylic & Gold Leaf on Linen',
+    sizeInch: '30 × 26 in',
+    sizeCm: '76.2 × 66.0 cm',
+    year: '2023',
+    category: 'Wildlife Iconography',
+    style: 'Woodland Mysticism',
+    shortDesc: 'Gentle fawn surrounded by sacred forest botanicals rendered in rich textural brushwork and leaf gilding.',
+    verified: true
+  },
+  {
+    id: 'o1',
+    title: 'Tune Of Bengal — 4',
+    artist: 'Sekhar Roy',
+    image: image2,
+    price: '₹45,000',
+    originalPrice: '₹56,000',
+    medium: 'Mixed Media on Canvas',
+    sizeInch: '24 × 24 in',
+    sizeCm: '60.9 × 60.9 cm',
+    year: '2023',
+    category: 'Heritage Folklore',
+    style: 'Neo-Folk Expressionism',
+    shortDesc: 'Vibrant cultural narratives woven from rural Bengal heritage with bold earthen pigments and sacred motifs.',
+    verified: false
+  },
+  {
+    id: 'o2',
+    title: 'Ocean Of Dreams',
+    artist: 'Uttam Bhattacharya',
+    image: diff1,
+    price: '₹38,000',
+    originalPrice: '₹47,500',
+    medium: 'Acrylic on Textured Canvas',
+    sizeInch: '24 × 20 in',
+    sizeCm: '60.9 × 50.8 cm',
+    year: '2022',
+    category: 'Maritime Abstraction',
+    style: 'Fluid Modernism',
+    shortDesc: 'Atmospheric azure waves surging into foam and light, capturing the timeless infinity of the ocean.',
+    verified: false
+  },
+  {
+    id: 'o3',
+    title: 'Eternal Grace',
+    artist: 'Priyanka Bardhan',
+    image: image3,
+    price: '₹55,000',
+    originalPrice: '₹68,750',
+    medium: 'Oil & 24K Leaf on Linen',
+    sizeInch: '28 × 24 in',
+    sizeCm: '71.1 × 60.9 cm',
+    year: '2024',
+    category: 'Mythological Splendor',
+    style: 'Royal Renaissance',
+    shortDesc: 'Regal peacock perched amid palace courtyards, crowned with 24-karat gold leaf illumination.',
+    verified: false
+  },
+  {
+    id: 'o4',
+    title: 'Inner Peace 6',
+    artist: 'Monalisa Sarkar Mitra',
+    image: diff5,
+    price: '₹29,500',
+    originalPrice: '₹37,000',
+    medium: 'Acrylic on Canvas',
+    sizeInch: '20 × 20 in',
+    sizeCm: '50.8 × 50.8 cm',
+    year: '2023',
+    category: 'Zen Abstraction',
+    style: 'Meditative Serenity',
+    shortDesc: 'Minimalist spiritual balance through quiet crimson and ivory tonal fields invoking tranquil awakening.',
+    verified: false
+  },
+  {
+    id: 'o5',
+    title: 'Sky Dream 1',
+    artist: 'L. Joss',
+    image: sky1,
+    price: '₹65,000',
+    originalPrice: '₹81,250',
+    medium: 'Acrylic on Belgian Canvas',
+    sizeInch: '30 × 24 in',
+    sizeCm: '76.2 × 60.9 cm',
+    year: '2024',
+    category: 'Ethereal Cloudscapes',
+    style: 'Chromatic Lyrical',
+    shortDesc: 'A panoramic study of celestial cloud movement painted in radiant ultramarine and dawn blush.',
+    verified: false
+  },
+  {
+    id: 'o6',
+    title: 'April Ensemble',
+    artist: 'Mila Weis',
+    image: image5,
+    price: '₹72,000',
+    originalPrice: '₹90,000',
+    medium: 'Oil & Tempera on Canvas',
+    sizeInch: '32 × 28 in',
+    sizeCm: '81.2 × 71.1 cm',
+    year: '2023',
+    category: 'Vernal Harmony',
+    style: 'Botanical Abstract',
+    shortDesc: 'Bursting springtime botanical colors arranged in rhythmic symphony across dense textured canvas.',
+    verified: false
+  }
+]
 
-  useEffect(() => {
-    if (!openModal) return
-    const originalOverflow = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') setOpenModal(false)
+// Luxury Gallery Artwork Card for Manually Controllable Carousel
+export function LuxuryGalleryCard({ artwork, verified = false }) {
+  const navigate = useNavigate()
+
+  const handleSelectArtwork = (e) => {
+    e.preventDefault()
+    // Open product page with the clicked artwork
+    navigate(`/Product?id=${artwork.id}`)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      handleSelectArtwork(e)
     }
-    window.addEventListener('keydown', handleKeyDown)
-    return () => {
-      document.body.style.overflow = originalOverflow
-      window.removeEventListener('keydown', handleKeyDown)
-    }
-  }, [openModal])
+  }
 
   return (
-    <>
-      <div className="group relative bg-[#13131a] hover:bg-[#181824] rounded-2xl sm:rounded-3xl overflow-hidden border border-neutral-800/90 hover:border-[#dfb76c]/60 transition-all duration-400 shadow-[0_6px_25px_rgba(0,0,0,0.5)] hover:shadow-[0_16px_40px_rgba(223,183,108,0.2)] flex flex-col justify-between h-[400px] sm:h-[425px]">
-        {/* Top Gold Edge Accent */}
-        <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#dfb76c] to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-400 z-10" />
+    <div 
+      role="button"
+      tabIndex={0}
+      onClick={handleSelectArtwork}
+      onKeyDown={handleKeyDown}
+      aria-label={`View artwork ${artwork.title} by ${artwork.artist}`}
+      className="group relative bg-[#13131a] hover:bg-[#181824] rounded-2xl sm:rounded-3xl overflow-hidden border border-neutral-800/90 hover:border-[#dfb76c]/60 transition-all duration-300 shadow-[0_6px_25px_rgba(0,0,0,0.5)] hover:shadow-[0_16px_40px_rgba(223,183,108,0.2)] flex flex-col justify-between h-[390px] sm:h-[420px] cursor-pointer select-none"
+    >
+      {/* Top Gold Edge Accent */}
+      <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-[#dfb76c] to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-300 z-10" />
 
-        {/* Decorative Art-Nouveau Corner Accents */}
-        <div className="absolute top-2 left-2 text-[#dfb76c]/30 text-[10px] pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity">⌜</div>
-        <div className="absolute top-2 right-2 text-[#dfb76c]/30 text-[10px] pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity">⌝</div>
+      {/* Decorative Art-Nouveau Corner Accents */}
+      <div className="absolute top-2 left-2 text-[#dfb76c]/30 text-[10px] pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity">⌜</div>
+      <div className="absolute top-2 right-2 text-[#dfb76c]/30 text-[10px] pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity">⌝</div>
 
-        {/* Image Frame */}
-        <div 
-          onClick={() => setOpenModal(true)}
-          className="relative h-[235px] sm:h-[260px] w-full overflow-hidden bg-neutral-950 cursor-pointer"
-        >
-          <img 
-            src={artwork.image} 
-            alt={artwork.title} 
-            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-106 filter brightness-95 group-hover:brightness-105 select-none" 
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#13131a] via-transparent to-black/30 opacity-75 group-hover:opacity-40 transition-opacity" />
+      {/* Image Frame */}
+      <div className="relative h-[235px] sm:h-[260px] w-full overflow-hidden bg-neutral-950">
+        <img 
+          src={artwork.image} 
+          alt={artwork.title} 
+          className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-106 filter brightness-95 group-hover:brightness-105 select-none pointer-events-none" 
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#13131a] via-transparent to-black/30 opacity-75 group-hover:opacity-40 transition-opacity" />
 
-          {/* Price Badge */}
-          {artwork.price && (
-            <div className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 z-10 px-2.5 sm:px-3 py-1 rounded-xl bg-black/85 backdrop-blur-md border border-[#dfb76c]/40 text-[#f7d794] text-[11px] sm:text-xs font-serif font-medium tracking-wide shadow-lg">
-              {artwork.price}
-            </div>
-          )}
-
-          {/* Hover Zoom Prompt */}
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40 backdrop-blur-[2px]">
-            <span className="px-3.5 py-1.5 rounded-full bg-[#121217]/90 text-[#dfb76c] border border-[#dfb76c]/50 text-xs font-mono uppercase tracking-wider flex items-center gap-1.5 shadow-xl">
-              <Eye size={13} />
-              <span>Inspect Masterpiece</span>
-            </span>
+        {/* Price Badge */}
+        {artwork.price && (
+          <div className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 z-10 px-2.5 sm:px-3 py-1 rounded-xl bg-black/85 backdrop-blur-md border border-[#dfb76c]/40 text-[#f7d794] text-[11px] sm:text-xs font-serif font-medium tracking-wide shadow-lg">
+            {artwork.price}
           </div>
-        </div>
+        )}
 
-        {/* Card Body */}
-        <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
-          <div>
-            <div className="flex items-center justify-between gap-2 mb-1">
-              <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-[#dfb76c]">
-                {artwork.artist}
-              </span>
-              {verified && (
-                <span className="text-[9px] font-mono text-neutral-400 bg-neutral-900 border border-neutral-800 px-1.5 py-0.5 rounded">
-                  Studio Original
-                </span>
-              )}
-            </div>
-
-            <h4 
-              onClick={() => setOpenModal(true)}
-              className="font-serif text-base sm:text-lg font-normal text-white group-hover:text-[#f7d794] transition-colors line-clamp-1 cursor-pointer"
-            >
-              {artwork.title}
-            </h4>
-          </div>
-
-          <div className="flex items-center justify-between pt-3 border-t border-neutral-800/80 mt-2">
-            <span className="text-[10px] text-neutral-400 font-light">Acrylic on Canvas</span>
-            <button
-              onClick={() => setOpenModal(true)}
-              className="text-xs text-[#dfb76c] hover:text-[#f7d794] font-medium flex items-center gap-1 cursor-pointer transition-colors"
-            >
-              <span>Details</span>
-              <ArrowUpRight size={13} />
-            </button>
-          </div>
+        {/* Hover View Prompt */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40 backdrop-blur-[2px]">
+          <span className="px-3.5 py-1.5 rounded-full bg-[#121217]/90 text-[#dfb76c] border border-[#dfb76c]/50 text-xs font-mono uppercase tracking-wider flex items-center gap-1.5 shadow-xl">
+            <Eye size={13} />
+            <span>Open Artwork</span>
+          </span>
         </div>
       </div>
 
-      {/* High-Resolution Artwork Quick View Modal */}
-      {openModal && createPortal(
-        <AnimatePresence>
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={() => setOpenModal(false)}
-            className="fixed inset-0 z-[9999] bg-black/85 backdrop-blur-xl flex items-center justify-center p-3 sm:p-6"
+      {/* Card Body */}
+      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
+        <div>
+          <div className="flex items-center justify-between gap-2 mb-1">
+            <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-[#dfb76c]">
+              {artwork.artist}
+            </span>
+            {(verified || artwork.verified) && (
+              <span className="text-[9px] font-mono text-neutral-400 bg-neutral-900 border border-neutral-800 px-1.5 py-0.5 rounded">
+                Studio Original
+              </span>
+            )}
+          </div>
+
+          <h4 className="font-serif text-base sm:text-lg font-normal text-white group-hover:text-[#f7d794] transition-colors line-clamp-1">
+            {artwork.title}
+          </h4>
+        </div>
+
+        <div className="flex items-center justify-between pt-3 border-t border-neutral-800/80 mt-2">
+          <span className="text-[10px] text-neutral-400 font-light truncate max-w-[150px]">
+            {artwork.medium || 'Acrylic on Canvas'}
+          </span>
+          <span className="text-xs text-[#dfb76c] group-hover:text-[#f7d794] font-medium flex items-center gap-1 transition-colors">
+            <span>Details</span>
+            <ArrowUpRight size={13} />
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// ── MANUALLY CONTROLLABLE TOUCH-FRIENDLY ARTWORK CAROUSEL ──
+function ArtworkManualCarousel({ title, badge, artworks, verified = false }) {
+  const scrollRef = useRef(null)
+  const [canScrollLeft, setCanScrollLeft] = useState(false)
+  const [canScrollRight, setCanScrollRight] = useState(true)
+
+  const checkScrollState = () => {
+    if (!scrollRef.current) return
+    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current
+    setCanScrollLeft(scrollLeft > 12)
+    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 12)
+  }
+
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    checkScrollState()
+    el.addEventListener('scroll', checkScrollState, { passive: true })
+    window.addEventListener('resize', checkScrollState)
+    return () => {
+      el.removeEventListener('scroll', checkScrollState)
+      window.removeEventListener('resize', checkScrollState)
+    }
+  }, [artworks])
+
+  const handleScroll = (direction) => {
+    if (!scrollRef.current) return
+    const cardWidth = 300
+    const scrollDistance = direction === 'left' ? -cardWidth * 1.5 : cardWidth * 1.5
+    scrollRef.current.scrollBy({ left: scrollDistance, behavior: 'smooth' })
+  }
+
+  return (
+    <section className="w-full">
+      <div className="flex items-center justify-between mb-4 sm:mb-6 px-1">
+        <div>
+          <div className="flex items-center gap-2 mb-1">
+            <span className="text-[10px] sm:text-xs uppercase tracking-[0.22em] text-[#dfb76c] font-semibold">
+              {badge}
+            </span>
+          </div>
+          <h3 className="font-serif text-xl sm:text-2xl md:text-3xl font-normal text-white tracking-tight">
+            {title}
+          </h3>
+        </div>
+
+        {/* Manual Scroll Controls */}
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => handleScroll('left')}
+            disabled={!canScrollLeft}
+            aria-label={`Scroll ${title} left`}
+            className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border flex items-center justify-center transition-all ${
+              canScrollLeft
+                ? 'border-[#dfb76c]/50 hover:border-[#dfb76c] bg-[#14141e] text-[#dfb76c] hover:bg-[#dfb76c]/15 cursor-pointer shadow-md'
+                : 'border-neutral-800 text-neutral-600 bg-neutral-900/40 cursor-not-allowed opacity-40'
+            }`}
           >
-            <motion.div
-              initial={{ scale: 0.92, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.92, opacity: 0, y: 20 }}
-              onClick={(e) => e.stopPropagation()}
-              className="w-full max-w-2xl bg-[#14141e] border border-[#dfb76c]/50 rounded-3xl p-5 sm:p-8 shadow-[0_25px_80px_rgba(0,0,0,0.95)] relative overflow-hidden"
+            <ChevronLeft size={16} />
+          </button>
+          <button
+            type="button"
+            onClick={() => handleScroll('right')}
+            disabled={!canScrollRight}
+            aria-label={`Scroll ${title} right`}
+            className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border flex items-center justify-center transition-all ${
+              canScrollRight
+                ? 'border-[#dfb76c]/50 hover:border-[#dfb76c] bg-[#14141e] text-[#dfb76c] hover:bg-[#dfb76c]/15 cursor-pointer shadow-md'
+                : 'border-neutral-800 text-neutral-600 bg-neutral-900/40 cursor-not-allowed opacity-40'
+            }`}
+          >
+            <ChevronRight size={16} />
+          </button>
+        </div>
+      </div>
+
+      {/* Fully Touch-Friendly, Free-Scrolling Carousel Container (No Auto-Fighting Animation) */}
+      <div className="relative bg-[#121217]/80 rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-neutral-800/80 backdrop-blur-md shadow-xl overflow-hidden">
+        <div 
+          ref={scrollRef} 
+          className="artwork-manual-carousel-track flex gap-4 sm:gap-6 overflow-x-auto scroll-smooth py-2 px-1 snap-x snap-mandatory touch-pan-x select-none"
+        >
+          {artworks.map((item) => (
+            <div 
+              key={item.id} 
+              className="snap-start shrink-0 w-[260px] xs:w-[280px] sm:w-[305px]"
             >
-              <button
-                onClick={() => setOpenModal(false)}
-                className="absolute top-4 right-4 w-8 h-8 rounded-full bg-neutral-900 border border-neutral-700 text-neutral-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer"
-              >
-                <X size={16} />
-              </button>
-
-              <div className="flex items-center gap-2 mb-2">
-                <span className="px-2.5 py-0.5 rounded-full bg-[#dfb76c]/15 text-[#f7d794] text-[10px] font-mono uppercase font-semibold">
-                  Curated Masterwork
-                </span>
-                <span className="text-xs text-neutral-400 font-mono">By {artwork.artist}</span>
-              </div>
-
-              <h3 className="font-serif text-2xl sm:text-3xl text-white font-normal mb-4">
-                {artwork.title}
-              </h3>
-
-              <div className="w-full h-64 sm:h-80 rounded-2xl overflow-hidden bg-black relative border border-neutral-800 mb-5 flex items-center justify-center">
-                <img src={artwork.image} alt={artwork.title} className="w-full h-full object-contain" />
-              </div>
-
-              <div className="flex items-center justify-between pt-3 border-t border-neutral-800">
-                <div>
-                  <span className="text-xs text-neutral-400 block font-mono">Acquisition Valuation</span>
-                  <span className="font-serif text-lg sm:text-xl font-bold text-[#dfb76c]">{artwork.price || 'Inquire with Curator'}</span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => setOpenModal(false)}
-                    className="px-4 py-2 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-700 text-neutral-300 text-xs uppercase tracking-wider font-semibold transition-colors"
-                  >
-                    Close
-                  </button>
-                  <button
-                    onClick={() => {
-                      setOpenModal(false)
-                      window.location.href = `/product`
-                    }}
-                    className="px-5 py-2 rounded-xl bg-gradient-to-r from-[#dfb76c] to-[#c9a96e] text-neutral-950 text-xs uppercase tracking-wider font-bold shadow-md hover:from-[#f7d794] transition-all"
-                  >
-                    View Artwork
-                  </button>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        </AnimatePresence>,
-        document.body
-      )}
-    </>
+              <LuxuryGalleryCard artwork={item} verified={verified || item.verified} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
   )
 }
 
@@ -276,101 +482,35 @@ export function CollectorReviewsSection() {
 // ── 2. EXPORTED ARTIST MARQUEES SECTION (Oeuvre & Other Masters Streams) ──
 export function ArtistMarqueesSection() {
   const shouldReduceMotion = useReducedMotion()
-  const marqueeRef1 = useRef(null)
-  const marqueeRef2 = useRef(null)
 
-  // Authentic Pradip Sarkar curated artworks
-  const pradipArtworks = [
-    { id: 1, title: 'Divine Tunes-11', artist: 'Pradip Sarkar', image: flowersImage, price: '₹1,18,300' },
-    { id: 2, title: 'Divine Tunes-09', artist: 'Pradip Sarkar', image: screenshotImage, price: '₹98,000' },
-    { id: 3, title: 'Divine Tunes-05', artist: 'Pradip Sarkar', image: image9, price: '₹75,000' },
-    { id: 4, title: 'Divine Tunes-02', artist: 'Pradip Sarkar', image: image12, price: '₹62,500' },
-    { id: 5, title: 'Divine Tunes-07', artist: 'Pradip Sarkar', image: diff3, price: '₹84,000' },
-  ]
-
-  // Authentic Other Masters curated artworks
-  const otherMastersArtworks = [
-    { id: 'o1', title: 'Tune Of Bengal — 4', artist: 'Sekhar Roy', image: image2, price: '₹45,000' },
-    { id: 'o2', title: 'Ocean Of Dreams', artist: 'Uttam Bhattacharya', image: diff1, price: '₹38,000' },
-    { id: 'o3', title: 'Eternal Grace', artist: 'Priyanka Bardhan', image: image3, price: '₹55,000' },
-    { id: 'o4', title: 'Inner Peace 6', artist: 'Monalisa Sarkar Mitra', image: diff5, price: '₹29,500' },
-    { id: 'o5', title: 'Sky Dream 1', artist: 'L. Joss', image: sky1, price: '₹65,000' },
-    { id: 'o6', title: 'April Ensemble', artist: 'Mila Weis', image: image5, price: '₹72,000' },
-  ]
+  const pradipArtworks = ALL_CURATED_ARTWORKS.filter(a => a.artist === 'Pradip Sarkar')
+  const otherMastersArtworks = ALL_CURATED_ARTWORKS.filter(a => a.artist !== 'Pradip Sarkar')
 
   return (
     <motion.div 
       data-showcase-section
       data-showcase-title="Related Masterworks & Streams"
-      initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 40, filter: 'blur(10px)' }}
-      whileInView={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-      viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-      className="w-full space-y-12 sm:space-y-16"
+      initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '0px 0px -40px 0px', amount: 0.05 }}
+      transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+      className="w-full space-y-10 sm:space-y-14"
     >
-      {/* RELATED ARTWORKS MARQUEE: PRADIP SARKAR */}
-      <section className="w-full">
-        <div className="flex items-center justify-between mb-4 sm:mb-6 px-1">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] sm:text-xs uppercase tracking-[0.22em] text-[#dfb76c] font-semibold">
-                Curated Selection
-              </span>
-            </div>
-            <h3 className="font-serif text-xl sm:text-2xl md:text-3xl font-normal text-white tracking-tight">
-              More Artworks by Pradip Sarkar
-            </h3>
-          </div>
-        </div>
+      {/* RELATED ARTWORKS: PRADIP SARKAR */}
+      <ArtworkManualCarousel 
+        title="More Artworks by Pradip Sarkar"
+        badge="Curated Selection"
+        artworks={pradipArtworks}
+        verified={true}
+      />
 
-        {/* Continuous Marquee Stream */}
-        <div ref={marqueeRef1} className="marquee-container bg-[#121217]/80 rounded-2xl sm:rounded-3xl py-4 sm:py-6 border border-neutral-800/80 backdrop-blur-md shadow-xl">
-          <div className="marquee-track">
-            {pradipArtworks.map((p) => (
-              <div key={`original-${p.id}`} className="marquee-item">
-                <LuxuryGalleryCard artwork={p} verified={true} />
-              </div>
-            ))}
-            {pradipArtworks.map((p) => (
-              <div key={`duplicate-${p.id}`} className="marquee-item">
-                <LuxuryGalleryCard artwork={p} verified={true} />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* RELATED ARTWORKS MARQUEE: OTHER MASTERS */}
-      <section className="w-full">
-        <div className="flex items-center justify-between mb-4 sm:mb-6 px-1">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-[10px] sm:text-xs uppercase tracking-[0.22em] text-[#dfb76c] font-semibold">
-                Gallery Recommendations
-              </span>
-            </div>
-            <h3 className="font-serif text-xl sm:text-2xl md:text-3xl font-normal text-white tracking-tight">
-              Featured Artworks from Other Masters
-            </h3>
-          </div>
-        </div>
-
-        {/* Continuous Marquee Stream */}
-        <div ref={marqueeRef2} className="marquee-container bg-[#121217]/80 rounded-2xl sm:rounded-3xl py-4 sm:py-6 border border-neutral-800/80 backdrop-blur-md shadow-xl">
-          <div className="marquee-track">
-            {otherMastersArtworks.map((p) => (
-              <div key={`original-${p.id}`} className="marquee-item">
-                <LuxuryGalleryCard artwork={p} />
-              </div>
-            ))}
-            {otherMastersArtworks.map((p) => (
-              <div key={`duplicate-${p.id}`} className="marquee-item">
-                <LuxuryGalleryCard artwork={p} />
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* RELATED ARTWORKS: OTHER MASTERS */}
+      <ArtworkManualCarousel 
+        title="Featured Artworks from Other Masters"
+        badge="Gallery Recommendations"
+        artworks={otherMastersArtworks}
+        verified={false}
+      />
     </motion.div>
   )
 }

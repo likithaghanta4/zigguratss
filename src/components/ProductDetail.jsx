@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { 
   ZoomIn, Maximize2, ShoppingCart, CreditCard, Truck, CheckCircle2, 
@@ -10,7 +11,7 @@ import {
 } from 'lucide-react'
 import { analyzeImageOrientation, validateImage } from '../services/imageService'
 import ArtistCardMini from './ArtistCardMini'
-import ArtistSaga, { ArtistMarqueesSection, CollectorReviewsSection } from './ArtistSaga'
+import ArtistSaga, { ArtistMarqueesSection, CollectorReviewsSection, ALL_CURATED_ARTWORKS } from './ArtistSaga'
 import WallHangedImageGenerator from './WallHangedImageGenerator'
 import FlightRadarMap from './FlightRadarMap'
 import ArchivalPreparationScene from './ArchivalPreparationScene'
@@ -85,6 +86,13 @@ const TRUST_GUARANTEE_ITEMS = [
 
 export default function ProductDetail({ onReplayEntrance }) {
   const shouldReduceMotion = useReducedMotion()
+  const [searchParams] = useSearchParams()
+  const artworkParam = searchParams.get('id') || searchParams.get('title')
+
+  const selectedArtwork = ALL_CURATED_ARTWORKS?.find(
+    (item) => item.id === artworkParam || item.title?.toLowerCase() === artworkParam?.toLowerCase()
+  ) || ALL_CURATED_ARTWORKS?.find((item) => item.id === 'dt-11') || ALL_CURATED_ARTWORKS?.[0]
+
   const [isAutoPlay, setIsAutoPlay] = useState(true)
   const [openFullscreen, setOpenFullscreen] = useState(false)
   const [isZoomed, setIsZoomed] = useState(false)
@@ -508,6 +516,24 @@ export default function ProductDetail({ onReplayEntrance }) {
     }
   ])
 
+  // Sync primary gallery image with selected artwork from registry / URL
+  useEffect(() => {
+    if (!artworkParam || !selectedArtwork) return
+    setGalleryThumbs((prev) => {
+      const updated = [...prev]
+      if (updated[0]) {
+        updated[0] = {
+          ...updated[0],
+          title: selectedArtwork.title,
+          src: selectedArtwork.image || updated[0].src,
+          alt: `${selectedArtwork.title} in Luxury Living Room`,
+          dimensions: `${selectedArtwork.sizeInch} (${selectedArtwork.sizeCm})`,
+        }
+      }
+      return updated
+    })
+  }, [artworkParam, selectedArtwork])
+
   // =========================================================
   // UNIFIED 24-STEP CONTINUOUS ROOM & ARTWORK TOUR ENGINE:
   // (4 Rooms × 6 Artworks = 24 Total Sequential Steps)
@@ -554,23 +580,23 @@ export default function ProductDetail({ onReplayEntrance }) {
     {
       id: 'category',
       label: 'Category',
-      value: 'Portrait / Abstract',
+      value: selectedArtwork?.category || 'Portrait / Abstract',
       heading: 'Category Classification',
-      shortDesc: 'Contemporary figurative portraiture fused with meditative geometric abstraction and nature symbolism.',
-      detail: 'Contemporary Indian fine art merging expressive figurative portraiture with meditative abstraction. The composition centers on a serene muse adorned with symbolic butterflies, exploring internal tranquility and spiritual resonance.',
+      shortDesc: selectedArtwork?.shortDesc || 'Contemporary figurative portraiture fused with meditative geometric abstraction and nature symbolism.',
+      detail: 'Contemporary fine art merging expressive figurative portraiture with meditative abstraction, exploring internal tranquility, harmonic balance, and spiritual resonance.',
       highlight: 'Contemporary Indian Fine Art',
-      curatorialNote: 'A benchmark piece bridging traditional Indian aesthetic sensibility and international modern abstraction.',
+      curatorialNote: 'A benchmark piece bridging traditional aesthetic sensibility and international modern abstraction.',
       provenanceSource: 'Zigguratss Curatorial Registry',
       icon: Palette
     },
     {
       id: 'style',
       label: 'Style',
-      value: 'Geometric Abstraction',
+      value: selectedArtwork?.style || 'Geometric Abstraction',
       heading: 'Artistic Style & Movement',
       shortDesc: 'Harmonic cubic matrices and architectural planes creating structured visual cadences on canvas.',
-      detail: 'Architectural planes, rhythmic cubic grids, and structured geometric matrices inspired by Indian modernism. Sarkar partitions the canvas into harmonious tonal blocks that guide the viewer\'s eye through dimensional visual cadences.',
-      highlight: 'Signature Cubist Modernism',
+      detail: `Architectural planes, rhythmic cubic grids, and structured geometric matrices inspired by Indian modernism. Partitioned into harmonious tonal blocks that guide the viewer's eye through dimensional visual cadences.`,
+      highlight: 'Signature Modernism',
       curatorialNote: 'Distinguished by precise linear discipline paired with emotional warmth and contemplative stillness.',
       provenanceSource: 'Zigguratss Style Archive',
       icon: Layers
@@ -590,9 +616,9 @@ export default function ProductDetail({ onReplayEntrance }) {
     {
       id: 'medium',
       label: 'Medium Used',
-      value: 'Acrylic on Canvas',
+      value: selectedArtwork?.medium || 'Acrylic on Canvas',
       heading: 'Medium & Substrate',
-      shortDesc: 'Artist-grade lightfast acrylic emulsions on heavyweight Belgian primed cotton-linen canvas.',
+      shortDesc: `Artist-grade lightfast emulsions on heavyweight Belgian primed cotton-linen canvas.`,
       detail: 'Premium artist-grade, lightfast acrylic emulsions formulated for permanent color saturation and archival stability. The pigment is bonded to heavyweight Belgian cotton-linen canvas primed with museum-grade acid-free titanium gesso.',
       highlight: '100% Archival Grade Materials',
       curatorialNote: 'Lightfastness rated ASTM I (100+ year gallery preservation index without pigment degradation).',
@@ -602,10 +628,10 @@ export default function ProductDetail({ onReplayEntrance }) {
     {
       id: 'size',
       label: 'Size (Inches)',
-      value: unit === 'cm' ? '81.28 × 76.20 cm' : '32.00 × 30.00 in',
+      value: unit === 'cm' ? (selectedArtwork?.sizeCm || '81.28 × 76.20 cm') : (selectedArtwork?.sizeInch || '32.00 × 30.00 in'),
       heading: 'Physical Dimensions & Scale',
-      shortDesc: unit === 'cm' ? '81.28 × 76.20 cm (32 × 30 in) calibrated for salon & residential spaces.' : '32.00 × 30.00 in (81.28 × 76.20 cm) calibrated for salon & residential spaces.',
-      detail: 'Museum-proportioned scale measuring exactly 32.00 × 30.00 inches (81.28 × 76.20 cm). Perfectly calibrated for prominent salon placement, collector living suites, and high-ceiling architectural environments without visual crowding.',
+      shortDesc: unit === 'cm' ? `${selectedArtwork?.sizeCm || '81.28 × 76.20 cm'} (${selectedArtwork?.sizeInch || '32 × 30 in'}) calibrated for salon & residential spaces.` : `${selectedArtwork?.sizeInch || '32.00 × 30.00 in'} (${selectedArtwork?.sizeCm || '81.28 × 76.20 cm'}) calibrated for salon & residential spaces.`,
+      detail: `Museum-proportioned scale measuring exactly ${selectedArtwork?.sizeInch || '32.00 × 30.00 inches'} (${selectedArtwork?.sizeCm || '81.28 × 76.20 cm'}). Perfectly calibrated for prominent salon placement, collector living suites, and high-ceiling architectural environments without visual crowding.`,
       highlight: 'Curated Architectural Scale',
       curatorialNote: 'Includes an additional 2.5-inch perimeter margin of unpainted archival canvas for customized gallery stretching or floating frame mounting.',
       provenanceSource: 'Zigguratss Dimension Registry',
@@ -614,10 +640,10 @@ export default function ProductDetail({ onReplayEntrance }) {
     {
       id: 'valuation',
       label: 'Valuation',
-      value: '₹1,18,300 ($1,577)',
+      value: selectedArtwork?.price ? `${selectedArtwork.price} ($${Math.round((parseInt(selectedArtwork.price.replace(/[^\d]/g, ''), 10) || 118300) / 75).toLocaleString()})` : '₹1,18,300 ($1,577)',
       heading: 'Acquisition Valuation',
       shortDesc: 'Studio-direct pricing indexed against artist auction records and verified gallery registry.',
-      detail: 'Primary market acquisition valuation indexed directly from Pradip Sarkar\'s registered studio catalog and verified gallery sales history. Fully inclusive of all museum packaging, provenance verification, and comprehensive air transit insurance.',
+      detail: `Primary market acquisition valuation indexed directly from ${selectedArtwork?.artist || "Pradip Sarkar"}'s registered studio catalog and verified gallery sales history. Fully inclusive of all museum packaging, provenance verification, and comprehensive air transit insurance.`,
       highlight: 'Registered Studio Provenance',
       curatorialNote: 'Accompanied by an official commercial gallery bill of sale and registered appraisal certification.',
       provenanceSource: 'Zigguratss Pricing Index',
@@ -626,11 +652,11 @@ export default function ProductDetail({ onReplayEntrance }) {
     {
       id: 'year',
       label: 'Year Created',
-      value: '2023 (Archival)',
+      value: `${selectedArtwork?.year || '2023'} (Archival)`,
       heading: 'Creation Chronology',
-      shortDesc: 'Executed in Mumbai studio as the cornerstone masterwork of the Divine Tunes suite.',
-      detail: 'Completed in 2023 within Pradip Sarkar\'s Mumbai studio. Formally cataloged as a vital pillar work within the internationally exhibited \'Divine Tunes\' series, representing the peak maturity of his cubic spiritual abstraction period.',
-      highlight: 'Master Mature Period (2023)',
+      shortDesc: `Executed in studio as a cornerstone masterwork of the ${selectedArtwork?.title || 'Divine Tunes'} suite.`,
+      detail: `Completed in ${selectedArtwork?.year || '2023'} within ${selectedArtwork?.artist || "Pradip Sarkar"}'s registered studio. Formally cataloged as a vital pillar work representing the peak maturity of the artist's contemporary period.`,
+      highlight: `Master Period (${selectedArtwork?.year || '2023'})`,
       curatorialNote: 'Personally titled, dated, and signed by the artist in pigment on the lower canvas face and in archival ink on reverse.',
       provenanceSource: 'Zigguratss Catalog Raisonné',
       icon: Clock
@@ -1130,7 +1156,7 @@ export default function ProductDetail({ onReplayEntrance }) {
                   </span>
                 </div>
                 <h1 className="font-serif text-2xl xs:text-3xl sm:text-4xl lg:text-[40px] font-normal text-white tracking-tight leading-tight break-words">
-                  Divine Tunes-11
+                  {selectedArtwork?.title || 'Divine Tunes-11'}
                 </h1>
                 <div className="flex items-center gap-2 pt-0.5 sm:pt-1">
                   <span className="text-xs sm:text-sm text-neutral-400 font-light">By</span>
@@ -1138,7 +1164,7 @@ export default function ProductDetail({ onReplayEntrance }) {
                     href="#artist-section"
                     className="text-xs sm:text-sm font-medium text-white hover:text-[#dfb76c] transition-colors underline underline-offset-4 decoration-[#dfb76c]/50"
                   >
-                    Pradip Sarkar
+                    {selectedArtwork?.artist || 'Pradip Sarkar'}
                   </a>
                   <CheckCircle2 size={15} className="text-[#dfb76c]" />
                 </div>
@@ -1192,7 +1218,7 @@ export default function ProductDetail({ onReplayEntrance }) {
                     <span className={`font-medium text-[11px] xs:text-xs sm:text-sm break-words transition-colors ${
                       activeDimBoxIdx === 0 ? 'text-white font-semibold' : 'text-neutral-200'
                     }`}>
-                      {unit === 'inch' ? '32 × 30 in' : '81.28 × 76.2 cm'}
+                      {unit === 'inch' ? (selectedArtwork?.sizeInch || '32 × 30 in') : (selectedArtwork?.sizeCm || '81.28 × 76.2 cm')}
                     </span>
                   </motion.div>
 
@@ -1217,7 +1243,7 @@ export default function ProductDetail({ onReplayEntrance }) {
                     <span className={`font-medium text-[11px] xs:text-xs sm:text-sm break-words transition-colors ${
                       activeDimBoxIdx === 1 ? 'text-white font-semibold' : 'text-neutral-200'
                     }`}>
-                      Acrylic on Canvas
+                      {selectedArtwork?.medium || 'Acrylic on Canvas'}
                     </span>
                   </motion.div>
                 </div>
@@ -1616,13 +1642,13 @@ export default function ProductDetail({ onReplayEntrance }) {
       <motion.section 
         data-showcase-section
         data-showcase-title="Technical Ledger & Specs"
-        initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
+        initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 16 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.05 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        viewport={{ once: true, margin: '0px 0px -30px 0px', amount: 0 }}
+        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
         className="w-full"
       >
-        <div className="bg-[#121217]/90 backdrop-blur-xl p-5 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl border border-neutral-800 shadow-xl space-y-6 sm:space-y-8">
+        <div className="bg-[#121217]/90 backdrop-blur-xl p-3.5 xs:p-4 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl border border-neutral-800 shadow-xl space-y-4 sm:space-y-8">
           <div className="text-center max-w-xl mx-auto">
             <span className="text-[10px] sm:text-xs uppercase tracking-[0.22em] text-[#dfb76c] font-semibold block mb-1">
               Specifications
@@ -1639,7 +1665,7 @@ export default function ProductDetail({ onReplayEntrance }) {
           <div 
             onMouseEnter={() => setIsSpecHovered(true)}
             onMouseLeave={() => setIsSpecHovered(false)}
-            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 pt-2 text-xs"
+            className="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 pt-2 text-xs"
           >
             {artworkSpecs.map((spec, i) => {
               const isActive = activeSpecIdx === i
@@ -1649,7 +1675,7 @@ export default function ProductDetail({ onReplayEntrance }) {
                   key={spec.id}
                   onClick={() => setActiveSpecIdx(i)}
                   onMouseEnter={() => setActiveSpecIdx(i)}
-                  initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 12 }}
+                  initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 10 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   animate={{
@@ -1662,7 +1688,7 @@ export default function ProductDetail({ onReplayEntrance }) {
                     damping: 24, 
                     mass: 0.8 
                   }}
-                  className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border transition-all duration-300 relative overflow-hidden group cursor-pointer flex flex-col justify-between gap-2.5 ${
+                  className={`p-2.5 xs:p-3 sm:p-4 rounded-xl sm:rounded-2xl border transition-all duration-300 relative overflow-hidden group cursor-pointer flex flex-col justify-between gap-1.5 sm:gap-2.5 ${
                     isActive
                       ? 'bg-gradient-to-b from-[#252538] via-[#1a1a27] to-[#12121b] border-[#dfb76c] ring-2 ring-[#dfb76c]/50 shadow-[0_8px_30px_rgba(223,183,108,0.32)] z-10'
                       : 'bg-gradient-to-b from-[#1d1d2b] via-[#14141e] to-[#101017] border-neutral-800 hover:border-[#dfb76c]/40 opacity-80 hover:opacity-100 shadow-md'
@@ -1674,12 +1700,12 @@ export default function ProductDetail({ onReplayEntrance }) {
 
                   {/* Header Row: Label & Active Ping Indicator */}
                   <div>
-                    <div className="flex items-center justify-between gap-1.5 mb-1.5">
+                    <div className="flex items-center justify-between gap-1 sm:gap-1.5 mb-1 sm:mb-1.5">
                       <div className="flex items-center gap-1.5 min-w-0">
-                        <SpecIcon size={13} className={`shrink-0 transition-colors ${
+                        <SpecIcon size={12} className={`sm:w-[13px] sm:h-[13px] shrink-0 transition-colors ${
                           isActive ? 'text-[#f7d794]' : 'text-[#dfb76c]'
                         }`} />
-                        <span className={`uppercase tracking-wider text-[10px] sm:text-[11px] font-semibold truncate transition-colors ${
+                        <span className={`uppercase tracking-wider text-[9.5px] xs:text-[10px] sm:text-[11px] font-semibold truncate transition-colors ${
                           isActive ? 'text-[#f7d794]' : 'text-[#dfb76c]'
                         }`}>
                           {spec.label}
@@ -1693,7 +1719,7 @@ export default function ProductDetail({ onReplayEntrance }) {
                     </div>
 
                     {/* Value */}
-                    <span className={`font-serif text-xs sm:text-[13px] font-medium block transition-colors leading-snug ${
+                    <span className={`font-serif text-[11px] xs:text-xs sm:text-[13px] font-medium block transition-colors leading-snug break-words ${
                       isActive ? 'text-white font-semibold drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]' : 'text-neutral-200'
                     }`}>
                       {spec.value}
@@ -1701,7 +1727,7 @@ export default function ProductDetail({ onReplayEntrance }) {
                   </div>
 
                   {/* Relevant Descriptive Content inside each box */}
-                  <p className={`text-[10px] sm:text-[11px] font-light leading-relaxed transition-colors border-t border-neutral-800/80 pt-2 ${
+                  <p className={`text-[9.5px] xs:text-[10px] sm:text-[11px] font-light leading-relaxed transition-colors border-t border-neutral-800/80 pt-1.5 sm:pt-2 ${
                     isActive ? 'text-neutral-200' : 'text-neutral-400'
                   }`}>
                     {spec.shortDesc}
@@ -2458,28 +2484,36 @@ export default function ProductDetail({ onReplayEntrance }) {
         <ArtistMarqueesSection />
 
         {/* Compact Bottom Product Bar (Referencing Singulart Luxury Spec) */}
-        <div className="sticky bottom-4 z-40 w-full max-w-5xl mx-auto px-2 sm:px-4 pointer-events-auto">
-          <div className="bg-[#121218]/95 backdrop-blur-2xl border border-[#dfb76c]/50 rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 md:p-5 shadow-[0_20px_60px_rgba(0,0,0,0.9)] ring-1 ring-[#dfb76c]/30">
+        <motion.div 
+          initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 24, scale: 0.98 }}
+          whileInView={{ opacity: 1, y: 0, scale: 1 }}
+          viewport={{ once: false, margin: '0px 0px -5% 0px', amount: 'some' }}
+          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          className="sticky bottom-4 z-40 w-full max-w-5xl mx-auto px-2 sm:px-4 pointer-events-auto"
+        >
+          <div className="bg-[#121217]/95 backdrop-blur-2xl border border-[#dfb76c]/50 rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 md:p-5 shadow-[0_20px_60px_rgba(0,0,0,0.9)] ring-1 ring-[#dfb76c]/30">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-6">
               {/* Artwork Info & Valuation */}
               <div className="flex items-center justify-between sm:justify-start gap-4 sm:gap-6">
                 <div>
                   <span className="text-[9.5px] sm:text-[11px] uppercase tracking-[0.2em] text-[#dfb76c] font-mono font-medium block">
-                    Pradip Sarkar
+                    {selectedArtwork?.artist || 'Pradip Sarkar'}
                   </span>
                   <h4 className="font-serif text-base sm:text-xl font-normal text-white tracking-tight">
-                    Divine Tunes-11
+                    {selectedArtwork?.title || 'Divine Tunes-11'}
                   </h4>
                 </div>
 
                 {/* Pricing with Strikethrough & -20% badge */}
                 <div className="text-right sm:text-left">
                   <div className="flex items-center gap-1.5 justify-end sm:justify-start">
-                    <span className="text-[10px] sm:text-xs text-neutral-500 line-through font-serif">₹1,47,800</span>
+                    <span className="text-[10px] sm:text-xs text-neutral-500 line-through font-serif">
+                      {selectedArtwork?.originalPrice || '₹1,47,800'}
+                    </span>
                     <span className="px-1.5 py-0.5 rounded bg-[#8a1c14] text-white text-[9px] font-bold font-mono tracking-wider">-20%</span>
                   </div>
                   <span className="font-serif text-base sm:text-xl font-bold text-[#dfb76c]">
-                    ₹1,18,300
+                    {selectedArtwork?.price || '₹1,18,300'}
                   </span>
                 </div>
               </div>
@@ -2504,7 +2538,7 @@ export default function ProductDetail({ onReplayEntrance }) {
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* ========================================================= */}
