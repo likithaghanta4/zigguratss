@@ -7,7 +7,12 @@
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
   -ms-overflow-style: none;
-  scroll-behavior: smooth;
+  user-select: none;
+  cursor: grab;
+}
+
+.artwork-manual-carousel-track:active {
+  cursor: grabbing;
 }
 
 .artwork-manual-carousel-track::-webkit-scrollbar {

@@ -23,6 +23,13 @@ const TRUST_PILLARS = [
     desc: 'Insured and tracked priority air freight',
     icon: Truck,
     tag: 'Safe Air Transit'
+  },
+  {
+    id: 'security',
+    title: '100% Secured Payment',
+    desc: 'Bank-grade encrypted escrow protection',
+    icon: ShieldCheck,
+    tag: 'Escrow Protected'
   }
 ]
 
@@ -31,7 +38,7 @@ export default function TrustBar() {
   const [activeIdx, setActiveIdx] = useState(0)
   const [isHovered, setIsHovered] = useState(false)
 
-  // Sequential cycling of the trust pillar boxes (0 -> 1 -> 2 -> 0)
+  // Sequential cycling of the trust pillar boxes (0 -> 1 -> 2 -> 3 -> 0)
   useEffect(() => {
     if (isHovered) return
     const interval = setInterval(() => {
@@ -44,7 +51,7 @@ export default function TrustBar() {
     <div 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6"
+      className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
     >
       {TRUST_PILLARS.map((pillar, idx) => {
         const IconComp = pillar.icon

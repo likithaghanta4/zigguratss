@@ -29,6 +29,8 @@ import livingRoomImg from '../assets/rooms/living_room.jpg'
 import bedroomImg from '../assets/rooms/master_bedroom.jpg'
 import gallerySalonImg from '../assets/rooms/gallery_salon.jpg'
 import executiveLoungeImg from '../assets/rooms/executive_lounge.jpg'
+import collectorStudyImg from '../assets/rooms/collector_study.jpg'
+import diningPavilionImg from '../assets/rooms/dining_pavilion.jpg'
 
 // Authentic Zigguratss Assets from repository
 import wallImage1 from '../assets/ProductPage-images/image 1.png'
@@ -112,14 +114,61 @@ export default function ProductDetail({ onReplayEntrance }) {
   const [activeArtistSuiteIdx, setActiveArtistSuiteIdx] = useState(0)
   const [isArtistSuiteHovered, setIsArtistSuiteHovered] = useState(false)
   const [activeDimBoxIdx, setActiveDimBoxIdx] = useState(0)
-  const [activeFilmstripIdx, setActiveFilmstripIdx] = useState(0)
-  const [isFilmstripHovered, setIsFilmstripHovered] = useState(false)
   const [activeAccreditationIdx, setActiveAccreditationIdx] = useState(0)
-  const [selectedRetrospectiveArt, setSelectedRetrospectiveArt] = useState(null)
   const [activeGuideline, setActiveGuideline] = useState(null)
   const [isGuidelinePinned, setIsGuidelinePinned] = useState(false)
   const hoverGuidelineTimeoutRef = useRef(null)
   const hoverIntentTimeoutRef = useRef(null)
+
+  // Floating horizontal product details bar accompanying Act 5 (Artworks), Act 6 (Shipping), and Act 7 (Reviews)
+  const lowerSectionsRef = useRef(null)
+  const [showHorizontalProductBar, setShowHorizontalProductBar] = useState(false)
+
+  useEffect(() => {
+    let ticking = false
+    const checkVisibility = () => {
+      if (!lowerSectionsRef.current) return
+      const rect = lowerSectionsRef.current.getBoundingClientRect()
+      // Visible when Act 5 enters viewport and until Act 7 scrolls out of view
+      const inView = rect.top <= window.innerHeight * 0.88 && rect.bottom >= 140
+      setShowHorizontalProductBar(inView)
+      ticking = false
+    }
+
+    const onScroll = () => {
+      if (!ticking) {
+        requestAnimationFrame(checkVisibility)
+        ticking = true
+      }
+    }
+
+    let observer = null
+    if (typeof IntersectionObserver !== 'undefined' && lowerSectionsRef.current) {
+      observer = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              checkVisibility()
+            } else {
+              setShowHorizontalProductBar(false)
+            }
+          })
+        },
+        { root: null, rootMargin: '0px 0px -40px 0px', threshold: [0, 0.05, 0.1, 0.5, 1.0] }
+      )
+      observer.observe(lowerSectionsRef.current)
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll, { passive: true })
+    checkVisibility()
+
+    return () => {
+      if (observer) observer.disconnect()
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
+  }, [])
 
   const handleGuidelineMouseEnter = (id) => {
     // Clear any pending auto-dismiss timer
@@ -241,14 +290,6 @@ export default function ProductDetail({ onReplayEntrance }) {
     return () => clearInterval(interval)
   }, [])
 
-  // Sequential cycling of Artist Filmstrip cards
-  useEffect(() => {
-    if (isFilmstripHovered) return
-    const interval = setInterval(() => {
-      setActiveFilmstripIdx((prev) => (prev + 1) % 8)
-    }, 2800)
-    return () => clearInterval(interval)
-  }, [isFilmstripHovered])
 
   // Sequential cycling of Provenance Accreditations
   useEffect(() => {
@@ -463,9 +504,9 @@ export default function ProductDetail({ onReplayEntrance }) {
       title: 'Studio Framed Canvas',
       src: testImage2,
       label: 'Framed Canvas',
-      roomName: 'Living Room',
-      alt: 'Studio Framed Canvas in Luxury Living Room',
-      defaultRoom: 'living-room',
+      roomName: "Collector's Library",
+      alt: "Studio Framed Canvas in Collector's Library",
+      defaultRoom: 'collector-study',
       aspectRatio: 1080 / 1350, // 0.800 (Portrait)
       orientation: 'portrait',
       dimensions: '30 × 37.5 in (76.2 × 95.3 cm)',
@@ -477,9 +518,9 @@ export default function ProductDetail({ onReplayEntrance }) {
       title: 'Archival Museum Setting',
       src: hansImage,
       label: 'Museum Setting',
-      roomName: 'Gallery Salon',
-      alt: 'Archival Museum Setting in Curated Gallery Salon',
-      defaultRoom: 'gallery-salon',
+      roomName: 'Zen Dining Pavilion',
+      alt: 'Archival Museum Setting in Zen Dining Pavilion',
+      defaultRoom: 'dining-pavilion',
       aspectRatio: 736 / 736, // 1.000 (Square)
       orientation: 'square',
       dimensions: '34 × 34 in (86.4 × 86.4 cm)',
@@ -719,89 +760,6 @@ export default function ProductDetail({ onReplayEntrance }) {
     }
   ]
 
-  // Pradip Sarkar Master Retrospective Portfolio (8 Iconic Archival Masterworks)
-  const artistFilmstrip = [
-    { 
-      id: 'dt-11',
-      title: 'Divine Tunes-11', 
-      subtitle: 'Archival Masterpiece', 
-      image: flowersImage, 
-      year: '2023', 
-      medium: 'Acrylic on Canvas', 
-      dimensions: '32 × 30 in (81.3 × 76.2 cm)',
-      description: 'The defining apex of Pradip Sarkar\'s cubic impasto period. Layered pigments with translucent glazes capture the meditative stillness of spiritual melodies.'
-    },
-    { 
-      id: 'dt-09',
-      title: 'Divine Tunes-09', 
-      subtitle: 'Studio Vault Selection', 
-      image: screenshotImage, 
-      year: '2022', 
-      medium: 'Acrylic on Canvas', 
-      dimensions: '30 × 28 in (76.2 × 71.1 cm)',
-      description: 'Luminous warm ochre and saffron tones evoking the harmonic geometry of twilight ragas, featuring Sarkar\'s iconic square impasto segmentation.'
-    },
-    { 
-      id: 'geom-sonata',
-      title: 'Geometric Sonata', 
-      subtitle: 'Cubic Abstraction Series', 
-      image: diff3, 
-      year: '2021', 
-      medium: 'Acrylic on Canvas', 
-      dimensions: '36 × 36 in (91.4 × 91.4 cm)',
-      description: 'An architectural study in tonal equilibrium, balancing structured vertical planes with fluid organic chromatic transitions.'
-    },
-    { 
-      id: 'spirit-sym',
-      title: 'Spiritual Symphony', 
-      subtitle: 'Harmonic Color Studies', 
-      image: image2, 
-      year: '2020', 
-      medium: 'Acrylic on Canvas', 
-      dimensions: '30 × 30 in (76.2 × 76.2 cm)',
-      description: 'Exploration of meditative consciousness through deep ultramarine blues and vibrant gold highlights inspired by Indian classical musical modes.'
-    },
-    { 
-      id: 'exhib-plate',
-      title: 'Exhibition Plate', 
-      subtitle: 'Career Retrospective Plate', 
-      image: akhImage, 
-      year: '1995–2024', 
-      medium: 'Mixed Media Archival', 
-      dimensions: '24 × 32 in (61.0 × 81.3 cm)',
-      description: 'Curatorial retrospective monograph plate documenting Sarkar\'s three-decade exhibition history across national and international salons.'
-    },
-    { 
-      id: 'color-space',
-      title: 'Color In Space', 
-      subtitle: 'Atmospheric Field Study', 
-      image: diff1, 
-      year: '2019', 
-      medium: 'Acrylic on Canvas', 
-      dimensions: '28 × 34 in (71.1 × 86.4 cm)',
-      description: 'Spatial dynamic color fields illustrating the resonance between painted surface texture and ambient gallery illumination.'
-    },
-    { 
-      id: 'heritage-retro',
-      title: 'Heritage Retrospective', 
-      subtitle: 'Archival Museum Loan', 
-      image: historyImage, 
-      year: 'Archive Loan', 
-      medium: 'Oil & Acrylic on Linen', 
-      dimensions: '40 × 40 in (101.6 × 101.6 cm)',
-      description: 'Monumental masterwork bridging Sarkar\'s early figurative draughtsmanship with mature modernist spatial cubism.'
-    },
-    { 
-      id: 'natural-cadence',
-      title: 'Natural Cadence', 
-      subtitle: 'Early Figurative Study', 
-      image: diff5, 
-      year: '2018', 
-      medium: 'Acrylic on Canvas', 
-      dimensions: '32 × 28 in (81.3 × 71.1 cm)',
-      description: 'Lyrical flora and avian motifs integrated within rhythmic color planes, demonstrating the natural world as spiritual inspiration.'
-    },
-  ]
 
   // Shipping & Logistics 4-Stage Animated Delivery Pipeline
   const shippingStages = [
@@ -1142,217 +1100,225 @@ export default function ProductDetail({ onReplayEntrance }) {
     }, 2500)
   }
 
-  // Reusable Product Purchase Dossier Box (rendered on right side of Acts 1-5 and Acts 7-8)
+  // Reusable Product Purchase Dossier Box (rendered on right side of Acts 1-4)
   const renderProductDossierBox = (keySuffix = 'main', isSecondary = false) => (
-            <div className="bg-[#121217]/95 backdrop-blur-2xl p-4 xs:p-5 sm:p-7 lg:p-8 xl:p-9 rounded-2xl sm:rounded-3xl border border-neutral-800 shadow-[0_16px_50px_rgba(0,0,0,0.5)] space-y-4 sm:space-y-6 w-full">
-              {/* Header: Title & Artist */}
-              <div className="space-y-1.5 sm:space-y-2 pb-4 sm:pb-6 border-b border-neutral-800/80">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-[9px] sm:text-xs uppercase tracking-[0.22em] text-[#dfb76c] font-semibold block">
-                    Archival Masterpiece
-                  </span>
-                  <span className="font-mono text-[8px] sm:text-[9px] text-neutral-400 bg-neutral-900 px-2 py-0.5 rounded border border-neutral-800">
-                    0{roomIndex + 1} / 0{ROOM_PRESETS.length}
-                  </span>
-                </div>
-                <h1 className="font-serif text-2xl xs:text-3xl sm:text-4xl lg:text-[40px] font-normal text-white tracking-tight leading-tight break-words">
-                  {selectedArtwork?.title || 'Divine Tunes-11'}
-                </h1>
-                <div className="flex items-center gap-2 pt-0.5 sm:pt-1">
-                  <span className="text-xs sm:text-sm text-neutral-400 font-light">By</span>
-                  <a
-                    href="#artist-section"
-                    className="text-xs sm:text-sm font-medium text-white hover:text-[#dfb76c] transition-colors underline underline-offset-4 decoration-[#dfb76c]/50"
-                  >
-                    {selectedArtwork?.artist || 'Pradip Sarkar'}
-                  </a>
-                  <CheckCircle2 size={15} className="text-[#dfb76c]" />
-                </div>
-              </div>
+    <div className="bg-[#121217]/95 backdrop-blur-2xl p-5 sm:p-6 rounded-2xl sm:rounded-3xl border border-neutral-800 shadow-[0_18px_55px_rgba(0,0,0,0.55)] space-y-3 sm:space-y-3.5 w-full">
+      {/* Header: Title, Artist & Series */}
+      <div className="pb-3 border-b border-neutral-800/80">
+        <div className="flex items-center justify-between gap-2 mb-1.5">
+          <span className="text-[10px] uppercase tracking-[0.22em] text-[#dfb76c] font-semibold block">
+            Archival Masterpiece • Series 11
+          </span>
+          <span className="font-mono text-[9px] text-neutral-400 bg-neutral-900 px-2.5 py-0.5 rounded border border-neutral-800">
+            0{roomIndex + 1} / 0{ROOM_PRESETS.length} Viewports
+          </span>
+        </div>
+        <h1 className="font-serif text-2xl sm:text-3xl lg:text-[28px] font-normal text-white tracking-tight leading-tight">
+          {selectedArtwork?.title || 'Divine Tunes-11'}
+        </h1>
+        <div className="flex items-center gap-2 pt-1 text-xs">
+          <span className="text-neutral-400 font-light">By</span>
+          <a
+            href="#artist-section"
+            className="font-medium text-white hover:text-[#dfb76c] transition-colors underline underline-offset-4 decoration-[#dfb76c]/50"
+          >
+            {selectedArtwork?.artist || 'Pradip Sarkar'}
+          </a>
+          <CheckCircle2 size={14} className="text-[#dfb76c]" />
+          <span className="text-neutral-500 font-mono text-[10px]">• Mumbai Atelier</span>
+        </div>
+      </div>
 
-              {/* Dimensions & Unit Switcher */}
-              <div className="pb-4 sm:pb-6 border-b border-neutral-800/80 space-y-2.5 sm:space-y-3">
-                <div className="flex flex-row items-center justify-between gap-2">
-                  <span className="text-[9.5px] sm:text-xs uppercase tracking-[0.18em] text-neutral-400 font-medium truncate">
-                    Dimensions & Medium
-                  </span>
-                  <div className="product-unit-toggle bg-neutral-900 p-0.5 sm:p-1 rounded-lg sm:rounded-xl border border-neutral-700/80 inline-flex flex-row items-center shrink-0 flex-nowrap">
-                    <button
-                      onClick={() => setUnit('inch')}
-                      className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-md text-[9.5px] sm:text-xs uppercase tracking-wider font-semibold transition-all cursor-pointer shrink-0 ${
-                        unit === 'inch' ? 'bg-[#dfb76c] text-neutral-950 shadow-sm' : 'text-neutral-400 hover:text-white'
-                      }`}
-                    >
-                      Inches
-                    </button>
-                    <button
-                      onClick={() => setUnit('cm')}
-                      className={`px-2 sm:px-3 py-0.5 sm:py-1 rounded-md text-[9.5px] sm:text-xs uppercase tracking-wider font-semibold transition-all cursor-pointer shrink-0 ${
-                        unit === 'cm' ? 'bg-[#dfb76c] text-neutral-950 shadow-sm' : 'text-neutral-400 hover:text-white'
-                      }`}
-                    >
-                      Centimeters
-                    </button>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 sm:gap-3 text-xs w-full">
-                  <motion.div 
-                    onClick={() => setActiveDimBoxIdx(0)}
-                    animate={{
-                      scale: activeDimBoxIdx === 0 ? 1.02 : 1.0,
-                    }}
-                    transition={{ type: 'spring', stiffness: 350, damping: 24 }}
-                    className={`p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl border transition-all duration-300 cursor-pointer relative overflow-hidden ${
-                      activeDimBoxIdx === 0
-                        ? 'bg-gradient-to-br from-[#202030] via-[#161622] to-[#101016] border-[#dfb76c] ring-1 ring-[#dfb76c]/40 shadow-[0_4px_20px_rgba(223,183,108,0.2)]'
-                        : 'bg-neutral-900/90 border-neutral-800 opacity-80'
-                    }`}
-                  >
-                    {activeDimBoxIdx === 0 && (
-                      <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#dfb76c]" />
-                    )}
-                    <span className={`text-[9.5px] sm:text-[11px] uppercase tracking-wider block mb-0.5 sm:mb-1 transition-colors ${
-                      activeDimBoxIdx === 0 ? 'text-[#f7d794] font-semibold' : 'text-neutral-400'
-                    }`}>Canvas Size</span>
-                    <span className={`font-medium text-[11px] xs:text-xs sm:text-sm break-words transition-colors ${
-                      activeDimBoxIdx === 0 ? 'text-white font-semibold' : 'text-neutral-200'
-                    }`}>
-                      {unit === 'inch' ? (selectedArtwork?.sizeInch || '32 × 30 in') : (selectedArtwork?.sizeCm || '81.28 × 76.2 cm')}
-                    </span>
-                  </motion.div>
-
-                  <motion.div 
-                    onClick={() => setActiveDimBoxIdx(1)}
-                    animate={{
-                      scale: activeDimBoxIdx === 1 ? 1.02 : 1.0,
-                    }}
-                    transition={{ type: 'spring', stiffness: 350, damping: 24 }}
-                    className={`p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl border transition-all duration-300 cursor-pointer relative overflow-hidden ${
-                      activeDimBoxIdx === 1
-                        ? 'bg-gradient-to-br from-[#202030] via-[#161622] to-[#101016] border-[#dfb76c] ring-1 ring-[#dfb76c]/40 shadow-[0_4px_20px_rgba(223,183,108,0.2)]'
-                        : 'bg-neutral-900/90 border-neutral-800 opacity-80'
-                    }`}
-                  >
-                    {activeDimBoxIdx === 1 && (
-                      <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#dfb76c]" />
-                    )}
-                    <span className={`text-[9.5px] sm:text-[11px] uppercase tracking-wider block mb-0.5 sm:mb-1 transition-colors ${
-                      activeDimBoxIdx === 1 ? 'text-[#f7d794] font-semibold' : 'text-neutral-400'
-                    }`}>Medium</span>
-                    <span className={`font-medium text-[11px] xs:text-xs sm:text-sm break-words transition-colors ${
-                      activeDimBoxIdx === 1 ? 'text-white font-semibold' : 'text-neutral-200'
-                    }`}>
-                      {selectedArtwork?.medium || 'Acrylic on Canvas'}
-                    </span>
-                  </motion.div>
-                </div>
-              </div>
-
-              {/* Primary Action Buttons (Acquire Artwork & Make Offer - Compact & Refined) */}
-              <div className="grid grid-cols-2 gap-2 sm:gap-2.5 pt-0.5 w-full max-w-[340px] sm:max-w-[360px]">
-                <motion.button
-                  whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
-                  whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
-                  onClick={handleAddToCart}
-                  className="w-full h-9 sm:h-10 px-3 bg-gradient-to-r from-[#dfb76c] via-[#f7d794] to-[#dfb76c] hover:from-[#f7d794] hover:to-[#dfb76c] text-neutral-950 rounded-lg sm:rounded-xl text-[9.5px] sm:text-[10px] uppercase tracking-wider font-bold transition-all duration-300 shadow-[0_2px_12px_rgba(223,183,108,0.2)] hover:shadow-[0_4px_18px_rgba(223,183,108,0.35)] flex items-center justify-center gap-1.5 cursor-pointer"
-                >
-                  <CreditCard size={13} className="shrink-0" />
-                  <span className="whitespace-nowrap">Acquire Artwork</span>
-                </motion.button>
-
-                <motion.button
-                  whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
-                  whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
-                  onClick={() => setShowOfferModal(true)}
-                  className="w-full h-9 sm:h-10 px-3 rounded-lg sm:rounded-xl border border-[#dfb76c]/80 text-[#dfb76c] hover:bg-[#dfb76c]/15 text-[9.5px] sm:text-[10px] uppercase tracking-wider font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer bg-neutral-900/80 hover:border-[#f7d794]"
-                >
-                  <MessageCircle size={13} className="shrink-0" />
-                  <span className="whitespace-nowrap">Make Offer</span>
-                </motion.button>
-              </div>
-
-              {/* 4 Interactive Product Guidelines with Interactive Panels & 3D Scene */}
-              <div 
-                onMouseEnter={() => setIsTrustHovered(true)}
-                onMouseLeave={() => {
-                  setIsTrustHovered(false)
-                  handleGuidelineMouseLeave()
-                }}
-                className="pt-4 sm:pt-5 border-t border-neutral-800/80 space-y-2 sm:space-y-2.5 relative"
-                aria-label="Interactive Product Guidelines"
-              >
-                {TRUST_GUARANTEE_ITEMS.map((item, idx) => {
-                  const IconComp = item.icon
-                  const isCurrentModal = activeGuideline === item.id
-                  const isHighlighted = isCurrentModal || (activeTrustIndex === idx && !activeGuideline)
-
-                  return (
-                    <motion.div
-                      key={`${item.id}-${keySuffix}`}
-                      role="button"
-                      tabIndex={0}
-                      aria-haspopup="dialog"
-                      aria-expanded={isCurrentModal}
-                      aria-label={`${item.text} - Tap or hover to view details`}
-                      onMouseEnter={() => handleGuidelineMouseEnter(item.id)}
-                      onMouseLeave={handleGuidelineMouseLeave}
-                      onClick={() => handleGuidelineClick(item.id)}
-                      onKeyDown={(e) => handleGuidelineKeyDown(e, item.id)}
-                      animate={{
-                        scale: isHighlighted ? 1.018 : 1.0,
-                        x: isHighlighted ? 3 : 0,
-                      }}
-                      transition={{ 
-                        type: 'spring', 
-                        stiffness: 380, 
-                        damping: 24, 
-                        mass: 0.8 
-                      }}
-                      className={`group flex flex-row items-center justify-between p-2.5 sm:p-3 rounded-xl transition-all duration-300 cursor-pointer focus:outline-none focus:ring-1 focus:ring-[#dfb76c] select-none ${
-                        isHighlighted
-                          ? 'bg-gradient-to-r from-[#dfb76c]/20 via-[#dfb76c]/10 to-neutral-900/60 border border-[#dfb76c]/70 shadow-[0_4px_22px_rgba(223,183,108,0.22)]'
-                          : 'hover:bg-neutral-900/60 border border-neutral-800/60 opacity-80 hover:opacity-100 hover:border-neutral-700'
-                      }`}
-                    >
-                      <div className="flex flex-row items-center gap-2.5 sm:gap-3.5 min-w-0 flex-1">
-                        <div 
-                          className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg transition-all duration-300 flex-shrink-0 flex items-center justify-center ${
-                            isHighlighted
-                              ? 'bg-[#dfb76c] text-neutral-950 shadow-[0_0_14px_rgba(223,183,108,0.65)]'
-                              : 'bg-neutral-800/90 text-[#dfb76c] group-hover:bg-[#dfb76c]/20'
-                          }`}
-                        >
-                          <IconComp size={15} className="stroke-[2.2]" />
-                        </div>
-                        <span 
-                          className={`transition-all duration-300 text-left text-xs xs:text-[13px] sm:text-[14px] leading-snug font-medium line-clamp-2 ${
-                            isHighlighted
-                              ? 'text-white tracking-normal drop-shadow-[0_1px_4px_rgba(0,0,0,0.8)]'
-                              : 'text-neutral-300 group-hover:text-white'
-                          }`}
-                        >
-                          {item.text}
-                        </span>
-                      </div>
-
-                      {/* Interactive Visual Cue Badge */}
-                      <div className="flex items-center gap-1.5 shrink-0 ml-2">
-                        <span className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[8.5px] sm:text-[9.5px] uppercase tracking-wider font-semibold transition-all ${
-                          isHighlighted
-                            ? 'bg-[#dfb76c]/25 text-[#f7d794] border border-[#dfb76c]/50 shadow-[0_0_8px_rgba(223,183,108,0.3)]'
-                            : 'bg-neutral-900/80 text-neutral-400 border border-neutral-800 opacity-70 group-hover:opacity-100 group-hover:border-[#dfb76c]/30 group-hover:text-[#dfb76c]'
-                        }`}>
-                          <span className={`w-1.5 h-1.5 rounded-full ${isHighlighted ? 'bg-[#dfb76c] animate-pulse' : 'bg-neutral-600'}`} />
-                          <span className="hidden xs:inline">{item.tag}</span>
-                          <ChevronRight size={11} className={`transition-transform duration-200 ${isHighlighted ? 'translate-x-0.5 text-[#dfb76c]' : 'text-neutral-500'}`} />
-                        </span>
-                      </div>
-                    </motion.div>
-                  )
-                })}
-              </div>
+      {/* Artwork Acquisition Value & Valuation */}
+      <div className="pb-3 border-b border-neutral-800/80 space-y-1">
+        <div className="flex items-center justify-between gap-2">
+          <div>
+            <span className="text-[9.5px] uppercase tracking-[0.18em] text-neutral-400 font-medium block">
+              Archival Acquisition Value
+            </span>
+            <div className="flex items-baseline gap-2.5 mt-0.5">
+              <span className="font-serif text-2xl xs:text-3xl font-semibold text-[#dfb76c] tracking-tight">
+                {selectedArtwork?.price || '₹1,18,300'}
+              </span>
+              {selectedArtwork?.originalPrice && (
+                <span className="text-sm text-neutral-500 line-through font-serif">
+                  {selectedArtwork.originalPrice}
+                </span>
+              )}
+              <span className="px-2 py-0.5 rounded-md bg-[#8a1c14] text-white text-[9.5px] font-bold font-mono tracking-wider shadow-sm">
+                -20%
+              </span>
             </div>
+          </div>
+          <div className="text-right">
+            <span className="text-[10px] font-mono text-emerald-400 flex items-center justify-end gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              In Vault • Available
+            </span>
+            <span className="text-[10.5px] text-neutral-500 font-light">($1,577.33 USD)</span>
+          </div>
+        </div>
+        <div className="text-[10px] text-neutral-400 font-light pt-0.5 flex items-center gap-3">
+          <span>✓ All GST & export duties included</span>
+          <span>✓ Insured air freight</span>
+        </div>
+      </div>
+
+      {/* Dimensions & Medium */}
+      <div className="pb-3 border-b border-neutral-800/80 space-y-2">
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[9.5px] uppercase tracking-[0.18em] text-neutral-400 font-medium">
+            Dimensions & Medium Ledger
+          </span>
+          <div className="product-unit-toggle bg-neutral-900 p-0.5 rounded-lg border border-neutral-700/80 inline-flex items-center">
+            <button
+              onClick={() => setUnit('inch')}
+              className={`px-2.5 py-0.5 rounded text-[9.5px] uppercase tracking-wider font-semibold cursor-pointer ${
+                unit === 'inch' ? 'bg-[#dfb76c] text-neutral-950 shadow-sm' : 'text-neutral-400 hover:text-white'
+              }`}
+            >
+              Inches
+            </button>
+            <button
+              onClick={() => setUnit('cm')}
+              className={`px-2.5 py-0.5 rounded text-[9.5px] uppercase tracking-wider font-semibold cursor-pointer ${
+                unit === 'cm' ? 'bg-[#dfb76c] text-neutral-950 shadow-sm' : 'text-neutral-400 hover:text-white'
+              }`}
+            >
+              Centimeters
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-2.5 text-xs">
+          <div className="p-2.5 rounded-xl bg-neutral-900/90 border border-neutral-800">
+            <span className="text-[9px] uppercase tracking-wider text-neutral-400 block mb-0.5">Canvas Scale</span>
+            <span className="font-medium text-xs sm:text-sm text-white">
+              {unit === 'inch' ? (selectedArtwork?.sizeInch || '32 × 30 in') : (selectedArtwork?.sizeCm || '81.28 × 76.2 cm')}
+            </span>
+          </div>
+          <div className="p-2.5 rounded-xl bg-neutral-900/90 border border-neutral-800">
+            <span className="text-[9px] uppercase tracking-wider text-neutral-400 block mb-0.5">Medium & Substrate</span>
+            <span className="font-medium text-xs sm:text-sm text-white truncate block">
+              {selectedArtwork?.medium || 'Acrylic on Canvas'}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Primary Action Buttons */}
+      <div className="grid grid-cols-2 gap-2.5 pt-0.5 w-full">
+        <motion.button
+          whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
+          whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
+          onClick={handleAddToCart}
+          className="w-full h-11 px-4 bg-gradient-to-r from-[#dfb76c] via-[#f7d794] to-[#dfb76c] hover:from-[#f7d794] hover:to-[#dfb76c] text-neutral-950 rounded-xl text-[10px] sm:text-xs uppercase tracking-wider font-bold transition-all duration-300 shadow-[0_4px_18px_rgba(223,183,108,0.25)] hover:shadow-[0_6px_24px_rgba(223,183,108,0.4)] flex items-center justify-center gap-2 cursor-pointer"
+        >
+          <CreditCard size={14} className="shrink-0" />
+          <span className="whitespace-nowrap">Acquire Artwork</span>
+        </motion.button>
+
+        <motion.button
+          whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
+          whileTap={shouldReduceMotion ? {} : { scale: 0.98 }}
+          onClick={() => setShowOfferModal(true)}
+          className="w-full h-11 px-4 rounded-xl border border-[#dfb76c]/80 text-[#dfb76c] hover:bg-[#dfb76c]/15 text-[10px] sm:text-xs uppercase tracking-wider font-semibold transition-all flex items-center justify-center gap-2 cursor-pointer bg-neutral-900/80 hover:border-[#f7d794]"
+        >
+          <MessageCircle size={14} className="shrink-0" />
+          <span className="whitespace-nowrap">Make Offer</span>
+        </motion.button>
+      </div>
+
+      {/* All 4 Interactive Product Guidelines Fully Visible */}
+      <div 
+        onMouseEnter={() => setIsTrustHovered(true)}
+        onMouseLeave={() => {
+          setIsTrustHovered(false)
+          handleGuidelineMouseLeave()
+        }}
+        className="pt-2.5 sm:pt-3 border-t border-neutral-800/80 space-y-2 relative"
+        aria-label="Interactive Product Guidelines"
+      >
+        <div className="flex items-center justify-between pb-0.5">
+          <span className="text-[9.5px] uppercase tracking-[0.2em] text-[#dfb76c] font-semibold block">
+            Collector Protection Guarantees (4)
+          </span>
+          <span className="text-[9px] text-neutral-500 font-mono">Tap or Hover to Inspect</span>
+        </div>
+        {TRUST_GUARANTEE_ITEMS.map((item, idx) => {
+          const IconComp = item.icon
+          const isCurrentModal = activeGuideline === item.id
+          const isHighlighted = isCurrentModal || (activeTrustIndex === idx && !activeGuideline)
+
+          return (
+            <motion.div
+              key={`${item.id}-${keySuffix}`}
+              role="button"
+              tabIndex={0}
+              aria-haspopup="dialog"
+              aria-expanded={isCurrentModal}
+              aria-label={`${item.text} - Tap or hover to view details`}
+              onMouseEnter={() => handleGuidelineMouseEnter(item.id)}
+              onMouseLeave={handleGuidelineMouseLeave}
+              onClick={() => handleGuidelineClick(item.id)}
+              onKeyDown={(e) => handleGuidelineKeyDown(e, item.id)}
+              animate={{
+                scale: isHighlighted ? 1.016 : 1.0,
+                x: isHighlighted ? 2.5 : 0,
+              }}
+              transition={{ type: 'spring', stiffness: 380, damping: 24, mass: 0.8 }}
+              className={`group flex items-center justify-between py-2 px-3 rounded-xl transition-all duration-300 cursor-pointer select-none ${
+                isHighlighted
+                  ? 'bg-gradient-to-r from-[#dfb76c]/20 via-[#dfb76c]/10 to-neutral-900/60 border border-[#dfb76c]/70 shadow-[0_4px_16px_rgba(223,183,108,0.2)]'
+                  : 'hover:bg-neutral-900/60 border border-neutral-800/60 opacity-85 hover:opacity-100 hover:border-neutral-700'
+              }`}
+            >
+              <div className="flex items-center gap-2.5 min-w-0 flex-1">
+                <div 
+                  className={`w-7 h-7 rounded-lg transition-all flex-shrink-0 flex items-center justify-center ${
+                    isHighlighted
+                      ? 'bg-[#dfb76c] text-neutral-950 shadow-[0_0_12px_rgba(223,183,108,0.65)]'
+                      : 'bg-neutral-800/90 text-[#dfb76c] group-hover:bg-[#dfb76c]/20'
+                  }`}
+                >
+                  <IconComp size={14} className="stroke-[2.2]" />
+                </div>
+                <span 
+                  className={`text-xs sm:text-[13px] leading-tight font-medium truncate block ${
+                    isHighlighted ? 'text-white' : 'text-neutral-300 group-hover:text-white'
+                  }`}
+                >
+                  {item.text}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-1 shrink-0 ml-2">
+                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[8.5px] uppercase tracking-wider font-semibold ${
+                  isHighlighted
+                    ? 'bg-[#dfb76c]/25 text-[#f7d794] border border-[#dfb76c]/50'
+                    : 'bg-neutral-900/80 text-neutral-400 border border-neutral-800'
+                }`}>
+                  <span className={`w-1 h-1 rounded-full ${isHighlighted ? 'bg-[#dfb76c] animate-pulse' : 'bg-neutral-600'}`} />
+                  <span>{item.tag}</span>
+                  <ChevronRight size={10} className={isHighlighted ? 'text-[#dfb76c]' : 'text-neutral-500'} />
+                </span>
+              </div>
+            </motion.div>
+          )
+        })}
+      </div>
+
+      {/* Curatorial Provenance Registry Bar */}
+      <div className="pt-2 border-t border-neutral-800/60 flex items-center justify-between text-[9.5px] text-neutral-400 font-mono">
+        <span className="flex items-center gap-1.5 text-neutral-300">
+          <Award size={11} className="text-[#dfb76c] shrink-0" />
+          <span>Catalog: <strong className="text-white">ZG-2024-PS-DT11</strong></span>
+        </span>
+        <span className="text-[#dfb76c] uppercase tracking-wider text-[8.5px] bg-[#dfb76c]/15 px-2 py-0.5 rounded border border-[#dfb76c]/30 font-semibold">
+          Direct Atelier Provenance
+        </span>
+      </div>
+    </div>
   )
 
   return (
@@ -1401,10 +1367,10 @@ export default function ProductDetail({ onReplayEntrance }) {
         </div>
       </motion.div>
 
-      {/* Master Two-Column Responsive Layout: Left 7 Columns for All Acts, Right 5 Columns Sticky for Product Details Box */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-10 xl:gap-12 items-start w-full">
-        {/* LEFT COLUMN: 7 Columns Containing All Content Sections */}
-        <div className="order-1 lg:order-none lg:col-span-7 xl:col-span-7 space-y-12 sm:space-y-16 lg:space-y-24 w-full min-w-0">
+      {/* Master Two-Column Responsive Layout: Left 7 Columns for Acts 1-4, Right 5 Columns for Single Sticky Product Details Box */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-10 xl:gap-12 w-full relative">
+        {/* LEFT COLUMN: 7 Columns Containing Acts 1 through 4 */}
+        <div className="order-1 lg:order-none lg:col-span-7 xl:col-span-7 space-y-12 sm:space-y-16 lg:space-y-20 w-full min-w-0">
           {/* ACT 1: MASTER CANVAS HERO & GALLERY STAGE */}
           <div 
             id="product-acquisition-stage" 
@@ -1632,14 +1598,14 @@ export default function ProductDetail({ onReplayEntrance }) {
           {/* Curved Reveal Divider */}
           <div className="curved-section-divider -my-4 opacity-50">
             <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
-              <path d="M0,0 C150,90 350,-40 500,60 C650,160 900,10 1200,40 L1200,120 L0,120 Z" className="shape-fill" />
+              <path d="M0,0 C150,90 350,-40 500,60 C650,160 900,10 1200,40 L1200,120 Z" className="shape-fill" />
             </svg>
           </div>
 
-      {/* ========================================================= */}
-      {/* ACT 2B: PRECISION TECHNICAL DOSSIER & SPECIFICATIONS (ARTWORK DETAILS) */}
-      {/* ========================================================= */}
-      <motion.section 
+          {/* ========================================================= */}
+          {/* ACT 2: PRECISION TECHNICAL DOSSIER & SPECIFICATIONS (ARTWORK DETAILS) */}
+          {/* ========================================================= */}
+          <motion.section 
         data-showcase-section
         data-showcase-title="Technical Ledger & Specs"
         initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 16 }}
@@ -1828,14 +1794,14 @@ export default function ProductDetail({ onReplayEntrance }) {
       {/* ACT 3: DEDICATED ARTWORK DESCRIPTION & CURATORIAL ESSENCE */}
       {/* ========================================================= */}
       <motion.section 
-        data-showcase-section
-        data-showcase-title="Artwork Description"
-        initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.05 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full"
-      >
+            data-showcase-section
+            data-showcase-title="Artwork Description"
+            initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.05 }}
+            transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+            className="w-full"
+          >
         <div className="bg-[#121217]/90 backdrop-blur-xl p-5 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl border border-neutral-800 shadow-xl space-y-6 sm:space-y-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 pb-5 border-b border-neutral-800/80">
             <div>
@@ -1913,7 +1879,7 @@ export default function ProductDetail({ onReplayEntrance }) {
       {/* Curved Reveal Divider */}
       <div className="curved-section-divider -my-4 opacity-50">
         <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
-          <path d="M0,0 C150,90 350,-40 500,60 C650,160 900,10 1200,40 L1200,120 L0,120 Z" className="shape-fill" />
+          <path d="M0,0 C150,90 350,-40 500,60 C650,160 900,10 1200,40 L1200,120 Z" className="shape-fill" />
         </svg>
       </div>
 
@@ -2239,8 +2205,19 @@ export default function ProductDetail({ onReplayEntrance }) {
           </blockquote>
         </div>
       </motion.section>
+        </div>
 
-      {/* Curved Reveal Divider */}
+        {/* RIGHT COLUMN: 5 Columns with Single Sticky Product Details Box Accompanying Acts 1 through 4 */}
+        <div className="hidden lg:block lg:col-span-5 xl:col-span-5 w-full min-w-0 h-full relative">
+          <div 
+            className="sticky top-20 sm:top-24 space-y-4 sm:space-y-6 w-full"
+          >
+            {renderProductDossierBox('desktop')}
+          </div>
+        </div>
+      </div>
+
+      {/* Curved Reveal Divider between Act 4 and Act 5 */}
       <div className="curved-section-divider -my-4 opacity-50 transform rotate-180">
         <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
           <path d="M0,0 C150,90 350,-40 500,60 C650,160 900,10 1200,40 L1200,120 L0,120 Z" className="shape-fill" />
@@ -2248,225 +2225,20 @@ export default function ProductDetail({ onReplayEntrance }) {
       </div>
 
       {/* ========================================================= */}
-      {/* ACT 5: MASTER ARTIST RETROSPECTIVE (BALANCED 8-IMAGE GALLERY) */}
+      {/* FULL-WIDTH LUXURY SECTIONS (ACT 5: ARTWORKS, ACT 6: SHIPPING, ACT 7: REVIEWS) */}
       {/* ========================================================= */}
-      <motion.section 
-        data-showcase-section
-        data-showcase-title="Pradip Sarkar Retrospective"
-        initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true, amount: 0.05 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full"
+      <div 
+        ref={lowerSectionsRef}
+        id="artworks-shipping-reviews-zone"
+        className="w-full space-y-16 sm:space-y-20 lg:space-y-28 relative"
       >
-        <div className="bg-[#121217]/90 backdrop-blur-xl p-5 sm:p-8 md:p-10 rounded-2xl sm:rounded-3xl border border-neutral-800 shadow-xl space-y-6 sm:space-y-8">
-          {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 border-b border-neutral-800/80 pb-5">
-            <div>
-              <span className="text-[10px] sm:text-xs uppercase tracking-[0.22em] text-[#dfb76c] font-semibold block mb-1">
-                Artist Monograph & Archive • 1995 – 2024
-              </span>
-              <h3 className="font-serif text-2xl sm:text-3xl md:text-4xl font-normal text-white tracking-tight">
-                Pradip Sarkar — Master Retrospective
-              </h3>
-              <p className="text-xs sm:text-sm text-neutral-400 font-light mt-1.5 max-w-xl leading-relaxed">
-                A balanced curatorial retrospective of 8 seminal works spanning three decades of cubic harmony, Vedic resonance, and spatial abstraction.
-              </p>
-            </div>
-            <div className="inline-flex items-center gap-1.5 sm:gap-2 py-1.5 px-3.5 bg-neutral-900 rounded-full border border-neutral-700 text-xs text-[#dfb76c] font-semibold w-fit shrink-0">
-              <Award size={13} />
-              <span>30+ Years of Mastery</span>
-            </div>
-          </div>
 
-          {/* Master Retrospective Balanced 2-Column Grid of 8 Works */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 sm:gap-6 w-full">
-            {artistFilmstrip.map((item, idx) => {
-              const isActive = activeFilmstripIdx === idx
-              return (
-                <motion.div
-                  key={item.id || `${item.title}-${idx}`}
-                  id={`retrospective-artwork-${idx}`}
-                  onClick={() => {
-                    setActiveFilmstripIdx(idx)
-                    setSelectedRetrospectiveArt(item)
-                  }}
-                  initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-40px' }}
-                  transition={{ duration: 0.5, delay: idx * 0.06, ease: [0.16, 1, 0.3, 1] }}
-                  whileHover={shouldReduceMotion ? {} : { y: -6, transition: { duration: 0.25 } }}
-                  className={`group relative rounded-2xl overflow-hidden border transition-all duration-300 flex flex-col justify-between cursor-pointer ${
-                    isActive
-                      ? 'bg-[#181826] border-[#dfb76c] ring-2 ring-[#dfb76c]/40 shadow-[0_12px_36px_rgba(223,183,108,0.28)]'
-                      : 'bg-[#13131c] border-neutral-800 hover:border-[#dfb76c]/60 hover:bg-[#161622] shadow-lg'
-                  }`}
-                >
-                  {/* Glowing gold top line on active or hover */}
-                  <div className={`absolute top-0 left-0 right-0 h-[2.5px] transition-all duration-300 z-20 ${
-                    isActive 
-                      ? 'bg-[#dfb76c] opacity-100 shadow-[0_0_10px_#dfb76c]' 
-                      : 'bg-transparent opacity-0 group-hover:bg-[#dfb76c] group-hover:opacity-100'
-                  }`} />
-
-                  {/* Corner accents */}
-                  <div className="absolute top-2.5 left-2.5 text-[#dfb76c]/30 text-xs font-mono pointer-events-none z-20 opacity-0 group-hover:opacity-100 transition-opacity">⌜</div>
-                  <div className="absolute top-2.5 right-2.5 text-[#dfb76c]/30 text-xs font-mono pointer-events-none z-20 opacity-0 group-hover:opacity-100 transition-opacity">⌝</div>
-
-                  {/* Clear Image Frame with Balanced Aspect Ratio (No overlapping or underlaying) */}
-                  <div className="aspect-[4/3] w-full overflow-hidden relative bg-neutral-950">
-                    <img 
-                      src={item.image} 
-                      alt={item.title} 
-                      className="w-full h-full object-cover transition-transform duration-600 ease-out group-hover:scale-106 select-none"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent pointer-events-none" />
-
-                    {/* Plate Index Badge */}
-                    <span className="absolute top-3 left-3 bg-black/80 backdrop-blur-md px-2.5 py-1 rounded-md text-[9.5px] font-mono text-[#dfb76c] border border-white/10 shadow-md">
-                      PLATE 0{idx + 1}
-                    </span>
-
-                    {/* Year Badge */}
-                    <span className="absolute bottom-3 left-3 bg-neutral-950/90 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-mono text-[#f7d794] border border-[#dfb76c]/30 flex items-center gap-1 shadow-md">
-                      <Sparkles size={10} className="text-[#dfb76c]" />
-                      <span>{item.year}</span>
-                    </span>
-
-                    {/* Dimensions Badge */}
-                    <span className="absolute bottom-3 right-3 bg-black/80 backdrop-blur-md px-2 py-0.5 rounded text-[10px] font-mono text-neutral-300 border border-white/10">
-                      {item.dimensions?.split(' ')[0]} {item.dimensions?.split(' ')[1]} {item.dimensions?.split(' ')[2]}
-                    </span>
-                  </div>
-
-                  {/* Artwork Meta & Curatorial Information */}
-                  <div className="p-4 sm:p-5 flex flex-col justify-between gap-3 flex-1">
-                    <div>
-                      <span className="text-[9.5px] uppercase font-mono tracking-wider text-[#dfb76c] block mb-1">
-                        {item.subtitle}
-                      </span>
-                      <h4 className="font-serif text-base sm:text-lg font-medium text-white group-hover:text-[#f7d794] transition-colors leading-snug">
-                        {item.title}
-                      </h4>
-                      <p className="text-xs text-neutral-300 font-light leading-relaxed mt-1.5 line-clamp-2">
-                        {item.description}
-                      </p>
-                    </div>
-
-                    <div className="pt-3 border-t border-neutral-800/80 flex items-center justify-between gap-2">
-                      <div className="text-[11px] text-neutral-400 font-light truncate">
-                        <span>{item.medium}</span>
-                      </div>
-                      <span className="inline-flex items-center gap-1 text-[10px] font-mono uppercase tracking-wider text-[#dfb76c] group-hover:underline shrink-0">
-                        <span>Inspect Canvas</span>
-                        <ArrowUpRight size={12} />
-                      </span>
-                    </div>
-                  </div>
-                </motion.div>
-              )
-            })}
-          </div>
-        </div>
-
-        {/* Retrospective Masterwork High-Res Lightbox Modal */}
-        <AnimatePresence>
-          {selectedRetrospectiveArt && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setSelectedRetrospectiveArt(null)}
-              className="fixed inset-0 z-50 bg-black/85 backdrop-blur-md flex items-center justify-center p-4 sm:p-6"
-            >
-              <motion.div
-                initial={{ scale: 0.95, opacity: 0, y: 16 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.95, opacity: 0, y: 16 }}
-                transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                onClick={(e) => e.stopPropagation()}
-                className="bg-[#14141e] border border-[#dfb76c]/40 rounded-2xl sm:rounded-3xl max-w-2xl w-full overflow-hidden shadow-2xl relative"
-              >
-                {/* Close Button */}
-                <button
-                  onClick={() => setSelectedRetrospectiveArt(null)}
-                  className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full bg-black/70 hover:bg-black text-neutral-300 hover:text-white flex items-center justify-center border border-white/10 transition-colors cursor-pointer"
-                  aria-label="Close modal"
-                >
-                  <X size={16} />
-                </button>
-
-                {/* Modal Image */}
-                <div className="w-full max-h-[380px] sm:max-h-[420px] overflow-hidden bg-neutral-950 flex items-center justify-center relative">
-                  <img
-                    src={selectedRetrospectiveArt.image}
-                    alt={selectedRetrospectiveArt.title}
-                    className="max-h-[380px] sm:max-h-[420px] w-full object-contain"
-                  />
-                  <div className="absolute top-3 left-3 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded text-[10px] font-mono text-[#dfb76c] border border-[#dfb76c]/30">
-                    Archival Monograph • {selectedRetrospectiveArt.year}
-                  </div>
-                </div>
-
-                {/* Modal Content */}
-                <div className="p-5 sm:p-7 space-y-4">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-neutral-800">
-                    <div>
-                      <span className="text-[10px] uppercase font-mono tracking-wider text-[#dfb76c] block">
-                        {selectedRetrospectiveArt.subtitle}
-                      </span>
-                      <h3 className="font-serif text-xl sm:text-2xl text-white font-medium">
-                        {selectedRetrospectiveArt.title}
-                      </h3>
-                    </div>
-                    <span className="text-xs font-mono text-neutral-400">
-                      Pradip Sarkar
-                    </span>
-                  </div>
-
-                  <p className="text-xs sm:text-sm text-neutral-300 font-light leading-relaxed">
-                    {selectedRetrospectiveArt.description}
-                  </p>
-
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 p-3 bg-neutral-900/80 rounded-xl border border-neutral-800 text-xs">
-                    <div>
-                      <span className="text-[10px] text-neutral-400 block font-mono">MEDIUM</span>
-                      <strong className="text-white font-medium">{selectedRetrospectiveArt.medium}</strong>
-                    </div>
-                    <div>
-                      <span className="text-[10px] text-neutral-400 block font-mono">DIMENSIONS</span>
-                      <strong className="text-white font-medium">{selectedRetrospectiveArt.dimensions}</strong>
-                    </div>
-                    <div className="col-span-2 sm:col-span-1">
-                      <span className="text-[10px] text-neutral-400 block font-mono">ORIGIN</span>
-                      <strong className="text-white font-medium">Mumbai Studio Vault</strong>
-                    </div>
-                  </div>
-
-                  <div className="pt-2 flex items-center justify-end gap-3">
-                    <button
-                      onClick={() => {
-                        setSelectedRetrospectiveArt(null)
-                        setShowOfferModal(true)
-                      }}
-                      className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#dfb76c] to-[#c9a96e] hover:from-[#f7d794] hover:to-[#dfb76c] text-neutral-950 font-bold text-xs uppercase tracking-wider transition-all cursor-pointer flex items-center gap-1.5 shadow-md"
-                    >
-                      <MessageCircle size={14} />
-                      <span>Inquire About Acquisition</span>
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </motion.section>
-        </div>
-
-        {/* RIGHT: 5 Columns with Sticky Product Details Box on Desktop for Acts 1-5 */}
-        <div className="hidden lg:block lg:col-span-5 xl:col-span-5 lg:sticky lg:top-24 space-y-4 sm:space-y-6 w-full min-w-0 self-start">
-          {renderProductDossierBox('desktop-top')}
-        </div>
+      {/* ========================================================= */}
+      {/* ACT 5: RELATED MASTERWORKS MARQUEE STREAMS */}
+      {/* (DUAL AUTO-SCROLL & MANUAL SWIPE/DRAG ARTWORK CAROUSEL) */}
+      {/* ========================================================= */}
+      <div className="w-full relative space-y-6 sm:space-y-8">
+        <ArtistMarqueesSection />
       </div>
 
       {/* Curved Reveal Divider */}
@@ -2477,88 +2249,8 @@ export default function ProductDetail({ onReplayEntrance }) {
       </div>
 
       {/* ========================================================= */}
-      {/* ACT 6: RELATED MASTERWORKS MARQUEE STREAMS & COMPACT PRODUCT BAR */}
-      {/* (FULL-WIDTH PANORAMIC STREAM - NO RIGHT-SIDE PRODUCT BOX) */}
+      {/* ACT 6: WHITE-GLOVE LOGISTICS PIPELINE */}
       {/* ========================================================= */}
-      <div className="w-full relative space-y-6 sm:space-y-8">
-        <ArtistMarqueesSection />
-
-        {/* Compact Bottom Product Bar (Referencing Singulart Luxury Spec) */}
-        <motion.div 
-          initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 24, scale: 0.98 }}
-          whileInView={{ opacity: 1, y: 0, scale: 1 }}
-          viewport={{ once: false, margin: '0px 0px -5% 0px', amount: 'some' }}
-          transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-          className="sticky bottom-4 z-40 w-full max-w-5xl mx-auto px-2 sm:px-4 pointer-events-auto"
-        >
-          <div className="bg-[#121217]/95 backdrop-blur-2xl border border-[#dfb76c]/50 rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 md:p-5 shadow-[0_20px_60px_rgba(0,0,0,0.9)] ring-1 ring-[#dfb76c]/30">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-6">
-              {/* Artwork Info & Valuation */}
-              <div className="flex items-center justify-between sm:justify-start gap-4 sm:gap-6">
-                <div>
-                  <span className="text-[9.5px] sm:text-[11px] uppercase tracking-[0.2em] text-[#dfb76c] font-mono font-medium block">
-                    {selectedArtwork?.artist || 'Pradip Sarkar'}
-                  </span>
-                  <h4 className="font-serif text-base sm:text-xl font-normal text-white tracking-tight">
-                    {selectedArtwork?.title || 'Divine Tunes-11'}
-                  </h4>
-                </div>
-
-                {/* Pricing with Strikethrough & -20% badge */}
-                <div className="text-right sm:text-left">
-                  <div className="flex items-center gap-1.5 justify-end sm:justify-start">
-                    <span className="text-[10px] sm:text-xs text-neutral-500 line-through font-serif">
-                      {selectedArtwork?.originalPrice || '₹1,47,800'}
-                    </span>
-                    <span className="px-1.5 py-0.5 rounded bg-[#8a1c14] text-white text-[9px] font-bold font-mono tracking-wider">-20%</span>
-                  </div>
-                  <span className="font-serif text-base sm:text-xl font-bold text-[#dfb76c]">
-                    {selectedArtwork?.price || '₹1,18,300'}
-                  </span>
-                </div>
-              </div>
-
-              {/* Action Buttons */}
-              <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
-                <button
-                  onClick={handleAddToCart}
-                  className="flex-1 sm:flex-none px-5 sm:px-7 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl bg-gradient-to-r from-[#dfb76c] via-[#f7d794] to-[#dfb76c] hover:from-[#f7d794] hover:to-[#dfb76c] text-neutral-950 font-bold text-xs uppercase tracking-wider transition-all duration-300 shadow-[0_4px_20px_rgba(223,183,108,0.3)] hover:shadow-[0_8px_30px_rgba(223,183,108,0.5)] flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <span>Acquire Artwork</span>
-                  <ArrowRight size={14} />
-                </button>
-
-                <button
-                  onClick={() => setShowOfferModal(true)}
-                  className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl border border-[#dfb76c]/40 hover:border-[#dfb76c] bg-neutral-900/90 hover:bg-[#dfb76c]/15 text-[#dfb76c] flex items-center justify-center transition-all cursor-pointer shadow-sm shrink-0"
-                  title="Make an Offer or Inquire"
-                >
-                  <MessageCircle size={17} />
-                </button>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* ========================================================= */}
-      {/* ACT 7: WHITE-GLOVE LOGISTICS & ACT 8: REVIEWS */}
-      {/* ========================================================= */}
-      {/* Curved Reveal Divider */}
-      <div className="curved-section-divider -my-4 opacity-50 transform rotate-180">
-        <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
-          <path d="M0,0 C150,90 350,-40 500,60 C650,160 900,10 1200,40 L1200,120 L0,120 Z" className="shape-fill" />
-        </svg>
-      </div>
-
-      {/* ========================================================= */}
-      {/* REMAINING SECTIONS: ACT 7 (LOGISTICS) & ACT 8 (REVIEWS) */}
-      {/* (WITH RIGHT-SIDE STICKY PRODUCT DETAILS BOX) */}
-      {/* ========================================================= */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 lg:gap-10 xl:gap-12 items-start w-full">
-        {/* LEFT COLUMN: 7 Columns for Remaining Acts */}
-        <div className="order-1 lg:order-none lg:col-span-7 xl:col-span-7 space-y-12 sm:space-y-16 lg:space-y-24 w-full min-w-0">
-          {/* ACT 7: INTERACTIVE 4-STAGE WHITE-GLOVE LOGISTICS PIPELINE (KEPT DOWN) */}
           <motion.section 
             data-showcase-section
             data-showcase-title="White-Glove Logistics Journey"
@@ -2859,16 +2551,74 @@ export default function ProductDetail({ onReplayEntrance }) {
       </div>
 
       {/* ========================================================= */}
-      {/* ACT 8: VERIFIED COLLECTOR LETTERHEAD REVIEWS */}
+      {/* ACT 7: VERIFIED COLLECTOR LETTERHEAD REVIEWS */}
       {/* ========================================================= */}
       <CollectorReviewsSection />
-        </div>
 
-        {/* RIGHT: 5 Columns with Sticky Product Details Box on Desktop for Remaining Acts */}
-        <div className="hidden lg:block lg:col-span-5 xl:col-span-5 lg:sticky lg:top-24 space-y-4 sm:space-y-6 w-full min-w-0 self-start">
-          {renderProductDossierBox('desktop-bottom')}
-        </div>
-      </div>
+      {/* Floating Compact Product Bar with Artist Name, Price & Acquire Artwork */}
+      {/* Elegantly proportioned width, accompanying user through Artworks, Shipping, and Reviews */}
+      <AnimatePresence>
+        {showHorizontalProductBar && (
+          <motion.div 
+            initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={shouldReduceMotion ? { opacity: 0, y: 0 } : { opacity: 0, y: 20, scale: 0.98 }}
+            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed bottom-3.5 left-0 right-0 z-40 w-full max-w-2xl md:max-w-3xl mx-auto px-4 pointer-events-none"
+          >
+            <div className="pointer-events-auto bg-[#121217]/95 backdrop-blur-2xl border border-[#dfb76c]/60 rounded-full py-2.5 px-5 sm:px-6 shadow-[0_16px_45px_rgba(0,0,0,0.85)] ring-1 ring-[#dfb76c]/30">
+              <div className="flex items-center justify-between gap-4 sm:gap-6">
+                {/* Title, Artist & Price */}
+                <div className="min-w-0 flex items-center gap-3 sm:gap-4">
+                  <div className="min-w-0">
+                    <span className="text-[9px] uppercase tracking-wider text-[#dfb76c] font-mono block leading-none mb-0.5 truncate">
+                      {selectedArtwork?.artist || 'Pradip Sarkar'}
+                    </span>
+                    <h4 className="font-serif text-sm sm:text-base font-normal text-white truncate max-w-[160px] sm:max-w-[240px] leading-tight">
+                      {selectedArtwork?.title || 'Divine Tunes-11'}
+                    </h4>
+                  </div>
+
+                  <div className="h-7 w-[1px] bg-neutral-800 shrink-0" />
+
+                  {/* Pricing */}
+                  <div className="shrink-0">
+                    <div className="flex items-center gap-1.5 leading-none mb-0.5">
+                      <span className="text-[9.5px] sm:text-[10px] text-neutral-500 line-through font-serif">
+                        {selectedArtwork?.originalPrice || '₹1,47,800'}
+                      </span>
+                      <span className="px-1.5 py-0.2 rounded bg-[#8a1c14] text-white text-[8px] sm:text-[8.5px] font-bold font-mono">-20%</span>
+                    </div>
+                    <span className="font-serif text-base sm:text-lg font-bold text-[#dfb76c] leading-none">
+                      {selectedArtwork?.price || '₹1,18,300'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+                  <button
+                    onClick={handleAddToCart}
+                    className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-[#dfb76c] via-[#f7d794] to-[#dfb76c] hover:from-[#f7d794] hover:to-[#dfb76c] text-neutral-950 font-bold text-[11px] sm:text-xs uppercase tracking-wider transition-all duration-300 shadow-[0_4px_16px_rgba(223,183,108,0.3)] hover:shadow-[0_6px_22px_rgba(223,183,108,0.5)] flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                  >
+                    <span>Acquire Artwork</span>
+                    <ArrowRight size={13} />
+                  </button>
+
+                  <button
+                    onClick={() => setShowOfferModal(true)}
+                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-[#dfb76c]/40 hover:border-[#dfb76c] bg-neutral-900/90 hover:bg-[#dfb76c]/15 text-[#dfb76c] flex items-center justify-center transition-all cursor-pointer shadow-sm shrink-0"
+                    title="Make an Offer or Inquire"
+                  >
+                    <MessageCircle size={15} />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
 
       {/* ========================================================= */}
       {/* HIGH-RESOLUTION FULLSCREEN ZOOM MODAL */}

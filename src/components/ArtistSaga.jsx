@@ -287,10 +287,13 @@ export const ALL_CURATED_ARTWORKS = [
 ]
 
 // Luxury Gallery Artwork Card for Manually Controllable Carousel
-export function LuxuryGalleryCard({ artwork, verified = false }) {
+export function LuxuryGalleryCard({ artwork, verified = false, onCardClick }) {
   const navigate = useNavigate()
 
   const handleSelectArtwork = (e) => {
+    if (onCardClick && onCardClick(e) === false) {
+      return
+    }
     e.preventDefault()
     // Open product page with the clicked artwork
     navigate(`/Product?id=${artwork.id}`)
@@ -307,6 +310,7 @@ export function LuxuryGalleryCard({ artwork, verified = false }) {
     <div 
       role="button"
       tabIndex={0}
+      draggable={false}
       onClick={handleSelectArtwork}
       onKeyDown={handleKeyDown}
       aria-label={`View artwork ${artwork.title} by ${artwork.artist}`}
@@ -320,13 +324,14 @@ export function LuxuryGalleryCard({ artwork, verified = false }) {
       <div className="absolute top-2 right-2 text-[#dfb76c]/30 text-[10px] pointer-events-none z-10 opacity-0 group-hover:opacity-100 transition-opacity">⌝</div>
 
       {/* Image Frame */}
-      <div className="relative h-[235px] sm:h-[260px] w-full overflow-hidden bg-neutral-950">
+      <div className="relative h-[235px] sm:h-[260px] w-full overflow-hidden bg-neutral-950 pointer-events-none select-none">
         <img 
           src={artwork.image} 
           alt={artwork.title} 
+          draggable={false}
           className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-106 filter brightness-95 group-hover:brightness-105 select-none pointer-events-none" 
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#13131a] via-transparent to-black/30 opacity-75 group-hover:opacity-40 transition-opacity" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#13131a] via-transparent to-black/30 opacity-75 group-hover:opacity-40 transition-opacity pointer-events-none" />
 
         {/* Price Badge */}
         {artwork.price && (
@@ -336,7 +341,7 @@ export function LuxuryGalleryCard({ artwork, verified = false }) {
         )}
 
         {/* Hover View Prompt */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40 backdrop-blur-[2px]">
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/40 backdrop-blur-[2px] pointer-events-none">
           <span className="px-3.5 py-1.5 rounded-full bg-[#121217]/90 text-[#dfb76c] border border-[#dfb76c]/50 text-xs font-mono uppercase tracking-wider flex items-center gap-1.5 shadow-xl">
             <Eye size={13} />
             <span>Open Artwork</span>
@@ -345,7 +350,7 @@ export function LuxuryGalleryCard({ artwork, verified = false }) {
       </div>
 
       {/* Card Body */}
-      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between">
+      <div className="p-4 sm:p-5 flex-1 flex flex-col justify-between select-none">
         <div>
           <div className="flex items-center justify-between gap-2 mb-1">
             <span className="text-[10px] sm:text-[11px] font-mono uppercase tracking-widest text-[#dfb76c]">
@@ -377,36 +382,258 @@ export function LuxuryGalleryCard({ artwork, verified = false }) {
   )
 }
 
-// ── MANUALLY CONTROLLABLE TOUCH-FRIENDLY ARTWORK CAROUSEL ──
+// ── DUAL AUTOMATIC & MANUALLY CONTROLLABLE ARTWORK CAROUSEL ──
 function ArtworkManualCarousel({ title, badge, artworks, verified = false }) {
   const scrollRef = useRef(null)
-  const [canScrollLeft, setCanScrollLeft] = useState(false)
-  const [canScrollRight, setCanScrollRight] = useState(true)
+  const isInteractingRef = useRef(false)
+  const resumeTimeoutRef = useRef(null)
+  const animFrameRef = useRef(null)
+  const lastTimeRef = useRef(performance.now())
+  const scrollPosRef = useRef(0)
 
-  const checkScrollState = () => {
-    if (!scrollRef.current) return
-    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current
-    setCanScrollLeft(scrollLeft > 12)
-    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 12)
+  // Pointer drag state (Desktop mouse dragging)
+  const isPointerDownRef = useRef(false)
+  const isProgrammaticScrollRef = useRef(false)
+  const startXRef = useRef(0)
+  const startScrollLeftRef = useRef(0)
+  const hasDraggedRef = useRef(false)
+  const suppressClickRef = useRef(false)
+  const suppressTimeoutRef = useRef(null)
+
+  // Quadruple artworks array (4 sets) so continuous loop is 100% seamless in both directions
+  const loopedArtworks = React.useMemo(() => {
+    if (!artworks || artworks.length === 0) return []
+    return [
+      ...artworks.map((a, i) => ({ ...a, uniqueKey: `set0-${a.id}-${i}` })),
+      ...artworks.map((a, i) => ({ ...a, uniqueKey: `set1-${a.id}-${i}` })),
+      ...artworks.map((a, i) => ({ ...a, uniqueKey: `set2-${a.id}-${i}` })),
+      ...artworks.map((a, i) => ({ ...a, uniqueKey: `set3-${a.id}-${i}` })),
+    ]
+  }, [artworks])
+
+  const pauseAutoScroll = () => {
+    isInteractingRef.current = true
+    if (resumeTimeoutRef.current) {
+      clearTimeout(resumeTimeoutRef.current)
+      resumeTimeoutRef.current = null
+    }
   }
 
+  const scheduleResume = (delay = 1500) => {
+    if (resumeTimeoutRef.current) {
+      clearTimeout(resumeTimeoutRef.current)
+    }
+    resumeTimeoutRef.current = setTimeout(() => {
+      isInteractingRef.current = false
+      if (scrollRef.current) {
+        scrollPosRef.current = scrollRef.current.scrollLeft
+      }
+      lastTimeRef.current = performance.now()
+    }, delay)
+  }
+
+  // Seamless infinite wrap check
+  const checkWrap = () => {
+    const el = scrollRef.current
+    if (!el) return
+    const segment = el.scrollWidth / 4
+    if (segment <= 50) return
+
+    // If moved past set 2 into set 3, invisibly wrap back by 1 set
+    if (el.scrollLeft >= segment * 2.2) {
+      el.scrollLeft -= segment
+      scrollPosRef.current -= segment
+    } 
+    // If moved back before set 1 into set 0, invisibly wrap forward by 1 set
+    else if (el.scrollLeft <= segment * 0.8) {
+      el.scrollLeft += segment
+      scrollPosRef.current += segment
+    }
+  }
+
+  // Initial positioning: start in Set 1 (between 1 and 2)
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
-    checkScrollState()
-    el.addEventListener('scroll', checkScrollState, { passive: true })
-    window.addEventListener('resize', checkScrollState)
-    return () => {
-      el.removeEventListener('scroll', checkScrollState)
-      window.removeEventListener('resize', checkScrollState)
-    }
-  }, [artworks])
 
-  const handleScroll = (direction) => {
-    if (!scrollRef.current) return
-    const cardWidth = 300
-    const scrollDistance = direction === 'left' ? -cardWidth * 1.5 : cardWidth * 1.5
-    scrollRef.current.scrollBy({ left: scrollDistance, behavior: 'smooth' })
+    const initPos = () => {
+      const segment = el.scrollWidth / 4
+      if (segment > 100) {
+        if (el.scrollLeft < segment * 0.5 || el.scrollLeft > segment * 2.5) {
+          isProgrammaticScrollRef.current = true
+          el.scrollLeft = segment
+          scrollPosRef.current = segment
+        }
+      }
+    }
+
+    initPos()
+    const t = setTimeout(initPos, 150)
+    return () => clearTimeout(t)
+  }, [loopedArtworks])
+
+  // Smooth continuous auto-scroll loop (60fps requestAnimationFrame with subpixel float accumulator)
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+
+    lastTimeRef.current = performance.now()
+    const speed = 1.25 // Smooth continuous auto-scroll drift speed
+
+    const tick = (now) => {
+      const deltaMs = Math.min(now - lastTimeRef.current, 50)
+      lastTimeRef.current = now
+
+      if (el) {
+        if (!isInteractingRef.current && !isPointerDownRef.current) {
+          const step = speed * (deltaMs / 16.67)
+          scrollPosRef.current += step
+          isProgrammaticScrollRef.current = true
+          el.scrollLeft = scrollPosRef.current
+        }
+        checkWrap()
+      }
+
+      animFrameRef.current = requestAnimationFrame(tick)
+    }
+
+    animFrameRef.current = requestAnimationFrame(tick)
+
+    return () => {
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
+      if (resumeTimeoutRef.current) clearTimeout(resumeTimeoutRef.current)
+      if (suppressTimeoutRef.current) clearTimeout(suppressTimeoutRef.current)
+    }
+  }, [loopedArtworks])
+
+  // Native scroll listener (fires for mouse wheel, trackpad, touch momentum)
+  const handleScroll = () => {
+    // Ignore programmatic scroll events from continuous auto-scroll
+    if (isProgrammaticScrollRef.current) {
+      isProgrammaticScrollRef.current = false
+      return
+    }
+    if (isPointerDownRef.current) return
+    pauseAutoScroll()
+    if (scrollRef.current) {
+      scrollPosRef.current = scrollRef.current.scrollLeft
+    }
+    checkWrap()
+    scheduleResume(1500)
+  }
+
+  // Global window mouseup / mousemove listener during drag for unbreakable desktop dragging
+  useEffect(() => {
+    const handleGlobalMouseMove = (e) => {
+      if (!isPointerDownRef.current || !scrollRef.current) return
+      const delta = e.clientX - startXRef.current
+      if (Math.abs(delta) > 4) {
+        hasDraggedRef.current = true
+      }
+      const newLeft = startScrollLeftRef.current - delta
+      scrollRef.current.scrollLeft = newLeft
+      scrollPosRef.current = newLeft
+      checkWrap()
+    }
+
+    const handleGlobalMouseUp = () => {
+      if (isPointerDownRef.current) {
+        isPointerDownRef.current = false
+        if (hasDraggedRef.current) {
+          suppressClickRef.current = true
+          if (suppressTimeoutRef.current) clearTimeout(suppressTimeoutRef.current)
+          suppressTimeoutRef.current = setTimeout(() => {
+            suppressClickRef.current = false
+            hasDraggedRef.current = false
+          }, 250)
+        }
+        scheduleResume(2000)
+      }
+    }
+
+    window.addEventListener('mousemove', handleGlobalMouseMove)
+    window.addEventListener('mouseup', handleGlobalMouseUp)
+    return () => {
+      window.removeEventListener('mousemove', handleGlobalMouseMove)
+      window.removeEventListener('mouseup', handleGlobalMouseUp)
+    }
+  }, [])
+
+  // Mouse Dragging Handlers (Desktop)
+  const handleMouseDown = (e) => {
+    if (e.button !== 0) return
+    pauseAutoScroll()
+    isPointerDownRef.current = true
+    hasDraggedRef.current = false
+    startXRef.current = e.clientX
+    startScrollLeftRef.current = scrollRef.current ? scrollRef.current.scrollLeft : 0
+  }
+
+  // Touch Events (Mobile Swiping)
+  const handleTouchStart = (e) => {
+    pauseAutoScroll()
+    isPointerDownRef.current = true
+    hasDraggedRef.current = false
+    startXRef.current = e.touches[0].clientX
+    startScrollLeftRef.current = scrollRef.current ? scrollRef.current.scrollLeft : 0
+  }
+
+  const handleTouchMove = (e) => {
+    if (!isPointerDownRef.current || !scrollRef.current) return
+    const delta = e.touches[0].clientX - startXRef.current
+    if (Math.abs(delta) > 4) {
+      hasDraggedRef.current = true
+    }
+    const newLeft = startScrollLeftRef.current - delta
+    scrollRef.current.scrollLeft = newLeft
+    scrollPosRef.current = newLeft
+    checkWrap()
+  }
+
+  const handleTouchEnd = () => {
+    isPointerDownRef.current = false
+    if (scrollRef.current) {
+      scrollPosRef.current = scrollRef.current.scrollLeft
+    }
+    if (hasDraggedRef.current) {
+      suppressClickRef.current = true
+      if (suppressTimeoutRef.current) clearTimeout(suppressTimeoutRef.current)
+      suppressTimeoutRef.current = setTimeout(() => {
+        suppressClickRef.current = false
+        hasDraggedRef.current = false
+      }, 250)
+    }
+    scheduleResume(2000)
+  }
+
+  // Trackpad / Wheel scroll
+  const handleWheel = () => {
+    pauseAutoScroll()
+    if (scrollRef.current) {
+      scrollPosRef.current = scrollRef.current.scrollLeft
+    }
+    checkWrap()
+    scheduleResume(2000)
+  }
+
+  // Manual Chevron Button Controls
+  const handleChevronScroll = (direction) => {
+    const el = scrollRef.current
+    if (!el) return
+    pauseAutoScroll()
+    const cardWidth = 320
+    const scrollAmount = direction === 'left' ? -cardWidth * 1.3 : cardWidth * 1.3
+    el.scrollBy({ left: scrollAmount, behavior: 'smooth' })
+    scrollPosRef.current = el.scrollLeft + scrollAmount
+    scheduleResume(2500)
+  }
+
+  // Suppress card click navigation if user was dragging or swiping
+  const handleCardClick = () => {
+    if (hasDraggedRef.current || suppressClickRef.current) {
+      return false
+    }
+    return true
   }
 
   return (
@@ -427,45 +654,45 @@ function ArtworkManualCarousel({ title, badge, artworks, verified = false }) {
         <div className="flex items-center gap-2">
           <button
             type="button"
-            onClick={() => handleScroll('left')}
-            disabled={!canScrollLeft}
+            onClick={() => handleChevronScroll('left')}
             aria-label={`Scroll ${title} left`}
-            className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border flex items-center justify-center transition-all ${
-              canScrollLeft
-                ? 'border-[#dfb76c]/50 hover:border-[#dfb76c] bg-[#14141e] text-[#dfb76c] hover:bg-[#dfb76c]/15 cursor-pointer shadow-md'
-                : 'border-neutral-800 text-neutral-600 bg-neutral-900/40 cursor-not-allowed opacity-40'
-            }`}
+            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-[#dfb76c]/50 hover:border-[#dfb76c] bg-[#14141e] text-[#dfb76c] hover:bg-[#dfb76c]/15 flex items-center justify-center transition-all cursor-pointer shadow-md"
           >
             <ChevronLeft size={16} />
           </button>
           <button
             type="button"
-            onClick={() => handleScroll('right')}
-            disabled={!canScrollRight}
+            onClick={() => handleChevronScroll('right')}
             aria-label={`Scroll ${title} right`}
-            className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full border flex items-center justify-center transition-all ${
-              canScrollRight
-                ? 'border-[#dfb76c]/50 hover:border-[#dfb76c] bg-[#14141e] text-[#dfb76c] hover:bg-[#dfb76c]/15 cursor-pointer shadow-md'
-                : 'border-neutral-800 text-neutral-600 bg-neutral-900/40 cursor-not-allowed opacity-40'
-            }`}
+            className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border border-[#dfb76c]/50 hover:border-[#dfb76c] bg-[#14141e] text-[#dfb76c] hover:bg-[#dfb76c]/15 flex items-center justify-center transition-all cursor-pointer shadow-md"
           >
             <ChevronRight size={16} />
           </button>
         </div>
       </div>
 
-      {/* Fully Touch-Friendly, Free-Scrolling Carousel Container (No Auto-Fighting Animation) */}
-      <div className="relative bg-[#121217]/80 rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-neutral-800/80 backdrop-blur-md shadow-xl overflow-hidden">
+      {/* Dual Continuous & Interactive Carousel Track */}
+      <div className="relative bg-[#121217]/80 rounded-2xl sm:rounded-3xl p-3 sm:p-5 border border-neutral-800/80 backdrop-blur-md shadow-xl overflow-hidden select-none">
         <div 
-          ref={scrollRef} 
-          className="artwork-manual-carousel-track flex gap-4 sm:gap-6 overflow-x-auto scroll-smooth py-2 px-1 snap-x snap-mandatory touch-pan-x select-none"
+          ref={scrollRef}
+          onScroll={handleScroll}
+          onWheel={handleWheel}
+          onMouseDown={handleMouseDown}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          className="artwork-manual-carousel-track flex gap-4 sm:gap-6 overflow-x-auto py-2 px-1 touch-pan-x select-none cursor-grab active:cursor-grabbing"
         >
-          {artworks.map((item) => (
+          {loopedArtworks.map((item) => (
             <div 
-              key={item.id} 
-              className="snap-start shrink-0 w-[260px] xs:w-[280px] sm:w-[305px]"
+              key={item.uniqueKey} 
+              className="shrink-0 w-[260px] xs:w-[280px] sm:w-[305px] select-none"
             >
-              <LuxuryGalleryCard artwork={item} verified={verified || item.verified} />
+              <LuxuryGalleryCard 
+                artwork={item} 
+                verified={verified || item.verified} 
+                onCardClick={handleCardClick}
+              />
             </div>
           ))}
         </div>
@@ -498,7 +725,7 @@ export function ArtistMarqueesSection() {
     >
       {/* RELATED ARTWORKS: PRADIP SARKAR */}
       <ArtworkManualCarousel 
-        title="More Artworks by Pradip Sarkar"
+        title="Artworks by Pradip Sarkar"
         badge="Curated Selection"
         artworks={pradipArtworks}
         verified={true}
@@ -506,7 +733,7 @@ export function ArtistMarqueesSection() {
 
       {/* RELATED ARTWORKS: OTHER MASTERS */}
       <ArtworkManualCarousel 
-        title="Featured Artworks from Other Masters"
+        title="Artworks by Other Artists"
         badge="Gallery Recommendations"
         artworks={otherMastersArtworks}
         verified={false}

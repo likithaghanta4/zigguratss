@@ -11,6 +11,8 @@ import livingRoomImg from '../assets/rooms/living_room.jpg'
 import bedroomImg from '../assets/rooms/master_bedroom.jpg'
 import gallerySalonImg from '../assets/rooms/gallery_salon.jpg'
 import executiveLoungeImg from '../assets/rooms/executive_lounge.jpg'
+import collectorStudyImg from '../assets/rooms/collector_study.jpg'
+import diningPavilionImg from '../assets/rooms/dining_pavilion.jpg'
 
 // Authentic 6 Zigguratss Master Artwork Assets
 import screenshotImage from '../assets/ProductPage-images/Screenshot from 2026-05-08 14-57-58.png'
@@ -84,6 +86,38 @@ export const ROOM_PRESETS = [
       spotlightColor: 'rgba(255, 225, 175, 0.40)',
       wallColorTone: 'dark-walnut'
     }
+  },
+  {
+    id: 'collector-study',
+    name: "Collector's Library",
+    subtitle: 'Chevron Walnut & Architectural Bookcases',
+    bg: collectorStudyImg,
+    icon: '📚',
+    wall: {
+      left: 50.0,
+      top: 42.0,
+      scaleFactor: 1.0,
+      maxHeightPct: 32.0,
+      spotlightIntensity: 0.32,
+      spotlightColor: 'rgba(255, 235, 195, 0.36)',
+      wallColorTone: 'neutral-warm'
+    }
+  },
+  {
+    id: 'dining-pavilion',
+    name: 'Zen Dining Pavilion',
+    subtitle: 'Floor-to-Ceiling Garden View & Travertine',
+    bg: diningPavilionImg,
+    icon: '🍵',
+    wall: {
+      left: 70.0,
+      top: 41.0,
+      scaleFactor: 0.95,
+      maxHeightPct: 32.0,
+      spotlightIntensity: 0.30,
+      spotlightColor: 'rgba(255, 240, 215, 0.35)',
+      wallColorTone: 'neutral-cool'
+    }
   }
 ]
 
@@ -150,7 +184,7 @@ export const ARTWORK_PRESETS = [
     dimensions: '30 × 37.5 in (76.2 × 95.3 cm)',
     wallWidthPct: 17.5,
     maxHeightPct: 34.0,
-    defaultRoom: 'living-room',
+    defaultRoom: 'collector-study',
     tag: 'Studio Master Plate'
   },
   {
@@ -163,7 +197,7 @@ export const ARTWORK_PRESETS = [
     dimensions: '34 × 34 in (86.4 × 86.4 cm)',
     wallWidthPct: 20.0,
     maxHeightPct: 32.0,
-    defaultRoom: 'executive-lounge',
+    defaultRoom: 'dining-pavilion',
     tag: 'Archival Plate'
   }
 ]
