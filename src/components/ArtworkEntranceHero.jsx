@@ -28,6 +28,15 @@ export default function ArtworkEntranceHero({ onComplete, onSkip, isInline = fal
   const [phase, setPhase] = useState(isInline ? 2 : 0) // 0: Orbit & Bobbing, 1: Convergence, 2: Centerpiece & Revealed Constellation
   const [isPlaying, setIsPlaying] = useState(!isInline)
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 768 : false)
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   // 12 Authentic floating artwork satellite layers with continuous up-and-down oscillation
   const floatingArtworkCards = [
@@ -227,6 +236,16 @@ export default function ArtworkEntranceHero({ onComplete, onSkip, isInline = fal
     setMousePos({ x: x * 25, y: y * 25 })
   }
 
+  // Mobile Touch parallax interaction
+  const handleTouchMove = (e) => {
+    if (!containerRef.current || !e.touches || e.touches.length === 0) return
+    const touch = e.touches[0]
+    const rect = containerRef.current.getBoundingClientRect()
+    const x = (touch.clientX - rect.left) / rect.width - 0.5
+    const y = (touch.clientY - rect.top) / rect.height - 0.5
+    setMousePos({ x: x * 20, y: y * 20 })
+  }
+
   // Ticker text based on progress
   const getStatusText = () => {
     if (progress < 25) return 'INITIALIZING CURATORIAL VAULT...'
@@ -241,12 +260,13 @@ export default function ArtworkEntranceHero({ onComplete, onSkip, isInline = fal
     <motion.div
       ref={containerRef}
       onMouseMove={handleMouseMove}
+      onTouchMove={handleTouchMove}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0, scale: 1.05, transition: { duration: 0.45, ease: [0.16, 1, 0.3, 1] } }}
       className={
         isInline
-          ? "relative w-full min-h-[580px] sm:min-h-[720px] bg-gradient-to-b from-[#0a0a0f] via-[#0d0d17] to-[#07070b] border border-[#dfb76c]/40 rounded-2xl sm:rounded-3xl shadow-[0_24px_75px_rgba(0,0,0,0.95)] text-neutral-100 flex flex-col justify-between items-center select-none overflow-hidden p-3 xs:p-4 sm:p-6 md:p-8 ring-1 ring-[#dfb76c]/20"
+          ? "relative w-full min-h-[660px] xs:min-h-[700px] sm:min-h-[760px] bg-gradient-to-b from-[#0a0a0f] via-[#0d0d17] to-[#07070b] border border-[#dfb76c]/40 rounded-2xl sm:rounded-3xl shadow-[0_24px_75px_rgba(0,0,0,0.95)] text-neutral-100 flex flex-col justify-between items-center select-none overflow-hidden p-3 xs:p-4 sm:p-6 md:p-8 ring-1 ring-[#dfb76c]/20"
           : "fixed inset-0 z-[100] bg-[#060609] text-neutral-100 flex flex-col justify-between items-center select-none overflow-hidden"
       }
     >
@@ -338,24 +358,25 @@ export default function ArtworkEntranceHero({ onComplete, onSkip, isInline = fal
           const isCenterpieceMode = phase === 2
 
           // Base coordinates
-          let targetX = card.desk.x + mousePos.x * 0.4
-          let targetY = card.desk.y + mousePos.y * 0.4
-          let targetScale = card.desk.scale
-          let targetRotate = card.desk.rotate
+          const coords = isMobile ? card.mob : card.desk
+          let targetX = coords.x + mousePos.x * (isMobile ? 0.2 : 0.4)
+          let targetY = coords.y + mousePos.y * (isMobile ? 0.2 : 0.4)
+          let targetScale = coords.scale
+          let targetRotate = coords.rotate
           let targetOpacity = 0.88
 
           if (isConverging) {
-            targetX = card.desk.x * 0.32
-            targetY = card.desk.y * 0.32
-            targetScale = card.desk.scale * 0.8
-            targetRotate = card.desk.rotate * 0.3
+            targetX = coords.x * 0.32
+            targetY = coords.y * 0.32
+            targetScale = coords.scale * 0.8
+            targetRotate = coords.rotate * 0.3
             targetOpacity = 0.5
           } else if (isCenterpieceMode) {
             // Keep all satellite cards permanently revealed and orbiting the centerpiece
-            targetX = card.desk.x * 0.95 + mousePos.x * 0.35
-            targetY = card.desk.y * 0.95 + mousePos.y * 0.35
-            targetScale = card.desk.scale * 0.92
-            targetRotate = card.desk.rotate * 0.85
+            targetX = coords.x * 0.95 + mousePos.x * (isMobile ? 0.18 : 0.35)
+            targetY = coords.y * 0.95 + mousePos.y * (isMobile ? 0.18 : 0.35)
+            targetScale = coords.scale * 0.92
+            targetRotate = coords.rotate * 0.85
             targetOpacity = 0.88
           }
 
@@ -377,12 +398,12 @@ export default function ArtworkEntranceHero({ onComplete, onSkip, isInline = fal
                 ease: [0.16, 1, 0.3, 1],
                 delay: idx * 0.04
               }}
-              className="absolute hidden md:flex flex-col w-40 lg:w-48 rounded-2xl overflow-hidden bg-[#13131c] border border-neutral-700/80 hover:border-[#dfb76c] shadow-[0_18px_45px_rgba(0,0,0,0.85)] pointer-events-auto z-10 transition-colors cursor-pointer group"
+              className="absolute flex flex-col w-24 xs:w-28 sm:w-36 md:w-40 lg:w-48 rounded-xl sm:rounded-2xl overflow-hidden bg-[#13131c] border border-neutral-700/80 hover:border-[#dfb76c] shadow-[0_12px_32px_rgba(0,0,0,0.85)] pointer-events-auto z-10 transition-colors cursor-pointer group"
             >
               {/* Internal Organic Up-and-Down Floating Bob */}
               <motion.div
                 animate={{
-                  y: card.floatRange
+                  y: isMobile ? [card.floatRange[0] * 0.6, card.floatRange[1] * 0.6] : card.floatRange
                 }}
                 transition={{
                   duration: card.floatDuration,
@@ -393,15 +414,15 @@ export default function ArtworkEntranceHero({ onComplete, onSkip, isInline = fal
                 }}
                 className="w-full"
               >
-                <div className="h-24 lg:h-30 w-full overflow-hidden bg-black relative">
+                <div className="h-16 xs:h-20 sm:h-24 lg:h-30 w-full overflow-hidden bg-black relative">
                   <img src={card.img} alt={card.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                  <div className="absolute top-2 left-2 px-1.5 py-0.5 rounded bg-black/80 text-[#dfb76c] text-[8px] font-mono uppercase tracking-wider border border-neutral-700">
+                  <div className="absolute top-1 left-1 sm:top-2 sm:left-2 px-1 sm:px-1.5 py-0.5 rounded bg-black/80 text-[#dfb76c] text-[6.5px] xs:text-[7.5px] sm:text-[8px] font-mono uppercase tracking-wider border border-neutral-700">
                     {card.tag}
                   </div>
                 </div>
-                <div className="p-2 bg-[#0e0e16] border-t border-neutral-800">
-                  <h6 className="font-serif text-[10px] text-white truncate group-hover:text-[#dfb76c] transition-colors">{card.title}</h6>
-                  <span className="text-[8px] text-neutral-400">Authentic Angle</span>
+                <div className="p-1 xs:p-1.5 sm:p-2 bg-[#0e0e16] border-t border-neutral-800">
+                  <h6 className="font-serif text-[8.5px] xs:text-[9.5px] sm:text-[10px] text-white truncate group-hover:text-[#dfb76c] transition-colors">{card.title}</h6>
+                  <span className="text-[6.5px] xs:text-[7px] sm:text-[8px] text-neutral-400">Authentic Angle</span>
                 </div>
               </motion.div>
             </motion.div>
@@ -421,30 +442,20 @@ export default function ArtworkEntranceHero({ onComplete, onSkip, isInline = fal
           {/* Beveled Museum Lighting Aura */}
           <div className="absolute -inset-4 sm:-inset-6 rounded-3xl bg-gradient-to-tr from-[#dfb76c]/30 via-[#f7d794]/20 to-transparent blur-2xl opacity-70 animate-pulse pointer-events-none" />
 
-          {/* Master Framed Canvas */}
+          {/* Master Framed Canvas - Outer Card Box Removed */}
           <motion.div
             initial={{ scale: 0.85, opacity: 0, y: 25 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="relative rounded-2xl sm:rounded-3xl overflow-hidden bg-gradient-to-b from-[#181824] via-[#12121a] to-[#0c0c12] border-2 border-[#dfb76c]/70 shadow-[0_24px_70px_rgba(0,0,0,0.9)] p-3.5 sm:p-5"
+            className="relative flex flex-col items-center justify-center"
           >
-            {/* Top Curatorial Badge */}
-            <div className="flex items-center justify-between gap-2 mb-2.5 sm:mb-3">
-              <span className="text-[9px] sm:text-xs uppercase tracking-widest font-bold bg-[#dfb76c]/20 text-[#f7d794] border border-[#dfb76c]/50 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full shadow-md flex items-center gap-1">
-                <Sparkles size={11} /> Masterpiece Reveal
-              </span>
-              <span className="text-[9px] sm:text-xs font-mono text-neutral-400">
-                1 of 1 Archival
-              </span>
-            </div>
-
             {/* Master Painting Canvas */}
-            <div className="w-44 xs:w-56 sm:w-72 md:w-80 h-44 xs:h-56 sm:h-72 md:h-80 rounded-xl overflow-hidden bg-black relative flex items-center justify-center border border-neutral-700 shadow-2xl">
+            <div className="w-44 xs:w-52 sm:w-72 md:w-80 h-44 xs:h-52 sm:h-72 md:h-80 rounded-2xl overflow-hidden relative flex items-center justify-center shadow-[0_20px_50px_rgba(0,0,0,0.95)] border border-[#dfb76c]/50">
               {/* Subtle Floating Pulse on Main Artwork */}
               <motion.img
                 src={screenshotImage}
                 alt="Divine Tunes-11 by Pradip Sarkar"
-                className="w-full h-full object-contain filter drop-shadow-[0_16px_40px_rgba(0,0,0,0.9)]"
+                className="w-full h-full object-cover filter drop-shadow-[0_16px_40px_rgba(0,0,0,0.9)]"
                 animate={{
                   scale: phase === 2 ? [1, 1.03, 1] : [1, 1.015, 1],
                   y: [-3, 3, -3]
@@ -453,21 +464,21 @@ export default function ArtworkEntranceHero({ onComplete, onSkip, isInline = fal
               />
 
               {/* Hologram Stamp */}
-              <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded bg-black/80 border border-[#dfb76c]/40 text-[#dfb76c] text-[8px] sm:text-[9px] font-mono flex items-center gap-1">
+              <div className="absolute bottom-2 right-2 px-2 py-0.5 rounded-md bg-black/85 border border-[#dfb76c]/40 text-[#dfb76c] text-[8px] sm:text-[9px] font-mono flex items-center gap-1 backdrop-blur-md">
                 <CheckCircle2 size={10} />
                 <span>SIGNED BY ARTIST</span>
               </div>
             </div>
 
             {/* Title & Artist Signature */}
-            <div className="mt-2.5 sm:mt-3 text-center">
-              <h2 className="font-serif text-sm sm:text-xl font-normal text-white tracking-tight">
+            <div className="mt-2 sm:mt-3 text-center">
+              <h2 className="font-serif text-sm sm:text-xl font-normal text-white tracking-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.9)]">
                 Divine Tunes-11
               </h2>
-              <div className="flex items-center justify-center gap-1.5 text-[10px] sm:text-xs text-neutral-400 font-light mt-0.5">
+              <div className="flex items-center justify-center gap-1.5 text-[10px] sm:text-xs text-neutral-300 font-light mt-0.5 drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]">
                 <span>By</span>
                 <span className="text-[#dfb76c] font-medium">Pradip Sarkar</span>
-                <span className="text-neutral-600">•</span>
+                <span className="text-neutral-500">•</span>
                 <span>Acrylic on Canvas (32" × 30")</span>
               </div>
             </div>
@@ -475,37 +486,7 @@ export default function ArtworkEntranceHero({ onComplete, onSkip, isInline = fal
         </motion.div>
       </div>
 
-      {/* ── MOBILE RESPONSIVE COMPANION ARTWORKS (REVEALED DIRECTLY WITHOUT CLICKING) ── */}
-      <div className="w-full md:hidden z-30 pt-2 pb-1 px-1">
-        <div className="flex items-center justify-between mb-1.5 px-1">
-          <span className="text-[9px] xs:text-[10px] uppercase tracking-wider text-[#dfb76c] font-semibold flex items-center gap-1.5">
-            <Layers size={11} /> Revealed Satellite Archival Cards ({floatingArtworkCards.length})
-          </span>
-          <span className="text-[8px] text-neutral-400 font-mono">Swipe horizontally</span>
-        </div>
-        <div 
-          className="flex flex-row items-center gap-2 overflow-x-auto pb-1.5 px-0.5 snap-x snap-mandatory flex-nowrap w-full"
-          style={{ scrollbarWidth: 'none', WebkitOverflowScrolling: 'touch' }}
-        >
-          {floatingArtworkCards.map((card) => (
-            <div
-              key={`mob-card-${card.id}`}
-              className="shrink-0 flex-shrink-0 w-28 xs:w-32 rounded-xl overflow-hidden bg-[#13131c] border border-neutral-700/80 shadow-md snap-center"
-            >
-              <div className="h-18 xs:h-20 w-full overflow-hidden bg-black relative">
-                <img src={card.img} alt={card.title} className="w-full h-full object-cover pointer-events-none" />
-                <div className="absolute top-1 left-1 px-1 py-0.5 rounded bg-black/80 text-[#dfb76c] text-[6.5px] xs:text-[7px] font-mono uppercase tracking-wider border border-neutral-700">
-                  {card.tag}
-                </div>
-              </div>
-              <div className="p-1 xs:p-1.5 bg-[#0e0e16] border-t border-neutral-800">
-                <h6 className="font-serif text-[9px] text-white truncate">{card.title}</h6>
-                <span className="text-[7px] text-neutral-400">Archival View</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
+
 
       {/* ── BOTTOM TRAY: LIVE TELEMETRY & PROGRESS BAR ── */}
       <div className="w-full max-w-3xl mx-auto px-1 xs:px-2 sm:px-8 pb-2 sm:pb-6 z-30 space-y-1.5 sm:space-y-2 mt-2 sm:mt-0">

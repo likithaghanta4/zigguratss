@@ -1941,11 +1941,11 @@ export default function ProductDetail({ onReplayEntrance }) {
               </span>
             </div>
 
-            {/* 4 Specification / Milestone Boxes Grid */}
+            {/* 4 Specification / Milestone Boxes Grid - 2 per row like artwork details */}
             <div 
               onMouseEnter={() => setIsMilestoneHovered(true)}
               onMouseLeave={() => setIsMilestoneHovered(false)}
-              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4"
+              className="grid grid-cols-2 gap-2.5 sm:gap-3.5"
             >
               {artistMilestones.map((m, idx) => {
                 const MIcon = m.icon
@@ -1961,11 +1961,11 @@ export default function ProductDetail({ onReplayEntrance }) {
                     viewport={{ once: true, margin: '-20px' }}
                     transition={{ duration: 0.45, delay: idx * 0.06, ease: [0.16, 1, 0.3, 1] }}
                     animate={{
-                      scale: isActive ? 1.03 : 1.0,
-                      y: isActive ? -4 : 0,
+                      scale: isActive ? 1.02 : 1.0,
+                      y: isActive ? -3 : 0,
                     }}
-                    whileHover={shouldReduceMotion ? {} : { y: -3, transition: { duration: 0.2 } }}
-                    className={`p-4 sm:p-5 rounded-2xl border transition-all duration-300 cursor-pointer relative overflow-hidden flex flex-col justify-between gap-3 text-left group ${
+                    whileHover={shouldReduceMotion ? {} : { y: -2, transition: { duration: 0.2 } }}
+                    className={`p-2.5 xs:p-3 sm:p-4 rounded-xl sm:rounded-2xl border transition-all duration-300 cursor-pointer relative overflow-hidden flex flex-col justify-between gap-1.5 sm:gap-2.5 text-left group ${
                       isActive
                         ? 'bg-gradient-to-br from-[#222234] via-[#181824] to-[#101018] border-[#dfb76c] ring-2 ring-[#dfb76c]/50 shadow-[0_10px_32px_rgba(223,183,108,0.28)] z-10'
                         : 'bg-[#121217]/90 border-neutral-800 hover:border-[#dfb76c]/40 hover:bg-[#16161f] shadow-md'
@@ -1979,24 +1979,24 @@ export default function ProductDetail({ onReplayEntrance }) {
                     }`} />
 
                     {/* Header with Origin & Category Icon */}
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="flex items-center gap-1.5">
-                        <span className={`text-[10px] uppercase tracking-widest font-mono font-bold transition-colors ${
+                    <div className="flex items-center justify-between gap-1.5 sm:gap-2">
+                      <div className="flex items-center gap-1">
+                        <span className={`text-[8.5px] xs:text-[9.5px] sm:text-[10px] uppercase tracking-wider font-mono font-bold transition-colors ${
                           isActive ? 'text-[#f7d794]' : 'text-[#dfb76c]'
                         }`}>
                           {m.origin}
                         </span>
                       </div>
-                      <div className={`p-1.5 rounded-lg transition-colors ${
+                      <div className={`p-1 xs:p-1.5 rounded-lg transition-colors ${
                         isActive ? 'bg-[#dfb76c]/20 text-[#f7d794]' : 'bg-neutral-800/60 text-neutral-400 group-hover:text-[#dfb76c]'
                       }`}>
-                        <MIcon size={14} className="shrink-0" />
+                        <MIcon size={12} className="sm:w-3.5 sm:h-3.5 shrink-0" />
                       </div>
                     </div>
 
                     {/* Milestone Title */}
                     <div>
-                      <h4 className={`font-serif text-sm sm:text-base font-medium leading-snug transition-colors ${
+                      <h4 className={`font-serif text-xs xs:text-[13px] sm:text-base font-medium leading-snug transition-colors ${
                         isActive ? 'text-white font-semibold drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]' : 'text-neutral-200'
                       }`}>
                         {m.title}
@@ -2004,7 +2004,7 @@ export default function ProductDetail({ onReplayEntrance }) {
                     </div>
 
                     {/* Relevant Descriptive Content inside each box */}
-                    <p className={`text-[11px] font-light leading-relaxed transition-colors border-t border-neutral-800/80 pt-2.5 ${
+                    <p className={`text-[9.5px] xs:text-[10px] sm:text-[11px] font-light leading-relaxed transition-colors border-t border-neutral-800/80 pt-1.5 sm:pt-2 ${
                       isActive ? 'text-neutral-200' : 'text-neutral-400'
                     }`}>
                       {m.desc}
@@ -2564,53 +2564,52 @@ export default function ProductDetail({ onReplayEntrance }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={shouldReduceMotion ? { opacity: 0, y: 0 } : { opacity: 0, y: 20, scale: 0.98 }}
             transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed bottom-3.5 left-0 right-0 z-40 w-full max-w-2xl md:max-w-3xl mx-auto px-4 pointer-events-none"
+            className="fixed bottom-2.5 xs:bottom-3 sm:bottom-4 left-0 right-0 z-40 w-full max-w-xl md:max-w-3xl mx-auto px-2 xs:px-3 sm:px-4 pointer-events-none"
           >
-            <div className="pointer-events-auto bg-[#121217]/95 backdrop-blur-2xl border border-[#dfb76c]/60 rounded-full py-2.5 px-5 sm:px-6 shadow-[0_16px_45px_rgba(0,0,0,0.85)] ring-1 ring-[#dfb76c]/30">
-              <div className="flex items-center justify-between gap-4 sm:gap-6">
-                {/* Title, Artist & Price */}
-                <div className="min-w-0 flex items-center gap-3 sm:gap-4">
-                  <div className="min-w-0">
-                    <span className="text-[9px] uppercase tracking-wider text-[#dfb76c] font-mono block leading-none mb-0.5 truncate">
-                      {selectedArtwork?.artist || 'Pradip Sarkar'}
+            <div className="pointer-events-auto bg-[#121217]/95 backdrop-blur-2xl border border-[#dfb76c]/60 rounded-full py-2 sm:py-2.5 px-3 xs:px-4 sm:px-6 shadow-[0_16px_45px_rgba(0,0,0,0.85)] ring-1 ring-[#dfb76c]/30">
+              <div className="flex items-center justify-between gap-2 xs:gap-3 sm:gap-6 w-full">
+                {/* Artwork Title & Valuation */}
+                <div className="min-w-0 flex-1 flex flex-col justify-center">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="text-[9px] uppercase tracking-wider text-[#dfb76c] font-mono shrink-0 hidden sm:inline">
+                      {selectedArtwork?.artist || 'Pradip Sarkar'} •
                     </span>
-                    <h4 className="font-serif text-sm sm:text-base font-normal text-white truncate max-w-[160px] sm:max-w-[240px] leading-tight">
+                    <h4 className="font-serif text-[11px] xs:text-xs sm:text-sm md:text-base font-normal text-white truncate leading-tight">
                       {selectedArtwork?.title || 'Divine Tunes-11'}
                     </h4>
                   </div>
 
-                  <div className="h-7 w-[1px] bg-neutral-800 shrink-0" />
-
-                  {/* Pricing */}
-                  <div className="shrink-0">
-                    <div className="flex items-center gap-1.5 leading-none mb-0.5">
-                      <span className="text-[9.5px] sm:text-[10px] text-neutral-500 line-through font-serif">
-                        {selectedArtwork?.originalPrice || '₹1,47,800'}
-                      </span>
-                      <span className="px-1.5 py-0.2 rounded bg-[#8a1c14] text-white text-[8px] sm:text-[8.5px] font-bold font-mono">-20%</span>
-                    </div>
-                    <span className="font-serif text-base sm:text-lg font-bold text-[#dfb76c] leading-none">
+                  {/* Pricing Details */}
+                  <div className="flex items-center gap-1 xs:gap-1.5 leading-none mt-0.5">
+                    <span className="font-serif text-xs xs:text-sm sm:text-base md:text-lg font-bold text-[#dfb76c] shrink-0">
                       {selectedArtwork?.price || '₹1,18,300'}
+                    </span>
+                    <span className="text-[8px] xs:text-[9px] sm:text-[10px] text-neutral-500 line-through font-serif shrink-0">
+                      {selectedArtwork?.originalPrice || '₹1,47,800'}
+                    </span>
+                    <span className="px-1 py-0.2 rounded bg-[#8a1c14] text-white text-[7px] xs:text-[7.5px] sm:text-[8px] font-bold font-mono shrink-0">
+                      -20%
                     </span>
                   </div>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+                <div className="flex items-center gap-1.5 xs:gap-2 sm:gap-2.5 shrink-0">
                   <button
                     onClick={handleAddToCart}
-                    className="px-4 sm:px-6 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-[#dfb76c] via-[#f7d794] to-[#dfb76c] hover:from-[#f7d794] hover:to-[#dfb76c] text-neutral-950 font-bold text-[11px] sm:text-xs uppercase tracking-wider transition-all duration-300 shadow-[0_4px_16px_rgba(223,183,108,0.3)] hover:shadow-[0_6px_22px_rgba(223,183,108,0.5)] flex items-center gap-1.5 cursor-pointer whitespace-nowrap"
+                    className="px-3 xs:px-4 sm:px-6 py-2 sm:py-2.5 rounded-full bg-gradient-to-r from-[#dfb76c] via-[#f7d794] to-[#dfb76c] hover:from-[#f7d794] hover:to-[#dfb76c] text-neutral-950 font-bold text-[10px] xs:text-[11px] sm:text-xs uppercase tracking-wider transition-all duration-300 shadow-[0_4px_16px_rgba(223,183,108,0.3)] hover:shadow-[0_6px_22px_rgba(223,183,108,0.5)] flex items-center gap-1 sm:gap-1.5 cursor-pointer whitespace-nowrap active:scale-95"
                   >
                     <span>Acquire Artwork</span>
-                    <ArrowRight size={13} />
+                    <ArrowRight size={12} className="hidden xs:inline" />
                   </button>
 
                   <button
                     onClick={() => setShowOfferModal(true)}
-                    className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-[#dfb76c]/40 hover:border-[#dfb76c] bg-neutral-900/90 hover:bg-[#dfb76c]/15 text-[#dfb76c] flex items-center justify-center transition-all cursor-pointer shadow-sm shrink-0"
+                    className="w-7 h-7 xs:w-8 xs:h-8 sm:w-9 sm:h-9 rounded-full border border-[#dfb76c]/40 hover:border-[#dfb76c] bg-neutral-900/90 hover:bg-[#dfb76c]/15 text-[#dfb76c] flex items-center justify-center transition-all cursor-pointer shadow-sm shrink-0 active:scale-95"
                     title="Make an Offer or Inquire"
+                    aria-label="Make an Offer or Inquire"
                   >
-                    <MessageCircle size={15} />
+                    <MessageCircle size={13} className="xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4" />
                   </button>
                 </div>
               </div>
